@@ -1,0 +1,18 @@
+{
+    "__class_name": "DependencyComb",
+    "_cookiecutter_sveetch_python_version": "0.4.2",
+    "_output_dir": "/home/emencia/Projects/Apps",
+    "_repo_dir": "/home/emencia/Projects/Apps/Cookies-dev/Python",
+    "_template": "/home/emencia/Projects/Apps/Cookies-dev/Python",
+    "app_name": "dependency_comb",
+    "author_email": "sveetch@gmail.com",
+    "author_name": "David Thenon",
+    "author_username": "sveetch",
+    "include_cli": true,
+    "init_git_repository": true,
+    "package_name": "dependency-comb",
+    "project_name": "Dependency comb",
+    "project_short_description": "A tool to analyze requirements with Libraries.io API",
+    "pypi_username": "sveetch",
+    "version": "0.1.0"
+}
