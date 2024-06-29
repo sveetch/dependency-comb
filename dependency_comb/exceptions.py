@@ -18,3 +18,31 @@ class AppOperationError(DependencyCombBaseException):
     Sample exception to raise from your code.
     """
     pass
+
+
+class AnalyzerError(DependencyCombBaseException):
+    """
+    When parser encounter some erroneus content.
+    """
+    pass
+
+
+class AnalyzerAPIError(AnalyzerError):
+    """
+    When analyzer encounter an error from a request from API.
+
+    Attribute ``http_status`` may contains a the HTTP response status code if any.
+
+    Keyword Arguments:
+        http_status (integer): HTTP response status code.
+    """
+    def __init__(self, *args, **kwargs):
+        self.http_status = kwargs.pop("http_status", None)
+        super().__init__(*args, **kwargs)
+
+
+class RequirementParserError(DependencyCombBaseException):
+    """
+    When parser encounter invalid syntax on given content.
+    """
+    pass

@@ -3,10 +3,11 @@ Main entrance to commandline actions
 """
 import click
 
-from dependency_comb.logger import init_logger
+from ..utils.logger import init_logger
 
-from dependency_comb.cli.version import version_command
-from dependency_comb.cli.greet import greet_command
+from .version import version_command
+from .greet import greet_command
+from .requirements import requirements_command
 
 
 # Help alias on "-h" argument
@@ -59,3 +60,4 @@ def cli_frontend(ctx, verbose):
 # Attach commands methods to the main grouper
 cli_frontend.add_command(version_command, name="version")
 cli_frontend.add_command(greet_command, name="greet")
+cli_frontend.add_command(requirements_command, name="requirements")

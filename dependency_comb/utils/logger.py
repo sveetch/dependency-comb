@@ -2,6 +2,8 @@ import logging
 
 import colorlog
 
+from .. import __pkgname__
+
 
 def init_logger(name, level, printout=True):
     """
@@ -38,3 +40,14 @@ def init_logger(name, level, printout=True):
     root_logger.addHandler(handler)
 
     return root_logger
+
+
+class LoggerBase:
+    """
+    A basic class just to ship the required logger object.
+
+    This class should be at the last position in inheritance definition, since it must
+    be called first because next classes may require its ``self.log`` attribute.
+    """
+    def __init__(self, *args, **kwargs):
+        self.log = logging.getLogger(__pkgname__)

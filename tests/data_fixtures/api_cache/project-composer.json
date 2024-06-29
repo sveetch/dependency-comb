@@ -1,0 +1,154 @@
+{
+    "contributions_count": 1,
+    "dependent_repos_count": 1,
+    "dependents_count": 1,
+    "deprecation_reason": null,
+    "description": "A system to compose project parts from applications enabled in a manifest",
+    "forks": 0,
+    "homepage": "https://github.com/sveetch/project-composer",
+    "keywords": [
+        "Python"
+    ],
+    "language": "Python",
+    "latest_download_url": null,
+    "latest_release_number": "0.7.1",
+    "latest_release_published_at": "2023-08-19T02:23:27.000Z",
+    "latest_stable_release_number": "0.7.1",
+    "latest_stable_release_published_at": "2023-08-19T02:23:27.000Z",
+    "license_normalized": false,
+    "licenses": "MIT",
+    "name": "project-composer",
+    "normalized_licenses": [
+        "MIT"
+    ],
+    "package_manager_url": "https://pypi.org/project/project-composer/",
+    "platform": "Pypi",
+    "rank": 7,
+    "repository_license": "MIT",
+    "repository_status": null,
+    "repository_url": "https://github.com/sveetch/project-composer",
+    "stars": 1,
+    "status": null,
+    "versions": [
+        {
+            "number": "0.2.0",
+            "published_at": "2022-10-02T23:25:26.608Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.2.1",
+            "published_at": "2022-10-04T10:02:04.817Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.2.2",
+            "published_at": "2022-10-05T01:10:04.061Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.2.3",
+            "published_at": "2022-10-05T15:29:12.910Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.3.0",
+            "published_at": "2022-10-11T11:54:05.073Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.4.0",
+            "published_at": "2022-10-15T18:37:31.361Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.4.1",
+            "published_at": "2022-10-16T02:39:02.665Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.4.2",
+            "published_at": "2022-10-16T16:19:09.299Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.5.0",
+            "published_at": "2022-10-31T01:37:05.862Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.6.0",
+            "published_at": "2022-11-03T01:13:01.659Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.7.0",
+            "published_at": "2022-12-12T00:09:31.857Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        },
+        {
+            "number": "0.7.1",
+            "published_at": "2023-08-19T02:23:27.000Z",
+            "spdx_expression": "MIT",
+            "original_license": "MIT",
+            "researched_at": null,
+            "repository_sources": [
+                "Pypi"
+            ]
+        }
+    ]
+}

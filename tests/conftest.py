@@ -7,6 +7,8 @@ import pytest
 
 import dependency_comb
 
+from tests.utils import get_api_key
+
 
 class FixturesSettingsTestMixin(object):
     """
@@ -52,6 +54,17 @@ class FixturesSettingsTestMixin(object):
             FIXTURES=str(self.fixtures_path),
             VERSION=dependency_comb.__version__,
         )
+
+    def api_key(self):
+        """
+        Get TMDb API key retrieved from file ``librariesio-key.txt`` at this project
+        root.
+
+        Returns:
+            string: Either the API key found from file if it exists else return
+            None.
+        """
+        return get_api_key()
 
 
 @pytest.fixture(scope="function")

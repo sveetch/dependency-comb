@@ -28,6 +28,8 @@ coverage.xml
 # Temp files
 *~
 .~lock*
+librariesio-key.txt
+/samples_requirements/
 
 # Swap files
 *.sw[po]

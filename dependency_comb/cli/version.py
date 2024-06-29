@@ -1,6 +1,6 @@
 import click
 
-from dependency_comb import __version__
+from .. import __version__
 
 
 @click.command()
