@@ -2,6 +2,7 @@ import datetime
 import json
 
 import pytest
+from freezegun import freeze_time
 
 from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
@@ -12,6 +13,7 @@ from dependency_comb.package import PackageRequirement
 from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
 
+@freeze_time("2024-01-15 10:00:00")
 def test_build_package_informations_with_requirement(settings):
     """
     Method should return computed informations for given package name and version
@@ -53,6 +55,7 @@ def test_build_package_informations_with_requirement(settings):
     }
 
 
+@freeze_time("2024-01-15 10:00:00")
 def test_build_package_informations_without_requirement(settings):
     """
     Method should return computed informations for given package name without any
@@ -84,6 +87,7 @@ def test_build_package_informations_without_requirement(settings):
     }
 
 
+@freeze_time("2024-01-15 10:00:00")
 def test_build_package_informations_with_exceed_requirement(settings):
     """
     If specifiers resolve to version higher than releases available on Pypi, no
