@@ -11,7 +11,7 @@
 Dependency comb
 ===============
 
-A tool to analyze requirements with `Libraries.io`_ API.
+A tool to analyze requirements lateness with `Libraries.io`_ API.
 
 The plan is to have a tool to read project requirements and check their informations
 from `Libraries.io`_ API and build a report about packages activities. The report will

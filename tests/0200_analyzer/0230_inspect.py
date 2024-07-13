@@ -8,7 +8,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
 # from tests.utils import API_FILEKEY_FILENAME, get_api_key
 
 
-@pytest.mark.parametrize("source, strict, expected, environment", [
+@pytest.mark.parametrize("source, strict, environment, expected", [
     (
         (
             "diskette\n"
@@ -20,6 +20,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             "boussole ; python_version < \"2.7\"\n"
         ),
         False,
+        {},
         [
             ("diskette", "diskette", "analyzed"),
             ("-r dev.txt", None, "unsupported-argument"),
@@ -28,7 +29,6 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             ("foo>1,foo<=2", None, "invalid"),
             ("boussole ; python_version < \"2.7\"", "boussole", "analyzed"),
         ],
-        {}
     ),
     (
         (
@@ -41,13 +41,13 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             "boussole ; python_version < \"2.7\"\n"
         ),
         True,
+        {},
         [
             ("diskette", "diskette", "analyzed"),
             ("project-composer==0.7.0", "project-composer", "analyzed"),
             ("django>3.1,<=3.2", "django", "analyzed"),
             ("boussole ; python_version < \"2.7\"", "boussole", "analyzed"),
         ],
-        {}
     ),
     (
         (
@@ -60,6 +60,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             "boussole ; python_version < \"2.7\"\n"
         ),
         False,
+        {"python_version": "3.4"},
         [
             ("diskette", "diskette", "analyzed"),
             ("-r dev.txt", None, "unsupported-argument"),
@@ -68,7 +69,6 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             ("foo>1,foo<=2", None, "invalid"),
             ("boussole ; python_version < \"2.7\"", "boussole", "marker-reject"),
         ],
-        {"python_version": "3.4"}
     ),
     (
         (
@@ -81,15 +81,15 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             "boussole ; python_version < \"2.7\"\n"
         ),
         True,
+        {"python_version": "3.4"},
         [
             ("diskette", "diskette", "analyzed"),
             ("project-composer==0.7.0", "project-composer", "analyzed"),
             ("django>3.1,<=3.2", "django", "analyzed"),
         ],
-        {"python_version": "3.4"}
     ),
 ])
-def test_inspect(settings, source, strict, expected, environment):
+def test_inspect(settings, source, strict, environment, expected):
     """
     Analyzer should return an iterator of PackageRequirement object with proper status
     from given requirements and possible strict option and possible environment.

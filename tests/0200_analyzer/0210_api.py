@@ -27,8 +27,6 @@ def test_get_package_data_invalid_key(settings):
     cachedir = settings.fixtures_path / "api_cache"
     analyzer = DependenciesAnalyzer("dummy-key", api_pause=None)
 
-    # Currently the analyzer does not check for response status. It should do it
-    # instead of coercing any response to json that lead to missunderstood issue
     with pytest.raises(AnalyzerAPIError) as excinfo:
         analyzer.get_package_data("project-composer")
 

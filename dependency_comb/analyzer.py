@@ -14,15 +14,15 @@ from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
 from . import __pkgname__, __version__
 
-PACKAGE_DETAIL_ENDPOINT = (
-    "https://libraries.io/api/{plateform}/{name}?api_key={key}"
-)
-
 
 class DependenciesAnalyzer:
     """
     Analyzer is able to request libraries.io API to get informations for requirements.
     """
+    PACKAGE_DETAIL_ENDPOINT = (
+        "https://libraries.io/api/{plateform}/{name}?api_key={key}"
+    )
+
     def __init__(self, api_key, cachedir=None, api_pause=None, logger=None):
         self.api_key = api_key
         self.cachedir = cachedir
@@ -48,7 +48,7 @@ class DependenciesAnalyzer:
         Request package detail API endpoint for given package name.
         """
         time.sleep(self.api_pause)
-        endpoint_url = PACKAGE_DETAIL_ENDPOINT.format(
+        endpoint_url = self.PACKAGE_DETAIL_ENDPOINT.format(
             plateform="Pypi",
             name=name,
             key=self.api_key,
@@ -243,13 +243,15 @@ class DependenciesAnalyzer:
         Inspect given requirement to get their informations.
 
         Arguments:
-            requirements (string):
+            requirements (string or Path): Either a Path object for a file to open or
+                directly requirements content as a string.
 
         Keyword Arguments:
             environment (dict):
-            strict (boolean): If True only the valid requirements are returned. Default
-                is False, all requirements are returned and you need to check their
-                status yourself.
+            strict (boolean): If True only the valid requirements (see
+                ``dependency_comb.package.PackageRequirement.is_valid``) are returned.
+                Default is False, all requirements are returned and you need to check
+                their status yourself if needed.
 
         Returns:
             iterator: Iterator of PackageRequirement objects for given requirements.

@@ -58,7 +58,9 @@ class PackageRequirement:
             Pypi and the resolved version.
         resolved_version (string): Resolved version from specifiers in parsed
             source. Specifiers are used against collected release version
-            available on Pypi.
+            available on Pypi. This value will be null if no specifier can be found.
+            Internally a null value is assumed the requirement can use the latest
+            version and so there is no lateness to compute.
         specifier (packaging.requirements.SpecifierSet): Possible version specifiers
             parsed from source.
         url (string): Possible mirror URL parsed from source.

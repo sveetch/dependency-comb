@@ -6,14 +6,7 @@ from packaging.requirements import Requirement
 @pytest.mark.skip("Just R&D demonstration")
 def test_packaging_splitter():
     """
-    Packaging specifier is more robust but don't support NPM style (like used in
-    Poetry).
-
-    We will need to check for SpecifierSet capacity to find the right elligible
-    version(s) against a specifier and a list of released versions.
-
-    This so, the Analyzer will need to include usage of SpecifierSet.contains() to
-    find the highest released versions we got from the API.
+    How to parse a requirement to divide package name from package version
     """
     reqs = [
         "django",
@@ -38,10 +31,11 @@ def test_packaging_splitter():
 @pytest.mark.skip("Just R&D demonstration")
 def test_packaging_match():
     """
-    Check SpecifierSet.contains() rightness with matching versions.
+    Check 'SpecifierSet.contains()' rightness with matching versions.
     """
     releases = [
-        "1.11.2", "0.1", "2.0", "1.11", "1.11-pre.1", "5.1.1", "5.0.12", "5.2.0", "1", "2.0.1"
+        "1.11.2", "0.1", "2.0", "1.11", "1.11-pre.1", "5.1.1", "5.0.12", "5.2.0", "1",
+        "2.0.1",
     ]
 
     print()
@@ -63,6 +57,8 @@ def test_packaging_match():
         print(item)
         print("├── name:", requirement.name)
         print("├── specifiers:", requirement.specifier)
-        print("└── matching:", list(requirement.specifier.filter(releases, prereleases=False)))
+        print("└── matching:", list(requirement.specifier.filter(
+            releases, prereleases=False
+        )))
 
     assert 1 == 42
