@@ -16,7 +16,7 @@ class PackageRequirement:
 
     Keyword Arguments:
         environment (dict): Optionnal dictionnary of environment variables to use
-            with possible marker resolution.
+            with possible specifier marker resolution.
 
     Attributes:
         source (string): Given requirement source.

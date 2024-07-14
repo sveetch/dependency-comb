@@ -83,6 +83,25 @@ from ..utils.logger import NoOperationLogger
         "override the API rate limit or you may be blocked."
     ),
 )
+@click.option(
+    "--env",
+    type=click.Path(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        path_type=Path,
+        resolve_path=True,
+    ),
+    default=None,
+    required=False,
+    metavar="FILEPATH",
+    help=(
+        "A JSON file for some environment variables to give to analyzer. This will be "
+        "used to resolve specifier markers. If analyzer does not receive any "
+        "environment variable all specifier markers are ignored (so its requirement "
+        "is always considered valid)."
+    ),
+)
 @click.pass_context
 def analyze_command(*args, **parameters):
     """
@@ -104,6 +123,7 @@ def analyze_command(*args, **parameters):
     filekey = parameters["filekey"]
     cachedir = parameters["cachedir"]
     destination = parameters["destination"]
+    environment = json.loads(parameters["env"].read_text()) if parameters["env"] else {}
     indent = parameters["indent"] or None
     api_pause = parameters["pause"] or None
 
@@ -140,7 +160,7 @@ def analyze_command(*args, **parameters):
             api_pause=api_pause,
             logger=logger,
         )
-        packages = analyzer.inspect(source, environment={}, strict=False)
+        packages = analyzer.inspect(source, environment=environment, strict=False)
         payload = [pkg.data() for pkg in packages]
     except DependencyCombError as e:
         logger.critical(e)

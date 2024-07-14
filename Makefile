@@ -130,7 +130,7 @@ test:
 	@echo ""
 	@printf "$(FORMATBLUE)$(FORMATBOLD)---> Tests <---$(FORMATRESET)\n"
 	@echo ""
-	$(PYTEST_BIN) --tb=long tests/
+	$(PYTEST_BIN) tests/
 .PHONY: test
 
 test-no-api: export COMB_TEST_API_ENABLED := false
@@ -138,7 +138,7 @@ test-no-api:
 	@echo ""
 	@printf "$(FORMATBLUE)$(FORMATBOLD)---> Tests (without API request) <---$(FORMATRESET)\n"
 	@echo ""
-	$(PYTEST_BIN) --tb=long tests/
+	$(PYTEST_BIN) tests/
 .PHONY: test-no-api
 
 freeze-dependencies:
