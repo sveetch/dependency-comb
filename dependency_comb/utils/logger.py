@@ -2,6 +2,7 @@ import logging
 
 import colorlog
 
+from ..exceptions import DependencyCombError
 from .. import __pkgname__
 
 
@@ -40,6 +41,30 @@ def init_logger(name, level, printout=True):
     root_logger.addHandler(handler)
 
     return root_logger
+
+
+class NoOperationLogger:
+    """
+    A fake logger which don't do anything, given messages to logging method just fall
+    into void except for ``critical`` which raise the ``DependencyCombError`` exception.
+    """
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def debug(self, msg):
+        pass
+
+    def info(self, msg):
+        pass
+
+    def warning(self, msg):
+        pass
+
+    def error(self, msg):
+        pass
+
+    def critical(self, msg):
+        raise DependencyCombError(msg)
 
 
 class LoggerBase:

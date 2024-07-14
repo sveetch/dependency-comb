@@ -50,6 +50,7 @@ help:
 	@echo "  flake                      -- to launch Flake8 checking"
 	@echo "  quality                    -- to launch run quality tasks and checks"
 	@echo "  test                       -- to launch base test suite using Pytest"
+	@echo "  test-no-api                -- to launch base test suite using Pytest without API filekey"
 	@echo "  tox                        -- to launch tests for every Tox environments"
 	@echo
 	@echo "  Release"
@@ -128,8 +129,17 @@ test:
 	@echo ""
 	@printf "$(FORMATBLUE)$(FORMATBOLD)---> Tests <---$(FORMATRESET)\n"
 	@echo ""
-	$(PYTEST_BIN) -vv tests/
+	$(PYTEST_BIN) --tb=long tests/
 .PHONY: test
+
+test-no-api:
+	@echo ""
+	@printf "$(FORMATBLUE)$(FORMATBOLD)---> Tests (without API request) <---$(FORMATRESET)\n"
+	@echo ""
+	mv librariesio-key.txt _librariesio-key.txt
+	$(PYTEST_BIN) --tb=long tests/
+	mv _librariesio-key.txt librariesio-key.txt
+.PHONY: test-no-api
 
 freeze-dependencies:
 	@echo ""

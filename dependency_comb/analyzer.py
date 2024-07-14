@@ -12,6 +12,7 @@ from packaging.version import Version
 
 from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
+from .utils.logger import NoOperationLogger
 from . import __pkgname__, __version__
 
 
@@ -26,7 +27,7 @@ class DependenciesAnalyzer:
     def __init__(self, api_key, cachedir=None, api_pause=None, logger=None):
         self.api_key = api_key
         self.cachedir = cachedir
-        self.logger = logger
+        self.logger = logger or NoOperationLogger()
         self.now_date = datetime.datetime.now()
         # Time in seconds to pause before an API request (to embrace limit of 60
         # requests max per minute)
@@ -55,12 +56,13 @@ class DependenciesAnalyzer:
         )
         response = requests.get(endpoint_url, headers=self.request_headers())
 
+        # Manage custom error message for some well known errors
         if response.status_code == 403:
             raise AnalyzerAPIError(
                 "API responded a 403 error, your API key is probably invalid.",
                 http_status=403
             )
-        if response.status_code == 404:
+        elif response.status_code == 404:
             raise AnalyzerAPIError(
                 "API responded a 404 error, package name is probably invalid.",
                 http_status=404
@@ -71,6 +73,7 @@ class DependenciesAnalyzer:
                 http_status=429
             )
 
+        # In case we an error status that is not taken in charge before
         response.raise_for_status()
 
         return response
@@ -79,7 +82,9 @@ class DependenciesAnalyzer:
         """
         Get package detail either from API or from cache if any.
         """
-        print("🐛 Package:", name)
+        self.logger.info("Processing package: {name}".format(
+            name=name or "Unknow"
+        ))
 
         if not name:
             raise AnalyzerError("Package without name can not be requested.")
@@ -91,18 +96,22 @@ class DependenciesAnalyzer:
 
         # Use cache if exists without any condition
         if cache_file and cache_file.exists():
-            print("  - Loading data from cache")
+            self.logger.debug("Loading data from cache")
             output = json.loads(cache_file.read_text())
         else:
             # Get payload from API
             response = self.endpoint_package_info(name)
 
-            print("  [{}]".format(response.status_code), "GET", response.url)
+            # Debug API url without API key
+            self.logger.debug("[{status}] API response from {url}".format(
+                status=response.status_code,
+                url=response.url.split("?")[0],
+            ))
             output = response.json()
 
             # Build cache if cache is enabled
             if self.cachedir:
-                print("  - Writing cache:", str(cache_file))
+                self.logger.debug("Writing cache: {}".format(cache_file))
                 cache_file.write_text(json.dumps(output, indent=4))
 
         return output

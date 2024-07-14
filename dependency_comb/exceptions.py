@@ -13,21 +13,21 @@ class DependencyCombBaseException(Exception):
     pass
 
 
-class AppOperationError(DependencyCombBaseException):
+class DependencyCombError(DependencyCombBaseException):
     """
-    Sample exception to raise from your code.
+    Basic global error exception.
     """
     pass
 
 
-class AnalyzerError(DependencyCombBaseException):
+class AnalyzerError(DependencyCombError):
     """
     When parser encounter some erroneus content.
     """
     pass
 
 
-class AnalyzerAPIError(AnalyzerError):
+class AnalyzerAPIError(DependencyCombError):
     """
     When analyzer encounter an error from a request from API.
 
@@ -41,7 +41,7 @@ class AnalyzerAPIError(AnalyzerError):
         super().__init__(*args, **kwargs)
 
 
-class RequirementParserError(DependencyCombBaseException):
+class RequirementParserError(DependencyCombError):
     """
     When parser encounter invalid syntax on given content.
     """

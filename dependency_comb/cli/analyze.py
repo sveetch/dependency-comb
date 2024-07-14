@@ -6,7 +6,9 @@ import click
 
 from .. import __pkgname__
 from ..analyzer import DependenciesAnalyzer
+from ..exceptions import DependencyCombError
 from ..utils.jsons import ExtendedJsonEncoder
+from ..utils.logger import NoOperationLogger
 
 
 @click.command()
@@ -93,6 +95,10 @@ def analyze_command(*args, **parameters):
     destination = parameters["destination"]
     indent = parameters["indent"] or None
 
+    # Disable logger when writing results to standard output
+    if not destination:
+        logger = NoOperationLogger()
+
     # Find the requirement basepath
     if parameters["source"].name == "<stdin>":
         # Since stdin cannot have a basepath like a file we assume the current working
@@ -102,7 +108,6 @@ def analyze_command(*args, **parameters):
         # Resolve basepath from file parent directory
         requirement_basepath = Path(parameters["source"].name).parent.resolve()
 
-    logger.debug("Requirements file: {}".format(source))
     logger.debug("API file key: {}".format(filekey))
     logger.debug("Cache directory: {}".format(cachedir))
 
@@ -114,9 +119,13 @@ def analyze_command(*args, **parameters):
         cachedir.mkdir()
 
     # Analyze requirements
-    analyzer = DependenciesAnalyzer(api_key, cachedir=cachedir)
-    packages = analyzer.inspect(source, environment={}, strict=False)
-    payload = [pkg.data() for pkg in packages]
+    try:
+        analyzer = DependenciesAnalyzer(api_key, cachedir=cachedir, logger=logger)
+        packages = analyzer.inspect(source, environment={}, strict=False)
+        payload = [pkg.data() for pkg in packages]
+    except DependencyCombError as e:
+        logger.critical(e)
+        raise click.Abort()
 
     # Build output
     output = json.dumps(payload, indent=indent, cls=ExtendedJsonEncoder)
