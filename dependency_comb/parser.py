@@ -7,6 +7,8 @@ class RequirementParser:
     """
     Parse a requirements file content to resolve each requirement line as a
     ``PackageRequirement`` object.
+
+    Multiline directive is not supported.
     """
     def parse_requirements(self, content, environment=None):
         """

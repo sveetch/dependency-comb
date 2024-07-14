@@ -14,7 +14,7 @@ from .utils.logger import NoOperationLogger
 from . import __pkgname__, __version__
 
 
-class DependenciesAnalyzer:
+class DependenciesAnalyzer(RequirementParser):
     """
     Analyzer is able to request libraries.io API to get informations for requirements.
     """
@@ -265,9 +265,7 @@ class DependenciesAnalyzer:
         Returns:
             iterator: Iterator of PackageRequirement objects for given requirements.
         """
-        parser = RequirementParser()
-
-        for item in parser.parse_requirements(requirements, environment=environment):
+        for item in self.parse_requirements(requirements, environment=environment):
             pkginfos = self.build_package_informations(item)
             if not strict or (strict and pkginfos.is_valid):
                 yield pkginfos
