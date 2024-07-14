@@ -7,6 +7,7 @@
 .. _tox: http://tox.readthedocs.io
 .. _livereload: https://livereload.readthedocs.io
 .. _twine: https://twine.readthedocs.io
+.. _pyenv: https://github.com/pyenv/pyenv
 
 .. _development_intro:
 
@@ -46,7 +47,7 @@ ones.
 
 .. Hint::
    If your system does not have the right Python version as the default one, you should
-   learn to use something like `pyenv <https://github.com/pyenv/pyenv>`_.
+   learn to use something like `pyenv`_.
 
 On Linux distribution
     You will install them from your common package manager like ``apt`` for Debian
@@ -80,12 +81,24 @@ to start them on your current development install: ::
 
     make test
 
+A file ``librariesio-key.txt`` containing a valid Libraries.io API key is required to
+run the few tests that are requesting API.
+
+If you have the valid API key file but are running tests often without any changes
+around the API request method from analyzer you can also skip them using the specific
+tasks: ::
+
+    make test-no-api
 
 Tox
 ***
 
 To ease development against multiple Python versions a tox configuration has
 been added. You are strongly encouraged to use it to test your pull requests.
+
+Before to be able to run Tox suite you will need first to install all supported Python
+versions from the Tox configuration from ``setup.cfg``, again we recommend you to use
+`pyenv`_.
 
 Just execute Tox: ::
 

@@ -72,6 +72,17 @@ from ..utils.logger import NoOperationLogger
         "Indentation level for JSON output. Default to 4 spaces."
     ),
 )
+@click.option(
+    "--pause",
+    type=click.INT,
+    default=1,
+    help=(
+        "The time in second to pause before an API requests. Default to 1 second "
+        "that should be enough to follow the Libraries.io rate limit for a free "
+        "account. *DO NOT* set it to zero if you don't own an API key suitable to "
+        "override the API rate limit or you may be blocked."
+    ),
+)
 @click.pass_context
 def analyze_command(*args, **parameters):
     """
@@ -94,6 +105,7 @@ def analyze_command(*args, **parameters):
     cachedir = parameters["cachedir"]
     destination = parameters["destination"]
     indent = parameters["indent"] or None
+    api_pause = parameters["pause"] or None
 
     # Disable logger when writing results to standard output
     if not destination:
@@ -122,7 +134,12 @@ def analyze_command(*args, **parameters):
 
     # Analyze requirements
     try:
-        analyzer = DependenciesAnalyzer(api_key, cachedir=cachedir, logger=logger)
+        analyzer = DependenciesAnalyzer(
+            api_key,
+            cachedir=cachedir,
+            api_pause=api_pause,
+            logger=logger,
+        )
         packages = analyzer.inspect(source, environment={}, strict=False)
         payload = [pkg.data() for pkg in packages]
     except DependencyCombError as e:

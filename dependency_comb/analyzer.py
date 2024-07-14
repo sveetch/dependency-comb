@@ -22,14 +22,14 @@ class DependenciesAnalyzer:
         "https://libraries.io/api/{plateform}/{name}?api_key={key}"
     )
 
-    def __init__(self, api_key, cachedir=None, api_pause=None, logger=None):
+    def __init__(self, api_key, cachedir=None, api_pause=1, logger=None):
         self.api_key = api_key
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
         self.now_date = datetime.datetime.now()
         # Time in seconds to pause before an API request (to embrace limit of 60
         # requests max per minute)
-        self.api_pause = api_pause or 1
+        self.api_pause = api_pause
 
     def request_headers(self):
         """
@@ -46,7 +46,9 @@ class DependenciesAnalyzer:
         """
         Request package detail API endpoint for given package name.
         """
-        time.sleep(self.api_pause)
+        if self.api_pause:
+            time.sleep(self.api_pause)
+
         endpoint_url = self.PACKAGE_DETAIL_ENDPOINT.format(
             plateform="Pypi",
             name=name,

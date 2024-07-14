@@ -7,7 +7,7 @@ import pytest
 
 import dependency_comb
 
-from tests.utils import get_api_key
+from tests.utils import get_api_key, skip_api_condition
 
 
 class FixturesSettingsTestMixin(object):
@@ -55,9 +55,10 @@ class FixturesSettingsTestMixin(object):
             VERSION=dependency_comb.__version__,
         )
 
+    @property
     def api_key(self):
         """
-        Get TMDb API key retrieved from file ``librariesio-key.txt`` at this project
+        Get API key retrieved from file ``librariesio-key.txt`` expected in project
         root.
 
         Returns:
@@ -65,6 +66,16 @@ class FixturesSettingsTestMixin(object):
             None.
         """
         return get_api_key()
+
+    @property
+    def is_api_request_enabled(self):
+        """
+        Return condition value for API request activation.
+
+        Returns:
+            boolean: True if API request is enabled else False.
+        """
+        return skip_api_condition
 
 
 @pytest.fixture(scope="function")

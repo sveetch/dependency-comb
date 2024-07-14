@@ -125,6 +125,7 @@ flake:
 	$(FLAKE_BIN) --statistics --show-source $(APPLICATION_NAME) tests
 .PHONY: flake
 
+test: export COMB_TEST_API_ENABLED := true
 test:
 	@echo ""
 	@printf "$(FORMATBLUE)$(FORMATBOLD)---> Tests <---$(FORMATRESET)\n"
@@ -132,13 +133,12 @@ test:
 	$(PYTEST_BIN) --tb=long tests/
 .PHONY: test
 
+test-no-api: export COMB_TEST_API_ENABLED := false
 test-no-api:
 	@echo ""
 	@printf "$(FORMATBLUE)$(FORMATBOLD)---> Tests (without API request) <---$(FORMATRESET)\n"
 	@echo ""
-	mv librariesio-key.txt _librariesio-key.txt
 	$(PYTEST_BIN) --tb=long tests/
-	mv _librariesio-key.txt librariesio-key.txt
 .PHONY: test-no-api
 
 freeze-dependencies:
