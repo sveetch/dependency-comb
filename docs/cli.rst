@@ -20,4 +20,4 @@ There is a base tool help for global arguments: ::
 
 And if you use ``-h`` after command name, you will get its specific help: ::
 
-    dependency_comb greet -h
+    dependency_comb analyze -h

@@ -24,18 +24,21 @@ class PackageRequirement:
         status (string): Computed requirement status from parsing process. Status can
             be:
 
-                * ``parsed``: requirement has been properly parsed as supported syntax;
-                * ``analyzed``: requirement has been parsed and has been processed by
-                  the Analyzer;
-                * ``unsupported-argument``: unsupported Pip argument, aborted parsing;
-                * ``unsupported-localpath``: unsupported local path to package, aborted
-                  parsing;
-                * ``unsupported-url``: unsupported package url, aborted parsing;
-                * ``invalid``: invalid requirement syntax (as from PEP425 and PEP440),
-                  aborted computation from parsed source;
-                * ``marker-reject``: Requirement did have marker that does not match
-                  required environment variables when given, aborted computation from
-                  parsed source;
+            * ``parsed``: requirement has been properly parsed as supported syntax;
+            * ``analyzed``: requirement has been parsed and has been processed by
+              the Analyzer;
+            * ``unsupported-argument``: unsupported Pip argument, aborted parsing;
+            * ``unsupported-localpath``: unsupported local path to package, aborted
+              parsing;
+            * ``unsupported-url``: unsupported package url, aborted parsing;
+            * ``invalid``: invalid requirement syntax (as from PEP425 and PEP440),
+              aborted computation from parsed source;
+            * ``marker-reject``: Requirement did have marker that does not match
+              required environment variables when given, aborted computation from
+              parsed source;
+
+            Commonly to get all valid requirements that have been properly analyzed,
+            you will just seek for items with status ``analyzed``.
 
         marker (packaging.markers.Marker): Marker object parsed from source.
         name (string): Package name parsed from source.

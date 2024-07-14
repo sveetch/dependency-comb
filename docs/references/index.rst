@@ -10,6 +10,8 @@ from code docstrings by Sphinx extension ``autodoc``.
 .. toctree::
    :maxdepth: 2
 
+   analyzer.rst
+   parser.rst
+   package.rst
    exceptions.rst
-   hello.rst
    logger.rst

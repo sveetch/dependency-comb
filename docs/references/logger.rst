@@ -3,6 +3,6 @@
 Logging
 =======
 
-.. automodule:: dependency_comb.logger
+.. automodule:: dependency_comb.utils.logger
     :members:
     :show-inheritance:
