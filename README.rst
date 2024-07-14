@@ -5,6 +5,8 @@
 .. _humanize: https://www.python.org/
 .. _packaging: https://www.python.org/
 .. _Libraries.io: https://www.python.org/
+.. _tabulate: https://pypi.org/project/tabulate/
+.. _colorlog: https://pypi.org/project/colorlog/
 
 
 ===============
@@ -28,9 +30,10 @@ Dependencies
 * `Python`_>=3.8;
 * `Click`_>=8.0;
 * `requests`_>=2.32.3;
-* `semantic-version`_>=2.10.0;
 * `humanize`_>=4.9.0;
 * `packaging`_>=24.0;
+* `tabulate`_>=0.9.0;
+* `colorlog`_>=6.8.2
 
 
 Links

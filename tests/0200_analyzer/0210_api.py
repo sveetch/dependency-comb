@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from dependency_comb.analyzer import DependenciesAnalyzer

@@ -8,6 +8,7 @@ import dependency_comb
 API_FILEKEY_FILENAME = "librariesio-key.txt"
 API_ENABLED_ENVVAR = "COMB_TEST_API_ENABLED"
 
+
 def get_api_key():
     """
     Get Libraries.io API key from expected file ``librariesio-key.txt`` at project root.
