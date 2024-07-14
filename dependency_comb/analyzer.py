@@ -3,11 +3,9 @@ import datetime
 import time
 
 from operator import itemgetter
-from pathlib import Path
 
 import humanize
 import requests
-from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
 
 from .exceptions import AnalyzerError, AnalyzerAPIError
@@ -219,8 +217,8 @@ class DependenciesAnalyzer:
             requirement.repository_url = data["repository_url"]
             requirement.highest_version = Version(data["latest_release_number"])
 
-            # Once numbers have been coerced they can be used to reorder versions properly
-            # on number
+            # Once numbers have been coerced they can be used to reorder versions
+            # properly on number
             versions = self.build_package_versions(data)
 
             if requirement.specifier:
@@ -268,6 +266,6 @@ class DependenciesAnalyzer:
         parser = RequirementParser()
 
         for item in parser.parse_requirements(requirements, environment=environment):
-            pkginfos =  self.build_package_informations(item)
+            pkginfos = self.build_package_informations(item)
             if not strict or (strict and pkginfos.is_valid):
                 yield pkginfos

@@ -1,16 +1,12 @@
 import datetime
-import json
 
-import pytest
 from freezegun import freeze_time
 
 from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
-from packaging.markers import Marker
 
 from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.package import PackageRequirement
-from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
 
 @freeze_time("2024-01-15 10:00:00")
@@ -128,13 +124,13 @@ def test_build_package_informations_status_check(settings):
     analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>0.4.0")
-    result = analyzer.build_package_informations(pkg)
+    analyzer.build_package_informations(pkg)
     assert pkg.name == "diskette"
     assert pkg.status == "analyzed"
     assert pkg.is_valid is True
 
     pkg = PackageRequirement("-r dev.txt")
-    result = analyzer.build_package_informations(pkg)
-    assert pkg.name == None
+    analyzer.build_package_informations(pkg)
+    assert pkg.name is None
     assert pkg.status == "unsupported-argument"
     assert pkg.is_valid is False

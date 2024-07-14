@@ -1,7 +1,3 @@
-import datetime
-
-import pytest
-
 from packaging.version import Version
 
 from dependency_comb.analyzer import DependenciesAnalyzer
@@ -18,7 +14,7 @@ def test_compute_lateness(settings):
 
     versions = [
         {"number": Version("1.0.0"), "published_at": "evening"},
-        {"number": Version("0.3.3"),"published_at": "noon"},
+        {"number": Version("0.3.3"), "published_at": "noon"},
         {"number": Version("0.0.1"), "published_at": "morning"},
         {"number": Version("0.3.5"), "published_at": "afternoon"},
         {"number": Version("0.3.4"), "published_at": "afternoon"},

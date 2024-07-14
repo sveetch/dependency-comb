@@ -1,11 +1,6 @@
-import datetime
-
 import pytest
 
-from packaging.version import Version
-
 from dependency_comb.analyzer import DependenciesAnalyzer
-# from tests.utils import API_FILEKEY_FILENAME, get_api_key
 
 
 @pytest.mark.parametrize("source, strict, environment, expected", [

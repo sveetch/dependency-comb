@@ -1,10 +1,4 @@
-import json
-import datetime
-
 import pytest
-
-from packaging.version import Version
-from requests.exceptions import HTTPError
 
 from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.exceptions import AnalyzerAPIError
@@ -24,7 +18,6 @@ def test_get_package_data_invalid_key(settings):
     """
     When given api key is invalid, the API respond with a Http 403 response
     """
-    cachedir = settings.fixtures_path / "api_cache"
     analyzer = DependenciesAnalyzer("dummy-key", api_pause=None)
 
     with pytest.raises(AnalyzerAPIError) as excinfo:
@@ -42,7 +35,6 @@ def test_get_package_data_invalid_name(settings):
     Request to API with a non existing package name should lead to an error from
     API
     """
-    cachedir = settings.fixtures_path / "api_cache"
     analyzer = DependenciesAnalyzer(settings.api_key(), api_pause=None)
 
     with pytest.raises(AnalyzerAPIError) as excinfo:
@@ -59,7 +51,6 @@ def test_get_package_data_from_api(settings):
     """
     Request to API for given package name should return proper JSON payload.
     """
-    cachedir = settings.fixtures_path / "api_cache"
     analyzer = DependenciesAnalyzer(settings.api_key(), api_pause=None)
 
     # Currently the analyzer does not check for response status. It should do it

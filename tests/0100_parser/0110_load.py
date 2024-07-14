@@ -1,9 +1,5 @@
 import json
 
-import pytest
-
-from packaging.requirements import Requirement
-
 from dependency_comb.parser import RequirementParser
 from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
@@ -48,7 +44,6 @@ def test_parse_markers(settings):
         "bar ; os_name == \"linux\"\n"
         "nope ; platform_system == \"plop\"\n"
     )
-    sample_parsed = settings.fixtures_path / "parsed_pip_requirements.json"
     parser = RequirementParser()
 
     results = parser.parse_requirements(sample_source, environment={

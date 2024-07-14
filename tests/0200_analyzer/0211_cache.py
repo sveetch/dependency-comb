@@ -1,7 +1,3 @@
-import pytest
-
-from packaging.version import Version
-
 from dependency_comb.analyzer import DependenciesAnalyzer
 
 

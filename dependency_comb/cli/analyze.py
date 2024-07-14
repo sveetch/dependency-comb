@@ -60,7 +60,7 @@ from ..utils.logger import NoOperationLogger
         file_okay=True, dir_okay=False, resolve_path=False, path_type=Path,
     ),
     help=(
-        "File path destination where to write serialized JSON manifest. If not given"
+        "File path destination where to write serialized JSON manifest. If not given "
         "the JSON will be sent to standard output."
     ),
 )
@@ -103,10 +103,12 @@ def analyze_command(*args, **parameters):
     if parameters["source"].name == "<stdin>":
         # Since stdin cannot have a basepath like a file we assume the current working
         # directory
-        requirement_basepath = Path.cwd()
+        requirement_basepath = Path.cwd()  # noqa: F841
     else:
         # Resolve basepath from file parent directory
-        requirement_basepath = Path(parameters["source"].name).parent.resolve()
+        requirement_basepath = Path(  # noqa: F841
+            parameters["source"].name
+        ).parent.resolve()
 
     logger.debug("API file key: {}".format(filekey))
     logger.debug("Cache directory: {}".format(cachedir))
