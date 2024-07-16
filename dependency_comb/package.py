@@ -19,7 +19,9 @@ class PackageRequirement:
             with possible specifier marker resolution.
 
     Attributes:
-        source (string): Given requirement source.
+        source (string): Given requirement source. The source string is expected to be
+            stripped from leading whitespaces else it could causes unexpected parsing
+            false positive.
         environment (dict): Given environment dictionnary
         status (string): Computed requirement status from parsing process. Status can
             be:

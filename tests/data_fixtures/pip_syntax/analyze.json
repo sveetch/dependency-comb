@@ -68,23 +68,6 @@
         "resolved_version": null
     },
     {
-        "extras": null,
-        "highest_published": null,
-        "highest_version": null,
-        "lateness": null,
-        "latest_activity": null,
-        "marker": null,
-        "name": null,
-        "parsed": null,
-        "pypi_url": null,
-        "repository_url": null,
-        "source": "-r requirements_foo.txt",
-        "specifier": null,
-        "status": "unsupported-argument",
-        "url": null,
-        "resolved_version": null
-    },
-    {
         "extras": [
             "security"
         ],

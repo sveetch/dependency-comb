@@ -56,7 +56,7 @@ def test_analyze_from_file(caplog, settings):
     from file path. We use cache to speed up tests.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    requirements_file = settings.fixtures_path / "pip_requirements.txt"
+    requirements_file = settings.fixtures_path / "pip_syntax/requirements.txt"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -70,13 +70,12 @@ def test_analyze_from_file(caplog, settings):
     assert result.exit_code == 0
 
     results = json.loads(result.output)
-    assert len(results) == 9
+    assert len(results) == 8
     assert [v["name"] for v in results] == [
         "django",
         "Pillow",
         "djangorestframework",
         "django-admin-shortcuts",
-        None,
         "requests",
         "urllib3",
         None,
@@ -120,11 +119,12 @@ def test_analyze_to_file(caplog, tmp_path, settings):
 
 def test_analyze_with_env(caplog, settings):
     """
-    Command should succeed to compute informations for requirement packages given
-    from file path. We use cache to speed up tests.
+    Command should pass the given JSON environment to analyzer to resolve specifier
+    markers and flag rejected requirement from marker which do not match with
+    environment.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    requirements_file = settings.fixtures_path / "pip_requirements.txt"
+    requirements_file = settings.fixtures_path / "pip_syntax/requirements.txt"
     environment_file = settings.fixtures_path / "env_requirements.json"
 
     runner = CliRunner()
@@ -145,13 +145,12 @@ def test_analyze_with_env(caplog, settings):
         for v in results
         if v["status"] != "marker-reject"
     ]
-    assert len(results) == 9
+    assert len(results) == 8
     assert names == [
         "django",
         "Pillow",
         "djangorestframework",
         "django-admin-shortcuts",
-        None,
         "urllib3",
         None,
         None,

@@ -1,0 +1,4 @@
+django>=1.11,<1.12
+
+-r dev.txt
+django-admin-shortcuts==1.2.6

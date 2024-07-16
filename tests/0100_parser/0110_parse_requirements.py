@@ -1,16 +1,21 @@
 import json
 
+import pytest
+
+from packaging.requirements import Requirement, SpecifierSet
+
+from dependency_comb.exceptions import RequirementParserError
 from dependency_comb.parser import RequirementParser
 from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
 
 def test_parse_content(settings):
     """
-    Parser should be able to parse requirements from a string then return requirements
-    objects.
+    Parser should be able to parse requirements with valid Pip syntax from a string
+    then return requirements objects.
     """
-    sample_source = settings.fixtures_path / "pip_requirements.txt"
-    sample_parsed = settings.fixtures_path / "parsed_pip_requirements.json"
+    sample_source = settings.fixtures_path / "pip_syntax/requirements.txt"
+    sample_parsed = settings.fixtures_path / "pip_syntax/analyze.json"
     parser = RequirementParser()
 
     # As a string
@@ -127,3 +132,108 @@ def test_parse_markers(settings):
             "resolved_version": None
         }
     ]
+
+
+def test_parse_inclusion_directive(settings):
+    """
+    Parser should replace inclusion directive with their resolved requirement
+    content if basepath is given.
+    """
+    sample_source = settings.fixtures_path / "nested_requirements/base.txt"
+    parser = RequirementParser()
+
+    results = parser.parse_requirements(
+        sample_source.read_text(),
+        basepath=settings.fixtures_path / "nested_requirements",
+    )
+
+    assert [pkg.data() for pkg in results] == [
+        {
+            "extras": set(),
+            "highest_published": None,
+            "highest_version": None,
+            "lateness": None,
+            "latest_activity": None,
+            "marker": None,
+            "name": "django",
+            "parsed": Requirement("django<1.12,>=1.11"),
+            "pypi_url": None,
+            "repository_url": None,
+            "resolved_version": None,
+            "source": "django>=1.11,<1.12",
+            "specifier": SpecifierSet("<1.12,>=1.11"),
+            "status": "parsed",
+            "url": None,
+        },
+        {
+            "extras": set(),
+            "highest_published": None,
+            "highest_version": None,
+            "lateness": None,
+            "latest_activity": None,
+            "marker": None,
+            "name": "diskette",
+            "parsed": Requirement("diskette"),
+            "pypi_url": None,
+            "repository_url": None,
+            "resolved_version": None,
+            "source": "diskette",
+            "specifier": SpecifierSet(""),
+            "status": "parsed",
+            "url": None,
+        },
+        {
+            "extras": set(),
+            "highest_published": None,
+            "highest_version": None,
+            "lateness": None,
+            "latest_activity": None,
+            "marker": None,
+            "name": "boussole",
+            "parsed": Requirement("boussole<=2.1.2"),
+            "pypi_url": None,
+            "repository_url": None,
+            "resolved_version": None,
+            "source": "boussole<=2.1.2",
+            "specifier": SpecifierSet("<=2.1.2"),
+            "status": "parsed",
+            "url": None,
+        },
+        {
+            "extras": set(),
+            "highest_published": None,
+            "highest_version": None,
+            "lateness": None,
+            "latest_activity": None,
+            "marker": None,
+            "name": "django-admin-shortcuts",
+            "parsed": Requirement("django-admin-shortcuts==1.2.6"),
+            "pypi_url": None,
+            "repository_url": None,
+            "resolved_version": None,
+            "source": "django-admin-shortcuts==1.2.6",
+            "specifier": SpecifierSet("==1.2.6"),
+            "status": "parsed",
+            "url": None,
+        },
+    ]
+
+
+def test_parse_inclusion_directive_notfound(settings):
+    """
+    A RequirementParserError exception should be raised with a proper message when
+    included source file is not found.
+    """
+    sample_source = settings.fixtures_path / "nested_requirements/base.txt"
+    included_source = settings.fixtures_path / "dev.txt"
+    parser = RequirementParser()
+
+    with pytest.raises(RequirementParserError) as excinfo:
+        parser.parse_requirements(
+            sample_source.read_text(),
+            basepath=settings.fixtures_path,
+        )
+
+    assert str(excinfo.value) == (
+        "Unable to find included source: {}".format(included_source)
+    )

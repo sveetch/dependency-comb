@@ -247,7 +247,7 @@ class DependenciesAnalyzer(RequirementParser):
 
         return requirement
 
-    def inspect(self, requirements, environment=None, strict=False):
+    def inspect(self, requirements, environment=None, strict=False, basepath=None):
         """
         Inspect given requirement to get their informations.
 
@@ -256,16 +256,25 @@ class DependenciesAnalyzer(RequirementParser):
                 directly requirements content as a string.
 
         Keyword Arguments:
-            environment (dict):
+            environment (dict): Optionnal dictionnary of environment variables to use
+            with possible specifier marker resolution.
             strict (boolean): If True only the valid requirements (see
                 ``dependency_comb.package.PackageRequirement.is_valid``) are returned.
                 Default is False, all requirements are returned and you need to check
                 their status yourself if needed.
+            basepath (Path): A directory path where to search for requirement
+                inclusions (directive ``-r foo.txt``) from requirements file.
 
         Returns:
             iterator: Iterator of PackageRequirement objects for given requirements.
         """
-        for item in self.parse_requirements(requirements, environment=environment):
+        parsed_requirements = self.parse_requirements(
+            requirements,
+            environment=environment,
+            basepath=basepath,
+        )
+
+        for item in parsed_requirements:
             pkginfos = self.build_package_informations(item)
             if not strict or (strict and pkginfos.is_valid):
                 yield pkginfos

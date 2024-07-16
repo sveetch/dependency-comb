@@ -113,9 +113,14 @@ def analyze_command(*args, **parameters):
     source
         Pip requirements file to parse and analyze.
         Instead of a file path you can also give a requirements file content from
-        standard input using '-'. For example:
+        standard input using '-'. For example using the Pip freeze output:
 
-            pip freeze | dependency_comb -
+            pip freeze | dependency_comb analyze -
+
+        Or to analyze an unique package:
+
+            echo "django==3.2.1" | dependency_comb analyze -
+
     """
     logger = logging.getLogger(__pkgname__)
 
@@ -135,10 +140,10 @@ def analyze_command(*args, **parameters):
     if parameters["source"].name == "<stdin>":
         # Since stdin cannot have a basepath like a file we assume the current working
         # directory
-        requirement_basepath = Path.cwd()  # noqa: F841
+        requirement_basepath = Path.cwd()
     else:
         # Resolve basepath from file parent directory
-        requirement_basepath = Path(  # noqa: F841
+        requirement_basepath = Path(
             parameters["source"].name
         ).parent.resolve()
 
@@ -160,7 +165,12 @@ def analyze_command(*args, **parameters):
             api_pause=api_pause,
             logger=logger,
         )
-        packages = analyzer.inspect(source, environment=environment, strict=False)
+        packages = analyzer.inspect(
+            source,
+            environment=environment,
+            strict=False,
+            basepath=requirement_basepath,
+        )
         payload = [pkg.data() for pkg in packages]
     except DependencyCombError as e:
         logger.critical(e)
