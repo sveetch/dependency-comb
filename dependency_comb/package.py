@@ -40,7 +40,8 @@ class PackageRequirement:
               parsed source;
 
             Commonly to get all valid requirements that have been properly analyzed,
-            you will just seek for items with status ``analyzed``.
+            you will just seek for items with status ``analyzed``. ``parsed`` status
+            should never occurs when analyzer has been involved.
 
         marker (packaging.markers.Marker): Marker object parsed from source.
         name (string): Package name parsed from source.

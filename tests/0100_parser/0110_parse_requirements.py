@@ -15,7 +15,7 @@ def test_parse_content(settings):
     then return requirements objects.
     """
     sample_source = settings.fixtures_path / "pip_syntax/requirements.txt"
-    sample_parsed = settings.fixtures_path / "pip_syntax/analyze.json"
+    sample_parsed = settings.fixtures_path / "pip_syntax/parsed.json"
     parser = RequirementParser()
 
     # As a string
