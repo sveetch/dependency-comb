@@ -100,3 +100,29 @@ def test_inspect(settings, source, strict, environment, expected):
     packages = analyzer.inspect(source, environment=environment, strict=strict)
 
     assert [(item.source, item.name, item.status) for item in packages] == expected
+
+
+@pytest.mark.skip("Just for test development")
+def test_build_inspection(settings):
+    """
+    A non test routine to rebuild 'pip_syntax/analyzed.json' fixture file content.
+    """
+    import json
+    from dependency_comb.utils.jsons import ExtendedJsonEncoder
+
+    cachedir = settings.fixtures_path / "api_cache"
+    sample_source = settings.fixtures_path / "pip_syntax/requirements.txt"
+    sample_analyzed = settings.fixtures_path / "pip_syntax/analyzed.json"
+
+    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+
+    packages = analyzer.inspect(sample_source)
+    sample_analyzed.write_text(json.dumps(
+        [item.data() for item in packages],
+        indent=4,
+        cls=ExtendedJsonEncoder),
+    )
+
+    print("Fixture wrote to:", sample_analyzed)
+
+    assert 1 == 42

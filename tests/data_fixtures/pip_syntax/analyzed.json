@@ -717,7 +717,6 @@
                 "2024-05-07T16:55:41"
             ]
         ],
-        "latest_activity": "a month",
         "marker": null,
         "name": "django",
         "parsed": "django<1.12,>=1.11",
@@ -727,7 +726,8 @@
         "specifier": "<1.12,>=1.11",
         "status": "analyzed",
         "url": null,
-        "resolved_version": "1.11.9"
+        "resolved_version": "1.11.9",
+        "resolved_published": "2018-01-02T02:12:15"
     },
     {
         "extras": [],
@@ -759,7 +759,6 @@
                 "2024-07-01T09:45:22"
             ]
         ],
-        "latest_activity": "15 days",
         "marker": null,
         "name": "Pillow",
         "parsed": "Pillow>=3.1.1",
@@ -769,14 +768,14 @@
         "specifier": ">=3.1.1",
         "status": "analyzed",
         "url": null,
-        "resolved_version": "9.5.0"
+        "resolved_version": "9.5.0",
+        "resolved_published": "2023-04-01T09:28:03"
     },
     {
         "extras": [],
         "highest_published": "2024-06-19T07:59:26",
         "highest_version": "3.15.2",
         "lateness": null,
-        "latest_activity": "27 days",
         "marker": null,
         "name": "djangorestframework",
         "parsed": "djangorestframework",
@@ -786,7 +785,8 @@
         "specifier": "",
         "status": "analyzed",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": [],
@@ -810,7 +810,6 @@
                 "2023-08-26T11:36:05"
             ]
         ],
-        "latest_activity": "10 months",
         "marker": null,
         "name": "django-admin-shortcuts",
         "parsed": "django-admin-shortcuts==1.2.6",
@@ -820,7 +819,8 @@
         "specifier": "==1.2.6",
         "status": "analyzed",
         "url": null,
-        "resolved_version": "1.2.6"
+        "resolved_version": "1.2.6",
+        "resolved_published": "2015-04-06T19:40:00"
     },
     {
         "extras": [
@@ -1054,7 +1054,6 @@
                 "2024-05-29T15:37:47"
             ]
         ],
-        "latest_activity": "a month",
         "marker": "python_version < \"2.7\"",
         "name": "requests",
         "parsed": "requests[security]==2.8.*,>=2.8.1; python_version < \"2.7\"",
@@ -1064,14 +1063,14 @@
         "specifier": "==2.8.*,>=2.8.1",
         "status": "analyzed",
         "url": null,
-        "resolved_version": "2.8.1"
+        "resolved_version": "2.8.1",
+        "resolved_published": "2015-10-13T12:56:41"
     },
     {
         "extras": [],
         "highest_published": "2024-06-17T13:40:07",
         "highest_version": "1.26.19",
         "lateness": null,
-        "latest_activity": "29 days",
         "marker": null,
         "name": "urllib3",
         "parsed": "urllib3@ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
@@ -1081,14 +1080,14 @@
         "specifier": "",
         "status": "analyzed",
         "url": "https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": null,
         "parsed": null,
@@ -1098,14 +1097,14 @@
         "specifier": null,
         "status": "unsupported-localpath",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": null,
         "parsed": null,
@@ -1115,6 +1114,7 @@
         "specifier": null,
         "status": "unsupported-url",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     }
 ]

@@ -15,7 +15,6 @@ def test_package_without_analyze():
         "highest_published": None,
         "highest_version": None,
         "lateness": None,
-        "latest_activity": None,
         "marker": None,
         "name": "diskette",
         "parsed": Requirement("diskette<0.3.4,>=0.1.0"),
@@ -25,5 +24,6 @@ def test_package_without_analyze():
         "specifier": SpecifierSet("<0.3.4,>=0.1.0"),
         "status": "parsed",
         "url": None,
-        "resolved_version": None
+        "resolved_version": None,
+        "resolved_published": None
     }

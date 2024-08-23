@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from pathlib import Path
@@ -5,7 +6,7 @@ from pathlib import Path
 
 class BaseReport:
     def __init__(self):
-        pass
+        self.now_date = datetime.datetime.now()
 
     def output(self, content):
         if isinstance(content, Path):

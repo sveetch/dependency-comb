@@ -22,7 +22,7 @@ def format_to_multline_str(content):
     )
 
 
-@freeze_time("2024-01-15 10:00:00")
+@freeze_time("2024-07-25 10:00:00")
 def test_rst_build_analyzed_table(settings):
     """
     Method should build a table for succeeded analyzed items with proper informations.
@@ -38,9 +38,9 @@ def test_rst_build_analyzed_table(settings):
     ]
     output = reporter.build_analyzed_table(items)
 
-    # print()
-    # print(format_to_multline_str(output))
-    # print()
+    print()
+    print(format_to_multline_str(output))
+    print()
 
     assert output == (
         """+----+------------------------+------------+------------+-----------------------+\n"""  # noqa: E501

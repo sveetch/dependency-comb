@@ -58,13 +58,12 @@ class PackageRequirement:
         lateness (list): List of tuples of version string and datetime for each
             released version that are higher than the resolved version. This means all
             available package versions that could upgraded to.
-        latest_activity (string): Humanized timedelta between last release version on
-            Pypi and the resolved version.
-        resolved_version (string): Resolved version from specifiers in parsed
+        resolved_version (string): Resolved release version from specifiers in parsed
             source. Specifiers are used against collected release version
             available on Pypi. This value will be null if no specifier can be found.
             Internally a null value is assumed the requirement can use the latest
             version and so there is no lateness to compute.
+        resolved_published (datetime.datetime): Date of the resolved release.
         specifier (packaging.requirements.SpecifierSet): Possible version specifiers
             parsed from source.
         url (string): Possible mirror URL parsed from source.
@@ -75,8 +74,9 @@ class PackageRequirement:
     VALID_STATUSES = ("parsed", "analyzed")
     PUBLISHED_ATTRIBUTES = [
         "extras", "highest_published", "highest_version", "lateness",
-        "latest_activity", "marker", "name", "parsed", "pypi_url", "repository_url",
+        "marker", "name", "parsed", "pypi_url", "repository_url",
         "source", "specifier", "status", "url", "resolved_version",
+        "resolved_published",
     ]
 
     def __init__(self, source, environment=None):
@@ -88,7 +88,6 @@ class PackageRequirement:
         self.highest_published = None
         self.highest_version = None
         self.lateness = None
-        self.latest_activity = None
         self.marker = None
         self.name = None
         self.parsed = None
@@ -98,6 +97,7 @@ class PackageRequirement:
         self.status = None
         self.url = None
         self.resolved_version = None
+        self.resolved_published = None
         self.parsing_error = None
 
         # Check if source syntax is supported

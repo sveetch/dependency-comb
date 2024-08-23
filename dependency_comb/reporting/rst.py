@@ -1,20 +1,52 @@
+import datetime
+
+import humanize
 from tabulate import tabulate
 
 from .base import BaseReport
 
 
 class RestructuredTextReport(BaseReport):
+    def get_required_release(self, item):
+        if not item["resolved_version"]:
+            return "Latest"
+
+        resolved_age = humanize.naturaldelta(
+            self.now_date - datetime.datetime.fromisoformat(
+                item["resolved_published"]
+            )
+        )
+        return item["resolved_version"], resolved_age.capitalize()
+
     def build_analyzed_table(self, items):
         rows = []
 
         for item in items:
             lateness = len(item["lateness"]) if item["lateness"] else "-"
-            resolved_version = item["resolved_version"] or "Latest"
+
+            resolved_version = self.get_required_release(item)
+            if isinstance(resolved_version, tuple):
+                resolved_version = "{} - {} ago".format(*resolved_version)
+
+            # Compute latest release label including humanized delta from current to
+            # latest date
+            latest_activity = humanize.naturaldelta(
+                self.now_date - datetime.datetime.fromisoformat(
+                    item["highest_published"]
+                )
+            )
             latest_release = "{} - {} ago".format(
                 item["highest_version"],
-                item["latest_activity"].capitalize(),
+                latest_activity.capitalize(),
             )
-            rows.append([item["name"], lateness, resolved_version, latest_release])
+
+            # Append column data to the requirement row
+            rows.append([
+                item["name"],
+                lateness,
+                resolved_version,
+                latest_release,
+            ])
 
         return str(tabulate(
             rows,
@@ -26,7 +58,7 @@ class RestructuredTextReport(BaseReport):
                 "Latest release",
             ],
             showindex="always",
-            colalign=("center", "left", "center", "center", "right"),
+            colalign=("center", "left", "center", "right", "right"),
         ))
 
     def output(self, content):
@@ -39,9 +71,9 @@ class RestructuredTextReport(BaseReport):
         print("ignored_items", len(ignored_items))
 
         analyzed_output = self.build_analyzed_table(analyzed_items)
-        print()
-        print(analyzed_output)
-        print()
+        #print()
+        #print(analyzed_output)
+        #print()
 
         # TODO: Make the ignored report that should be a different table structure
         # with different informations

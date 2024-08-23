@@ -4,7 +4,6 @@ import time
 
 from operator import itemgetter
 
-import humanize
 import requests
 from packaging.version import Version
 
@@ -26,7 +25,6 @@ class DependenciesAnalyzer(RequirementParser):
         self.api_key = api_key
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
-        self.now_date = datetime.datetime.now()
         # Time in seconds to pause before an API request (to embrace limit of 60
         # requests max per minute)
         self.api_pause = api_pause
@@ -116,15 +114,15 @@ class DependenciesAnalyzer(RequirementParser):
 
         return output
 
-    def build_package_versions(self, data):
+    def compute_package_releases(self, data):
         """
         Build version list from API patched with some values in useful types.
 
         Arguments:
-            data (dict):
+            data (dict): Dictionnary of package data as retrieved from API.
 
         Returns:
-            list:
+            list: List of dictionnary for computed releases.
         """
         # Rebuild the version list to patch some values in useful types
         versions = []
@@ -139,6 +137,38 @@ class DependenciesAnalyzer(RequirementParser):
             versions.append
 
         return sorted(data["versions"], key=itemgetter("number"))
+
+    def get_latest_specified_release(self, specifiers, releases):
+        """
+        Get the latest release that match given specifiers on given release list.
+
+        Pre releases are always ignored.
+
+        Arguments:
+            specifiers (packaging.SpecifierSet): Version specifiers to match against
+                releases.
+            releases (list): List of dict for releases as built from
+                ``DependenciesAnalyzer.compute_package_releases()``.
+
+        Returns:
+            dict: Dictionnary of release data taken from given releases if it matched
+            specifier. Else returns a null value.
+        """
+        indexed = {
+            str(item["number"]): item
+            for item in releases
+        }
+        matched = sorted(
+            specifiers.filter(
+                [str(item["number"]) for item in releases],
+                prereleases=False
+            ),
+        )
+
+        if not matched:
+            return None
+
+        return indexed[matched[-1]]
 
     def compute_lateness(self, target, versions):
         """
@@ -174,32 +204,6 @@ class DependenciesAnalyzer(RequirementParser):
             )
         ]
 
-    def get_latest_version(self, specifiers, versions):
-        """
-        Get the latest version number from given version list that match given
-        specifier.
-
-        Arguments:
-            specifiers (packaging.SpecifierSet):
-            versions (list): List of dict for versions as built from
-                ``DependenciesAnalyzer.build_package_versions()``.
-
-        Returns:
-            string: Version number if there is latest version. In some case there can
-            be no found latest version when specifiers resolve to versions higher than
-            the released ones (commonly if specifiers are invalid or using releases
-            not published on Pypi).
-        """
-        releases = sorted(specifiers.filter(
-            [str(item["number"]) for item in versions],
-            prereleases=False
-        ))
-
-        if not releases:
-            return None
-
-        return releases[-1]
-
     def build_package_informations(self, requirement):
         """
         Compute and set informations onto a ``PackageRequirement`` object.
@@ -221,22 +225,20 @@ class DependenciesAnalyzer(RequirementParser):
 
             # Once numbers have been coerced they can be used to reorder versions
             # properly on number
-            versions = self.build_package_versions(data)
+            versions = self.compute_package_releases(data)
 
             if requirement.specifier:
-                # Match the highest elligible version from specifiers against built
-                # versions
-                requirement.resolved_version = self.get_latest_version(
+                # Match the highest elligible release
+                resolved = self.get_latest_specified_release(
                     requirement.specifier,
                     versions
                 )
+                if resolved:
+                    requirement.resolved_version = resolved["number"]
+                    requirement.resolved_published = resolved["published_at"]
 
             # Highest released version
             requirement.highest_published = versions[-1]["published_at"]
-            # Delta time from that highest released version
-            requirement.latest_activity = humanize.naturaldelta(
-                self.now_date - requirement.highest_published
-            )
 
             # Compute version lateness if a version has been given
             if requirement.resolved_version:

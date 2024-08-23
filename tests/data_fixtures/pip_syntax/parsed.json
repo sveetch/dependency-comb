@@ -4,7 +4,6 @@
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": "django",
         "parsed": "django<1.12,>=1.11",
@@ -14,14 +13,14 @@
         "specifier": "<1.12,>=1.11",
         "status": "parsed",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": "Pillow",
         "parsed": "Pillow>=3.1.1",
@@ -31,14 +30,14 @@
         "specifier": ">=3.1.1",
         "status": "parsed",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": "djangorestframework",
         "parsed": "djangorestframework",
@@ -48,14 +47,14 @@
         "specifier": "",
         "status": "parsed",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": "django-admin-shortcuts",
         "parsed": "django-admin-shortcuts==1.2.6",
@@ -65,7 +64,8 @@
         "specifier": "==1.2.6",
         "status": "parsed",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": [
@@ -74,7 +74,6 @@
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": "python_version < \"2.7\"",
         "name": "requests",
         "parsed": "requests[security]==2.8.*,>=2.8.1; python_version < \"2.7\"",
@@ -84,14 +83,14 @@
         "specifier": "==2.8.*,>=2.8.1",
         "status": "parsed",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": "urllib3",
         "parsed": "urllib3@ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
@@ -101,14 +100,14 @@
         "specifier": "",
         "status": "parsed",
         "url": "https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": null,
         "parsed": null,
@@ -118,14 +117,14 @@
         "specifier": null,
         "status": "unsupported-localpath",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
         "lateness": null,
-        "latest_activity": null,
         "marker": null,
         "name": null,
         "parsed": null,
@@ -135,6 +134,7 @@
         "specifier": null,
         "status": "unsupported-url",
         "url": null,
-        "resolved_version": null
+        "resolved_version": null,
+        "resolved_published": null
     }
 ]

@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from freezegun import freeze_time
 
 from packaging.requirements import Requirement, SpecifierSet
@@ -7,6 +8,53 @@ from packaging.version import Version
 
 from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.package import PackageRequirement
+
+
+@freeze_time("2024-01-15 10:00:00")
+@pytest.mark.parametrize("source, expected", [
+    (
+        "diskette>=0.1.0,<0.3.4",
+        {
+            "number": Version("0.3.3"),
+            "original_license": "MIT",
+            "published_at": datetime.datetime(2024, 3, 28, 15, 46, 54),
+            "repository_sources": [
+                "Pypi",
+            ],
+            "researched_at": None,
+            "spdx_expression": "MIT",
+        }
+    ),
+    (
+        "diskette>=2.0.0",
+        None
+    ),
+    (
+        "diskette",
+        {
+            "number": Version("0.3.5"),
+            "original_license": "MIT",
+            "published_at": datetime.datetime(2024, 3, 31, 2, 27, 8),
+            "repository_sources": [
+                "Pypi",
+            ],
+            "researched_at": None,
+            "spdx_expression": "MIT",
+        }
+    )
+])
+def test_get_latest_specified_release(settings, source, expected):
+    """
+    Method should return the latest release matching specifier if any else None.
+    """
+    cachedir = settings.fixtures_path / "api_cache"
+    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+
+    pkg = PackageRequirement(source)
+    data = analyzer.get_package_data(pkg.name)
+    versions = analyzer.compute_package_releases(data)
+
+    assert analyzer.get_latest_specified_release(pkg.specifier, versions) == expected
 
 
 @freeze_time("2024-01-15 10:00:00")
@@ -20,8 +68,6 @@ def test_build_package_informations_with_requirement(settings):
 
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
     analyzer.build_package_informations(pkg)
-
-    # print(json.dumps(pkg.data(), indent=4, cls=ExtendedJsonEncoder))
 
     assert pkg.data() == {
         "extras": set(),
@@ -37,7 +83,6 @@ def test_build_package_informations_with_requirement(settings):
                 datetime.datetime(2024, 3, 31, 2, 27, 8),
             ),
         ],
-        "latest_activity": "2 months",
         "marker": None,
         "name": "diskette",
         "parsed": Requirement("diskette<0.3.4,>=0.1.0"),
@@ -47,7 +92,8 @@ def test_build_package_informations_with_requirement(settings):
         "specifier": SpecifierSet("<0.3.4,>=0.1.0"),
         "status": "analyzed",
         "url": None,
-        "resolved_version": "0.3.3"
+        "resolved_version": Version("0.3.3"),
+        "resolved_published": datetime.datetime(2024, 3, 28, 15, 46, 54)
     }
 
 
@@ -64,12 +110,15 @@ def test_build_package_informations_without_requirement(settings):
     pkg = PackageRequirement("diskette")
     analyzer.build_package_informations(pkg)
 
+    # import json
+    # from dependency_comb.utils.jsons import ExtendedJsonEncoder
+    # print(json.dumps(pkg.data(), indent=4, cls=ExtendedJsonEncoder))
+
     assert pkg.data() == {
         "extras": set(),
         "highest_published": datetime.datetime(2024, 3, 31, 2, 27, 8),
         "highest_version": Version("0.3.5"),
         "lateness": None,
-        "latest_activity": "2 months",
         "marker": None,
         "name": "diskette",
         "parsed": Requirement("diskette"),
@@ -80,6 +129,7 @@ def test_build_package_informations_without_requirement(settings):
         "status": "analyzed",
         "url": None,
         "resolved_version": None,
+        "resolved_published": None,
     }
 
 
@@ -100,7 +150,6 @@ def test_build_package_informations_with_exceed_requirement(settings):
         "highest_published": datetime.datetime(2024, 3, 31, 2, 27, 8),
         "highest_version": Version("0.3.5"),
         "lateness": None,
-        "latest_activity": "2 months",
         "marker": None,
         "name": "diskette",
         "parsed": Requirement("diskette>0.4.0"),
@@ -111,6 +160,7 @@ def test_build_package_informations_with_exceed_requirement(settings):
         "status": "analyzed",
         "url": None,
         "resolved_version": None,
+        "resolved_published": None,
     }
 
 
