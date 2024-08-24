@@ -93,7 +93,8 @@ def test_build_package_informations_with_requirement(settings):
         "status": "analyzed",
         "url": None,
         "resolved_version": Version("0.3.3"),
-        "resolved_published": datetime.datetime(2024, 3, 28, 15, 46, 54)
+        "resolved_published": datetime.datetime(2024, 3, 28, 15, 46, 54),
+        "parsing_error": None
     }
 
 
@@ -130,6 +131,7 @@ def test_build_package_informations_without_requirement(settings):
         "url": None,
         "resolved_version": None,
         "resolved_published": None,
+        "parsing_error": None
     }
 
 
@@ -161,6 +163,7 @@ def test_build_package_informations_with_exceed_requirement(settings):
         "url": None,
         "resolved_version": None,
         "resolved_published": None,
+        "parsing_error": None
     }
 
 

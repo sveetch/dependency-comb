@@ -62,7 +62,10 @@ class DependenciesAnalyzer(RequirementParser):
             )
         elif response.status_code == 404:
             raise AnalyzerAPIError(
-                "API responded a 404 error, package name is probably invalid.",
+                (
+                    "API responded a 404 error, package name '{}' is probably "
+                    "invalid or not available on Pypi."
+                ).format(name),
                 http_status=404
             )
         elif response.status_code == 429:

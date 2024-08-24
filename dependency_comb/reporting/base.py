@@ -5,8 +5,8 @@ from pathlib import Path
 
 
 class BaseReport:
-    def __init__(self):
-        self.now_date = datetime.datetime.now()
+    def __init__(self, now_date=None):
+        self.now_date = now_date or datetime.datetime.now()
 
     def output(self, content):
         if isinstance(content, Path):

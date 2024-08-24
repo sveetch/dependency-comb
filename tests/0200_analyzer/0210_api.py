@@ -38,7 +38,8 @@ def test_get_package_data_invalid_name(settings):
         analyzer.get_package_data("combabcdenope")
 
     assert str(excinfo.value) == (
-        "API responded a 404 error, package name is probably invalid."
+        "API responded a 404 error, package name 'combabcdenope' is probably invalid "
+        "or not available on Pypi."
     )
     assert excinfo.value.http_status == 404
 

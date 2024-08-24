@@ -1,13 +1,29 @@
 import datetime
+from textwrap import TextWrapper
 
 import humanize
 from tabulate import tabulate
 
+from ..package import PackageRequirement
 from .base import BaseReport
 
 
 class RestructuredTextReport(BaseReport):
+    """
+    Build a RestructuredText report for a requirements analyze.
+    """
     def get_required_release(self, item):
+        """
+        Return a release labels for a requirement.
+
+        Arguments:
+            item (dict): The requirement dictionnary.
+
+        Returns:
+            tuple or string: Just string "Latest" if there is not resolved_version,
+                else the version label and resolved age delta computed from release
+                publish date against date now.
+        """
         if not item["resolved_version"]:
             return "Latest"
 
@@ -19,9 +35,20 @@ class RestructuredTextReport(BaseReport):
         return item["resolved_version"], resolved_age.capitalize()
 
     def build_analyzed_table(self, items):
+        """
+        Build the information table for properly analyzed requirements.
+
+        Arguments:
+            items (list): List of requirement dict as returned from Analyzer. All
+                given items should have a status "analyzed" else it would lead to
+                unexpected results or even errors.
+
+        Returns:
+            string: An ASCII table built from given items.
+        """
         rows = []
 
-        for item in items:
+        for i, item in enumerate(items, start=1):
             lateness = len(item["lateness"]) if item["lateness"] else "-"
 
             resolved_version = self.get_required_release(item)
@@ -42,6 +69,7 @@ class RestructuredTextReport(BaseReport):
 
             # Append column data to the requirement row
             rows.append([
+                i,
                 item["name"],
                 lateness,
                 resolved_version,
@@ -52,30 +80,73 @@ class RestructuredTextReport(BaseReport):
             rows,
             tablefmt="grid",
             headers=[
+                "#",
                 "Name",
                 "Lateness",
                 "Required",
                 "Latest release",
             ],
-            showindex="always",
-            colalign=("center", "left", "center", "right", "right"),
+            colalign=("left", "left", "center", "right", "right"),
         ))
 
-    def output(self, content):
+    def build_errors_table(self, items):
+        """
+        Build the information table for failed requirements analyze.
+
+        Arguments:
+            items (list): List of requirement dict as returned from Analyzer. Given
+                items could have any status despite not very useful for properly
+                analyzed items.
+
+        Returns:
+            string: An ASCII table built from given items.
+        """
+        rows = []
+        wrapper = TextWrapper(width=40, max_lines=2, placeholder="")
+        default_label = PackageRequirement.STATUS_LABELS["unknown"]
+
+        for i, item in enumerate(items, start=1):
+            status = item["status"]
+
+            resume = PackageRequirement.STATUS_LABELS.get(status, default_label)
+            if status == "invalid":
+                resume += ": {}".format(item["parsing_error"])
+
+            rows.append([
+                i,
+                wrapper.fill(item["source"]),
+                status,
+                wrapper.fill(resume),
+            ])
+
+        return str(tabulate(
+            rows,
+            tablefmt="grid",
+            headers=[
+                "#",
+                "Source",
+                "Status",
+                "Resume",
+            ],
+            colalign=("left", "left", "center", "left"),
+        ))
+
+    def output(self, content, with_failures=True):
+        output = []
         data = super().output(content)
 
         analyzed_items = [v for v in data if v["status"] == "analyzed"]
         ignored_items = [v for v in data if v["status"] != "analyzed"]
 
-        print("analyzed_items", len(analyzed_items))
-        print("ignored_items", len(ignored_items))
+        if with_failures:
+            output.append("Analyzed")
+            output.append("*" * len("Analyzed"))
 
-        analyzed_output = self.build_analyzed_table(analyzed_items)
-        #print()
-        #print(analyzed_output)
-        #print()
+        output.append(self.build_analyzed_table(analyzed_items))
 
-        # TODO: Make the ignored report that should be a different table structure
-        # with different informations
+        if with_failures:
+            output.append("\nFailures")
+            output.append("*" * len("Failures"))
+            output.append(self.build_errors_table(ignored_items))
 
-        return data
+        return "\n".join(output)

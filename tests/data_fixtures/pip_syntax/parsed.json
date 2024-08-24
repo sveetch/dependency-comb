@@ -14,7 +14,8 @@
         "status": "parsed",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -31,7 +32,8 @@
         "status": "parsed",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -48,7 +50,8 @@
         "status": "parsed",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -65,7 +68,8 @@
         "status": "parsed",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": [
@@ -84,7 +88,8 @@
         "status": "parsed",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -101,7 +106,8 @@
         "status": "parsed",
         "url": "https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": null,
@@ -118,7 +124,8 @@
         "status": "unsupported-localpath",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": null,
@@ -135,6 +142,7 @@
         "status": "unsupported-url",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     }
 ]

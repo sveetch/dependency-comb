@@ -71,12 +71,22 @@ class PackageRequirement:
         parsing_error (object): The exception object raise from
             ``packaging.Requirement`` when there was a parsing error.
     """
+    STATUS_LABELS = {
+        "parsed": "Parsed requirement syntax",
+        "analyzed": "Analyzed package informations",
+        "unsupported-argument": "Unsupported Pip argument",
+        "unsupported-localpath": "Local package is not supported",
+        "unsupported-url": "Direct package URL is not supported",
+        "invalid": "Invalid syntax",
+        "marker-reject": "Rejected by marker evaluation against given environment",
+        "unknown": "Unexpected failure",
+    }
     VALID_STATUSES = ("parsed", "analyzed")
     PUBLISHED_ATTRIBUTES = [
         "extras", "highest_published", "highest_version", "lateness",
         "marker", "name", "parsed", "pypi_url", "repository_url",
         "source", "specifier", "status", "url", "resolved_version",
-        "resolved_published",
+        "resolved_published", "parsing_error",
     ]
 
     def __init__(self, source, environment=None):

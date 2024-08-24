@@ -727,7 +727,8 @@
         "status": "analyzed",
         "url": null,
         "resolved_version": "1.11.9",
-        "resolved_published": "2018-01-02T02:12:15"
+        "resolved_published": "2018-01-02T02:12:15",
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -769,7 +770,8 @@
         "status": "analyzed",
         "url": null,
         "resolved_version": "9.5.0",
-        "resolved_published": "2023-04-01T09:28:03"
+        "resolved_published": "2023-04-01T09:28:03",
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -786,7 +788,8 @@
         "status": "analyzed",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -820,7 +823,8 @@
         "status": "analyzed",
         "url": null,
         "resolved_version": "1.2.6",
-        "resolved_published": "2015-04-06T19:40:00"
+        "resolved_published": "2015-04-06T19:40:00",
+        "parsing_error": null
     },
     {
         "extras": [
@@ -1064,7 +1068,8 @@
         "status": "analyzed",
         "url": null,
         "resolved_version": "2.8.1",
-        "resolved_published": "2015-10-13T12:56:41"
+        "resolved_published": "2015-10-13T12:56:41",
+        "parsing_error": null
     },
     {
         "extras": [],
@@ -1081,7 +1086,8 @@
         "status": "analyzed",
         "url": "https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": null,
@@ -1098,7 +1104,8 @@
         "status": "unsupported-localpath",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     },
     {
         "extras": null,
@@ -1115,6 +1122,7 @@
         "status": "unsupported-url",
         "url": null,
         "resolved_version": null,
-        "resolved_published": null
+        "resolved_published": null,
+        "parsing_error": null
     }
 ]

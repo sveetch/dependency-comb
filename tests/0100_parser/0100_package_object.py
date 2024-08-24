@@ -25,5 +25,6 @@ def test_package_without_analyze():
         "status": "parsed",
         "url": None,
         "resolved_version": None,
-        "resolved_published": None
+        "resolved_published": None,
+        "parsing_error": None
     }

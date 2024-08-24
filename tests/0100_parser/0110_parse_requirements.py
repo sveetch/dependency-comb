@@ -78,7 +78,8 @@ def test_parse_markers(settings):
             "status": "parsed",
             "url": None,
             "resolved_version": None,
-            "resolved_published": None
+            "resolved_published": None,
+            "parsing_error": None
         },
         {
             "extras": [],
@@ -95,7 +96,8 @@ def test_parse_markers(settings):
             "status": "marker-reject",
             "url": None,
             "resolved_version": None,
-            "resolved_published": None
+            "resolved_published": None,
+            "parsing_error": None
         },
         {
             "extras": [],
@@ -112,7 +114,8 @@ def test_parse_markers(settings):
             "status": "parsed",
             "url": None,
             "resolved_version": None,
-            "resolved_published": None
+            "resolved_published": None,
+            "parsing_error": None
         },
         {
             "extras": [],
@@ -129,7 +132,8 @@ def test_parse_markers(settings):
             "status": "marker-reject",
             "url": None,
             "resolved_version": None,
-            "resolved_published": None
+            "resolved_published": None,
+            "parsing_error": None
         }
     ]
 
@@ -164,6 +168,7 @@ def test_parse_inclusion_directive(settings):
             "specifier": SpecifierSet("<1.12,>=1.11"),
             "status": "parsed",
             "url": None,
+            "parsing_error": None,
         },
         {
             "extras": set(),
@@ -181,6 +186,7 @@ def test_parse_inclusion_directive(settings):
             "specifier": SpecifierSet(""),
             "status": "parsed",
             "url": None,
+            "parsing_error": None,
         },
         {
             "extras": set(),
@@ -198,6 +204,7 @@ def test_parse_inclusion_directive(settings):
             "specifier": SpecifierSet("<=2.1.2"),
             "status": "parsed",
             "url": None,
+            "parsing_error": None,
         },
         {
             "extras": set(),
@@ -215,6 +222,7 @@ def test_parse_inclusion_directive(settings):
             "specifier": SpecifierSet("==1.2.6"),
             "status": "parsed",
             "url": None,
+            "parsing_error": None,
         },
     ]
 
