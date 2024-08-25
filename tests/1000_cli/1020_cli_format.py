@@ -1,0 +1,82 @@
+from click.testing import CliRunner
+
+from dependency_comb.cli.entrypoint import cli_frontend
+
+
+def test_format_default(caplog):
+    """
+    Command should fail without requirement arguments/options.
+    """
+    runner = CliRunner()
+    result = runner.invoke(cli_frontend, ["format"])
+
+    msg = (
+        "Error: Invalid value for 'SOURCE': 'requirements.txt': No such file or "
+        "directory"
+    )
+
+    assert result.exit_code == 2
+    assert msg in result.output
+    assert caplog.record_tuples == []
+
+
+def test_format_with_failures_from_stdin(caplog, settings):
+    """
+    Command should succeed to get JSON analyze from standard input and return a full
+    RST format with failures included.
+    """
+    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_frontend,
+        ["format", "-", "--failures"],
+        input=analyze.read_text()
+    )
+
+    assert result.exit_code == 0
+    assert caplog.record_tuples == []
+
+    assert result.output == formatted.read_text()
+
+
+def test_format_without_failures_from_stdin(caplog, settings):
+    """
+    Command should succeed to get JSON analyze from standard input and return a
+    RST format without failures included and titles.
+    """
+    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+
+    runner = CliRunner()
+    result = runner.invoke(cli_frontend, ["format", "-"], input=analyze.read_text())
+
+    assert result.exit_code == 0
+    assert caplog.record_tuples == []
+
+    assert result.output == formatted.read_text()
+
+
+def test_format_to_file(caplog, tmp_path, settings):
+    """
+    Command should should write JSON to a file instead of standard output and logging
+    some messages.
+    """
+    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    destination = tmp_path / "format.rst"
+    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_frontend,
+        ["format", "-", "--destination", str(destination)],
+        input=analyze.read_text()
+    )
+    assert result.exit_code == 0
+
+    # Written format contains an additional newline character
+    assert expected.read_text() == destination.read_text() + "\n"
+    assert caplog.record_tuples == [
+        ("dependency-comb", 20, "Formatted analyze to: {}".format(destination)),
+    ]

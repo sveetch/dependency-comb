@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 
 
-class BaseReport:
+class BaseFormatter:
     """
-    Base reporter just defines some internal attributes and return Python object from
+    Base formatter just defines some internal attributes and return Python object from
     given JSON.
 
     Arguments:
@@ -19,7 +19,7 @@ class BaseReport:
 
     def output(self, content):
         """
-        Returns report output.
+        Returns formatted output.
 
         This base method only parse given content and returns it as a Python list.
 

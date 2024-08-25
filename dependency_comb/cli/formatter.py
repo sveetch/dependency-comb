@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 
 from ..utils.logger import NoOperationLogger
-from ..reporting import RestructuredTextReport
+from ..formatting import RestructuredTextFormatter
 from .. import __pkgname__
 
 
@@ -33,7 +33,7 @@ from .. import __pkgname__
     ),
 )
 @click.pass_context
-def report_command(*args, **parameters):
+def format_command(*args, **parameters):
     """
     Build a report from a requirement analyze.
 
@@ -54,11 +54,15 @@ def report_command(*args, **parameters):
     destination = parameters["destination"]
     with_failures = parameters["failures"]
 
-    reporter = RestructuredTextReport()
+    # Disable logger when writing results to standard output
+    if not destination:
+        logger = NoOperationLogger()
+
+    reporter = RestructuredTextFormatter()
     output = reporter.output(source, with_failures=with_failures)
 
     if not destination:
         click.echo(output)
     else:
         destination.write_text(output)
-        logger.info("Written report to: {}".format(destination))
+        logger.info("Formatted analyze to: {}".format(destination))

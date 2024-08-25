@@ -5,12 +5,12 @@ import humanize
 from tabulate import tabulate
 
 from ..package import PackageRequirement
-from .base import BaseReport
+from .base import BaseFormatter
 
 
-class RestructuredTextReport(BaseReport):
+class RestructuredTextFormatter(BaseFormatter):
     """
-    Build a RestructuredText report for a requirements analyze.
+    Format a requirements analyze to a RestructuredText report.
     """
     def get_required_release(self, item):
         """
@@ -57,7 +57,6 @@ class RestructuredTextReport(BaseReport):
                 resolved_version = "{} - {} ago".format(label, age)
             else:
                 resolved_version = label
-
 
             # Compute latest release label including humanized delta from current to
             # latest date
@@ -137,7 +136,7 @@ class RestructuredTextReport(BaseReport):
 
     def output(self, content, with_failures=True):
         """
-        Output analyzed requirements report.
+        Output formatted analyze.
 
         Arguments:
             content (Path or string or list): JSON content as built from Analyzer. It

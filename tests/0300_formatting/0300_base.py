@@ -1,15 +1,15 @@
-from dependency_comb.reporting import BaseReport
+from dependency_comb.formatting import BaseFormatter
 
 
-def test_base_report_from_filepath(settings):
+def test_base_format_from_filepath(settings):
     """
-    Base report is able to open analyze from a file path but just returns deserialized
-    JSON to Python data.
+    Base formatter is able to open analyze from a file path but just returns
+    deserialized JSON to Python data.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    reporter = BaseReport()
+    formatter = BaseFormatter()
 
-    output = reporter.output(analyze)
+    output = formatter.output(analyze)
 
     assert len(output) == 8
     assert [v["source"] for v in output] == [
@@ -27,15 +27,15 @@ def test_base_report_from_filepath(settings):
     ]
 
 
-def test_base_report_from_string(settings):
+def test_base_format_from_string(settings):
     """
-    Base report is able to open analyze from a string but just returns deserialized
+    Base formatter is able to open analyze from a string but just returns deserialized
     JSON to Python data.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    reporter = BaseReport()
+    formatter = BaseFormatter()
 
-    output = reporter.output(analyze.read_text())
+    output = formatter.output(analyze.read_text())
 
     assert len(output) == 8
     assert [v["source"] for v in output] == [

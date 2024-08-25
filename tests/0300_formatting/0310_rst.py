@@ -1,6 +1,6 @@
 from freezegun import freeze_time
 
-from dependency_comb.reporting import BaseReport, RestructuredTextReport
+from dependency_comb.formatting import BaseFormatter, RestructuredTextFormatter
 
 
 def format_to_multline_str(content):
@@ -34,8 +34,8 @@ def test_rst_build_analyzed_table(settings):
     Method should build a table for succeeded analyzed items with proper informations.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    base_reporter = BaseReport()
-    reporter = RestructuredTextReport()
+    base_reporter = BaseFormatter()
+    reporter = RestructuredTextFormatter()
 
     output = reporter.build_analyzed_table([
         v
@@ -71,7 +71,7 @@ def test_rst_build_errors_table():
     """
     Method should build a table for failures from items.
     """
-    reporter = RestructuredTextReport()
+    reporter = RestructuredTextFormatter()
     output = reporter.build_errors_table([
         {
             "marker": None,
@@ -170,7 +170,7 @@ def test_rst_output(settings):
     Without failures enabled the output should only contains the analyzed table.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    reporter = RestructuredTextReport()
+    reporter = RestructuredTextFormatter()
 
     output = reporter.output(analyze, with_failures=False)
 
@@ -205,7 +205,7 @@ def test_rst_output_with_failures(settings):
     each with a title.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    reporter = RestructuredTextReport()
+    reporter = RestructuredTextFormatter()
 
     output = reporter.output(analyze, with_failures=True)
 
