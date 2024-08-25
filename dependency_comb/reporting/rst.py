@@ -20,12 +20,13 @@ class RestructuredTextReport(BaseReport):
             item (dict): The requirement dictionnary.
 
         Returns:
-            tuple or string: Just string "Latest" if there is not resolved_version,
-                else the version label and resolved age delta computed from release
-                publish date against date now.
+            tuple: Respectively the version label and resolved age delta
+                computed from release publish date against date now. If
+                ``resolved_version`` is empty, the version label will just be
+                ``Latest`` and resolved delta will be null.
         """
         if not item["resolved_version"]:
-            return "Latest"
+            return "Latest", None
 
         resolved_age = humanize.naturaldelta(
             self.now_date - datetime.datetime.fromisoformat(
@@ -51,9 +52,12 @@ class RestructuredTextReport(BaseReport):
         for i, item in enumerate(items, start=1):
             lateness = len(item["lateness"]) if item["lateness"] else "-"
 
-            resolved_version = self.get_required_release(item)
-            if isinstance(resolved_version, tuple):
-                resolved_version = "{} - {} ago".format(*resolved_version)
+            label, age = self.get_required_release(item)
+            if age:
+                resolved_version = "{} - {} ago".format(label, age)
+            else:
+                resolved_version = label
+
 
             # Compute latest release label including humanized delta from current to
             # latest date
@@ -132,8 +136,26 @@ class RestructuredTextReport(BaseReport):
         ))
 
     def output(self, content, with_failures=True):
-        output = []
+        """
+        Output analyzed requirements report.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. It
+                can be either:
+
+                * A JSON as a string that will be parsed;
+                * A file Path that will be readed and parsed as JSON;
+                * A list that is expected to be directly the list of analyzed
+                  requirements, no parsing will be involved.
+            with_failures (boolean): If True, the report include both analyzed and
+                failures in different tables, both tables will have a title. If False,
+                only the table of analyzed items without a title.
+
+        Returns:
+            string: Built report.
+        """
         data = super().output(content)
+        output = []
 
         analyzed_items = [v for v in data if v["status"] == "analyzed"]
         ignored_items = [v for v in data if v["status"] != "analyzed"]

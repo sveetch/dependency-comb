@@ -71,6 +71,7 @@ def test_analyze_from_file(caplog, settings):
 
     results = json.loads(result.output)
     assert len(results) == 8
+    # Get all packages names from JSON output
     assert [v["name"] for v in results] == [
         "django",
         "Pillow",
@@ -86,7 +87,7 @@ def test_analyze_from_file(caplog, settings):
 
 def test_analyze_to_file(caplog, tmp_path, settings):
     """
-    Command should should write JSON to a file instead of standard output and log out
+    Command should should write JSON to a file instead of standard output and logging
     some messages.
     """
     cachedir = settings.fixtures_path / "api_cache"
@@ -107,10 +108,12 @@ def test_analyze_to_file(caplog, tmp_path, settings):
 
     results = json.loads(destination.read_text())
     assert len(results) == 2
+    # Get all packages names from JSON output
     assert [v["name"] for v in results] == [
         "django",
         "diskette",
     ]
+    # There is some info logs
     assert caplog.record_tuples == [
         ("dependency-comb", 20, "Processing package: django"),
         ("dependency-comb", 20, "Processing package: diskette"),
@@ -140,6 +143,7 @@ def test_analyze_with_env(caplog, settings):
     assert result.exit_code == 0
 
     results = json.loads(result.output)
+    # Get analyzed packages names from JSON output
     names = [
         v["name"]
         for v in results
@@ -155,4 +159,5 @@ def test_analyze_with_env(caplog, settings):
         None,
         None,
     ]
+    # No logs since they are muted to have clear output
     assert caplog.record_tuples == []

@@ -52,7 +52,7 @@ def test_get_latest_specified_release(settings, source, expected):
 
     pkg = PackageRequirement(source)
     data = analyzer.get_package_data(pkg.name)
-    versions = analyzer.compute_package_releases(data)
+    versions = analyzer.compute_package_releases(pkg.name, data)
 
     assert analyzer.get_latest_specified_release(pkg.specifier, versions) == expected
 

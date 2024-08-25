@@ -3,6 +3,8 @@ from pathlib import Path
 
 import click
 
+from ..utils.logger import NoOperationLogger
+from ..reporting import RestructuredTextReport
 from .. import __pkgname__
 
 
@@ -23,10 +25,19 @@ from .. import __pkgname__
         "the JSON will be sent to standard output."
     ),
 )
+@click.option(
+    "--failures",
+    is_flag=True,
+    help=(
+        "Commit the purge."
+    ),
+)
 @click.pass_context
 def report_command(*args, **parameters):
     """
-    Build a report from requirements analyze.
+    Build a report from a requirement analyze.
+
+    Analyze is expected to be a valid JSON as outputted from 'analyze' command.
 
     Arguments:
 
@@ -39,7 +50,15 @@ def report_command(*args, **parameters):
     """
     logger = logging.getLogger(__pkgname__)
 
-    source = parameters["source"].read()  # noqa: F841
-    destination = parameters["destination"]  # noqa: F841
+    source = parameters["source"].read()
+    destination = parameters["destination"]
+    with_failures = parameters["failures"]
 
-    logger.info("TODO")
+    reporter = RestructuredTextReport()
+    output = reporter.output(source, with_failures=with_failures)
+
+    if not destination:
+        click.echo(output)
+    else:
+        destination.write_text(output)
+        logger.info("Written report to: {}".format(destination))

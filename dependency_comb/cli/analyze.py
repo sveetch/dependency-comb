@@ -4,11 +4,11 @@ from pathlib import Path
 
 import click
 
-from .. import __pkgname__
 from ..analyzer import DependenciesAnalyzer
 from ..exceptions import DependencyCombError
 from ..utils.jsons import ExtendedJsonEncoder
 from ..utils.logger import NoOperationLogger
+from .. import __pkgname__
 
 
 @click.command()
@@ -105,7 +105,8 @@ from ..utils.logger import NoOperationLogger
 @click.pass_context
 def analyze_command(*args, **parameters):
     """
-    Analyze package from a requirements file and output computed statistics as JSON.
+    Analyze package releases from a requirements file and output computed statistics
+    as JSON.
 
     Arguments:
 

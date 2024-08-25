@@ -5,7 +5,7 @@ import time
 from operator import itemgetter
 
 import requests
-from packaging.version import Version
+from packaging.version import Version, InvalidVersion
 
 from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
@@ -21,13 +21,17 @@ class DependenciesAnalyzer(RequirementParser):
         "https://libraries.io/api/{plateform}/{name}?api_key={key}"
     )
 
-    def __init__(self, api_key, cachedir=None, api_pause=1, logger=None):
+    def __init__(self, api_key, cachedir=None, api_pause=1, logger=None, ignores=None):
         self.api_key = api_key
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
         # Time in seconds to pause before an API request (to embrace limit of 60
         # requests max per minute)
         self.api_pause = api_pause
+        # TODO: Currently not implemented, it should be a list of package names to
+        # ignore from analyze, dont know the state it will end in. It will be helpful
+        # to bypass some erroneous requirements without break the whole analyze.
+        self.ignores = ignores or []
 
     def request_headers(self):
         """
@@ -117,29 +121,40 @@ class DependenciesAnalyzer(RequirementParser):
 
         return output
 
-    def compute_package_releases(self, data):
+    def compute_package_releases(self, name, data):
         """
-        Build version list from API patched with some values in useful types.
+        Build a list of released versions from API patched with some values in useful
+        types.
 
         Arguments:
+            name (string): Parsed package name.
             data (dict): Dictionnary of package data as retrieved from API.
 
         Returns:
             list: List of dictionnary for computed releases.
         """
-        # Rebuild the version list to patch some values in useful types
         versions = []
+        # Rebuild the version list to patch some values in useful types
         for item in data["versions"]:
             # Enforce real datetime
             item["published_at"] = datetime.datetime.fromisoformat(
                 item["published_at"].split(".")[0]
             )
             # Coerce original number to a Version object
-            item["number"] = Version(item["number"])
+            try:
+                number = Version(item["number"])
+            except InvalidVersion:
+                msg = (
+                    "Ignored package '{name}' invalid release version number "
+                    "'{version}'"
+                )
+                self.logger.warning(msg.format(name=name, version=item["number"]))
+                continue
+            else:
+                item["number"] = number
+                versions.append(item)
 
-            versions.append
-
-        return sorted(data["versions"], key=itemgetter("number"))
+        return sorted(versions, key=itemgetter("number"))
 
     def get_latest_specified_release(self, specifiers, releases):
         """
@@ -209,7 +224,7 @@ class DependenciesAnalyzer(RequirementParser):
 
     def build_package_informations(self, requirement):
         """
-        Compute and set informations onto a ``PackageRequirement`` object.
+        Compute and set informations in a ``PackageRequirement`` object.
 
         Arguments:
             requirement (PackageRequirement): The package object for to search
@@ -228,7 +243,7 @@ class DependenciesAnalyzer(RequirementParser):
 
             # Once numbers have been coerced they can be used to reorder versions
             # properly on number
-            versions = self.compute_package_releases(data)
+            versions = self.compute_package_releases(requirement.name, data)
 
             if requirement.specifier:
                 # Match the highest elligible release
