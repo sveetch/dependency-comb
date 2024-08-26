@@ -84,6 +84,16 @@ from .. import __pkgname__
     ),
 )
 @click.option(
+    "--timeout",
+    type=click.INT,
+    default=15,
+    help=(
+        "Timeout in seconds for API requests. Sometime Libraries.io is unresponsive "
+        "and the request may hang almost infinitely so this option may avoid this."
+        "The default timeout is set to 15 seconds, set it to 0 to disable timeout."
+    ),
+)
+@click.option(
     "--env",
     type=click.Path(
         exists=True,
@@ -132,6 +142,7 @@ def analyze_command(*args, **parameters):
     environment = json.loads(parameters["env"].read_text()) if parameters["env"] else {}
     indent = parameters["indent"] or None
     api_pause = parameters["pause"] or None
+    api_timeout = parameters["timeout"] or None
 
     # Disable logger when writing results to standard output
     if not destination:
@@ -164,6 +175,7 @@ def analyze_command(*args, **parameters):
             api_key,
             cachedir=cachedir,
             api_pause=api_pause,
+            api_timeout=api_timeout,
             logger=logger,
         )
         packages = analyzer.inspect(

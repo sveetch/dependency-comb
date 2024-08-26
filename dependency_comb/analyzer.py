@@ -21,13 +21,16 @@ class DependenciesAnalyzer(RequirementParser):
         "https://libraries.io/api/{plateform}/{name}?api_key={key}"
     )
 
-    def __init__(self, api_key, cachedir=None, api_pause=1, logger=None, ignores=None):
+    def __init__(self, api_key, cachedir=None, api_pause=1, api_timeout=None,
+                 logger=None, ignores=None):
         self.api_key = api_key
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
         # Time in seconds to pause before an API request (to embrace limit of 60
         # requests max per minute)
         self.api_pause = api_pause
+        # Time in seconds for timeout limit on API request
+        self.api_timeout = api_timeout
         # TODO: Currently not implemented, it should be a list of package names to
         # ignore from analyze, dont know the state it will end in. It will be helpful
         # to bypass some erroneous requirements without break the whole analyze.
@@ -56,7 +59,11 @@ class DependenciesAnalyzer(RequirementParser):
             name=name,
             key=self.api_key,
         )
-        response = requests.get(endpoint_url, headers=self.request_headers())
+        response = requests.get(
+            endpoint_url,
+            headers=self.request_headers(),
+            timeout=self.api_timeout,
+        )
 
         # Manage custom error message for some well known errors
         if response.status_code == 403:

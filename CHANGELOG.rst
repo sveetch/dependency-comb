@@ -6,8 +6,15 @@ Changelog
 Version 0.3.0 - Unreleased
 **************************
 
-* Added test for PackageRequirement basic behavior (before the analyzer post process);
 * Implemented Pip inclusion directive (aka ``-r dev.txt``) and added a test for it;
+* Added commandlines:
+
+  * ``analyze`` to analyze requirements and output a JSON of computed informations;
+  * ``format`` to format JSON output from ``analyze`` to RestructuredText tables;
+  * ``report`` which merge behaviors of ``analyze`` and ``format`` in a single shot
+    without to pipe commands between them;
+
+* Covered everything with tests;
 
 
 Version 0.2.0 - 2024/07/14
