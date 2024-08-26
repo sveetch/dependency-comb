@@ -1,5 +1,7 @@
 import json
 
+from freezegun import freeze_time
+
 from click.testing import CliRunner
 
 from dependency_comb.cli.entrypoint import cli_frontend
@@ -22,6 +24,7 @@ def test_analyze_default(caplog):
     assert caplog.record_tuples == []
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_analyze_from_stdin(caplog, settings):
     """
     Command should succeed to compute informations for requirement packages given
@@ -50,6 +53,7 @@ def test_analyze_from_stdin(caplog, settings):
     assert caplog.record_tuples == []
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_analyze_from_file(caplog, settings):
     """
     Command should succeed to compute informations for requirement packages given
@@ -85,6 +89,7 @@ def test_analyze_from_file(caplog, settings):
     assert caplog.record_tuples == []
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_analyze_to_file(caplog, tmp_path, settings):
     """
     Command should should write JSON to a file instead of standard output and logging
@@ -120,6 +125,7 @@ def test_analyze_to_file(caplog, tmp_path, settings):
     ]
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_analyze_with_env(caplog, settings):
     """
     Command should pass the given JSON environment to analyzer to resolve specifier

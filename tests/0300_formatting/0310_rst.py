@@ -34,12 +34,12 @@ def test_rst_build_analyzed_table(settings):
     Method should build a table for succeeded analyzed items with proper informations.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    base_reporter = BaseFormatter()
-    reporter = RestructuredTextFormatter()
+    base_formatter = BaseFormatter()
+    formatter = RestructuredTextFormatter()
 
-    output = reporter.build_analyzed_table([
+    output = formatter.build_analyzed_table([
         v
-        for v in base_reporter.output(analyze)
+        for v in base_formatter.output(analyze)
         if v["status"] == "analyzed"
     ])
 
@@ -71,8 +71,8 @@ def test_rst_build_errors_table():
     """
     Method should build a table for failures from items.
     """
-    reporter = RestructuredTextFormatter()
-    output = reporter.build_errors_table([
+    formatter = RestructuredTextFormatter()
+    output = formatter.build_errors_table([
         {
             "marker": None,
             "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
@@ -170,32 +170,17 @@ def test_rst_output(settings):
     Without failures enabled the output should only contains the analyzed table.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    reporter = RestructuredTextFormatter()
+    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    formatter = RestructuredTextFormatter()
 
-    output = reporter.output(analyze, with_failures=False)
+    output = formatter.output(analyze, with_failures=False)
 
     # Used to rebuild table when code or formatting have changed
     # print()
-    # print(format_to_multline_str(output))
+    # print(output)
     # print()
 
-    assert output == (
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| #   | Name                   |  Lateness  |                     Required |        Latest release |\n"""  # noqa: E501
-        """+=====+========================+============+==============================+=======================+\n"""  # noqa: E501
-        """| 1   | django                 |    178     |         1.11.9 - 6 years ago |  5.1a1 - 2 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 2   | Pillow                 |     6      | 9.5.0 - 1 year, 3 months ago |  10.4.0 - 24 days ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 3   | djangorestframework    |     -      |                       Latest |  3.15.2 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 4   | django-admin-shortcuts |     4      |          1.2.6 - 9 years ago | 2.1.1 - 10 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 5   | requests               |     56     |          2.8.1 - 8 years ago |  2.32.3 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 6   | urllib3                |     -      |                       Latest | 1.26.19 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+"""  # noqa: E501
-    )
+    assert output + "\n" == formatted.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -205,43 +190,14 @@ def test_rst_output_with_failures(settings):
     each with a title.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    reporter = RestructuredTextFormatter()
+    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
+    formatter = RestructuredTextFormatter()
 
-    output = reporter.output(analyze, with_failures=True)
+    output = formatter.output(analyze, with_failures=True)
 
     # Used to rebuild table when code or formatting have changed
     # print()
-    # print(format_to_multline_str(output))
+    # print(output)
     # print()
 
-    assert output == (
-        """Analyzed\n"""  # noqa: E501
-        """********\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| #   | Name                   |  Lateness  |                     Required |        Latest release |\n"""  # noqa: E501
-        """+=====+========================+============+==============================+=======================+\n"""  # noqa: E501
-        """| 1   | django                 |    178     |         1.11.9 - 6 years ago |  5.1a1 - 2 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 2   | Pillow                 |     6      | 9.5.0 - 1 year, 3 months ago |  10.4.0 - 24 days ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 3   | djangorestframework    |     -      |                       Latest |  3.15.2 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 4   | django-admin-shortcuts |     4      |          1.2.6 - 9 years ago | 2.1.1 - 10 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 5   | requests               |     56     |          2.8.1 - 8 years ago |  2.32.3 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 6   | urllib3                |     -      |                       Latest | 1.26.19 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """\n"""  # noqa: E501
-        """Failures\n"""  # noqa: E501
-        """********\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+-------------------------------------+\n"""  # noqa: E501
-        """| #   | Source                                   |        Status         | Resume                              |\n"""  # noqa: E501
-        """+=====+==========================================+=======================+=====================================+\n"""  # noqa: E501
-        """| 1   | ./downloads/numpy-1.9.2-cp34-none-       | unsupported-localpath | Local package is not supported      |\n"""  # noqa: E501
-        """|     | win32.whl                                |                       |                                     |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+-------------------------------------+\n"""  # noqa: E501
-        """| 2   | http://wxpython.org/Phoenix/snapshot-bui |    unsupported-url    | Direct package URL is not supported |\n"""  # noqa: E501
-        """|     | lds/wxPython_Phoenix-                    |                       |                                     |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+-------------------------------------+"""  # noqa: E501
-    )
+    assert output + "\n" == formatted.read_text()

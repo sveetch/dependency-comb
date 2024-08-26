@@ -29,7 +29,8 @@ from .. import __pkgname__
     "--failures",
     is_flag=True,
     help=(
-        "Commit the purge."
+        "Include requirement analyze failures in a different table, also each table"
+        "will have its own title."
     ),
 )
 @click.pass_context

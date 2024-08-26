@@ -1,3 +1,5 @@
+from freezegun import freeze_time
+
 from click.testing import CliRunner
 
 from dependency_comb.cli.entrypoint import cli_frontend
@@ -20,6 +22,7 @@ def test_format_default(caplog):
     assert caplog.record_tuples == []
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_format_with_failures_from_stdin(caplog, settings):
     """
     Command should succeed to get JSON analyze from standard input and return a full
@@ -41,6 +44,7 @@ def test_format_with_failures_from_stdin(caplog, settings):
     assert result.output == formatted.read_text()
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_format_without_failures_from_stdin(caplog, settings):
     """
     Command should succeed to get JSON analyze from standard input and return a
@@ -58,7 +62,8 @@ def test_format_without_failures_from_stdin(caplog, settings):
     assert result.output == formatted.read_text()
 
 
-def test_format_to_file(caplog, tmp_path, settings):
+@freeze_time("2024-07-25 10:00:00")
+def test_format_without_failures_to_file(caplog, tmp_path, settings):
     """
     Command should should write JSON to a file instead of standard output and logging
     some messages.
@@ -75,8 +80,9 @@ def test_format_to_file(caplog, tmp_path, settings):
     )
     assert result.exit_code == 0
 
-    # Written format contains an additional newline character
+    # Written format contains have an additional newline character
     assert expected.read_text() == destination.read_text() + "\n"
+
     assert caplog.record_tuples == [
         ("dependency-comb", 20, "Formatted analyze to: {}".format(destination)),
     ]
