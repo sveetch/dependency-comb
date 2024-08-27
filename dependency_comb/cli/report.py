@@ -115,15 +115,10 @@ from .. import __pkgname__
 @click.pass_context
 def report_command(*args, **parameters):
     """
-    TODO:
+    Analyze and report informations about requirements.
 
-        Merge command analyze and report
-
-        Options from both 'analyze' and 'format' command are merged there except
-        '--indent' from 'analyze' that is useless here.
-
-        Opposed to 'analyze' command, the logs are not muted when there is no
-        destination file.
+    Opposed to the 'analyze' command, the logs are not muted when there is no
+    destination file.
 
     Arguments:
 

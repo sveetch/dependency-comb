@@ -3,7 +3,7 @@
 Changelog
 =========
 
-Version 0.3.0 - Unreleased
+Version 0.3.0 - 2024/07/14
 **************************
 
 * Implemented Pip inclusion directive (aka ``-r dev.txt``) and added a test for it;
@@ -15,6 +15,7 @@ Version 0.3.0 - Unreleased
     without to pipe commands between them;
 
 * Covered everything with tests;
+* Covered current version with documentation;
 
 
 Version 0.2.0 - 2024/07/14

@@ -10,6 +10,7 @@ Contents
    :maxdepth: 2
 
    install.rst
+   overview.rst
    cli.rst
    references/index.rst
 

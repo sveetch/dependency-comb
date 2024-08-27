@@ -11,7 +11,8 @@ from code docstrings by Sphinx extension ``autodoc``.
    :maxdepth: 2
 
    analyzer.rst
-   parser.rst
-   package.rst
    exceptions.rst
+   formatting.rst
    logger.rst
+   package.rst
+   parser.rst

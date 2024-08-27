@@ -34,7 +34,7 @@ APP_LOGGER_CONF = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", None)
 @click.pass_context
 def cli_frontend(ctx, verbose):
     """
-    Sample tool for dependency-comb
+    dependency-comb commandline entrypoint.
     """
     printout = True
     if verbose == 0:
