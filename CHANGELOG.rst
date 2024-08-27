@@ -3,7 +3,7 @@
 Changelog
 =========
 
-Version 0.3.0 - 2024/07/14
+Version 0.3.0 - 2024/08/27
 **************************
 
 * Implemented Pip inclusion directive (aka ``-r dev.txt``) and added a test for it;
