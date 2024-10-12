@@ -1,28 +1,20 @@
 import datetime
 
 import pytest
-from freezegun import freeze_time
 
 from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
 
-from dependency_comb.analyzer import DependenciesAnalyzer
+from dependency_comb.new_analyzer import DependenciesAnalyzer
 from dependency_comb.package import PackageRequirement
 
 
-@freeze_time("2024-01-15 10:00:00")
 @pytest.mark.parametrize("source, expected", [
     (
         "diskette>=0.1.0,<0.3.4",
         {
             "number": Version("0.3.3"),
-            "original_license": "MIT",
             "published_at": datetime.datetime(2024, 3, 28, 15, 46, 54),
-            "repository_sources": [
-                "Pypi",
-            ],
-            "researched_at": None,
-            "spdx_expression": "MIT",
         }
     ),
     (
@@ -32,14 +24,8 @@ from dependency_comb.package import PackageRequirement
     (
         "diskette",
         {
-            "number": Version("0.3.5"),
-            "original_license": "MIT",
-            "published_at": datetime.datetime(2024, 3, 31, 2, 27, 8),
-            "repository_sources": [
-                "Pypi",
-            ],
-            "researched_at": None,
-            "spdx_expression": "MIT",
+            "number": Version("0.3.6"),
+            "published_at": datetime.datetime(2024, 9, 1, 20, 1, 50),
         }
     )
 ])
@@ -48,7 +34,7 @@ def test_get_latest_specified_release(settings, source, expected):
     Method should return the latest release matching specifier if any else None.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement(source)
     data = analyzer.get_package_data(pkg.name)
@@ -57,22 +43,21 @@ def test_get_latest_specified_release(settings, source, expected):
     assert analyzer.get_latest_specified_release(pkg.specifier, versions) == expected
 
 
-@freeze_time("2024-01-15 10:00:00")
 def test_build_package_informations_with_requirement(settings):
     """
     Method should return computed informations for given package name and version
     requirement specifiers that lead to a proper lateness computation.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
     analyzer.build_package_informations(pkg)
 
     assert pkg.data() == {
         "extras": set(),
-        "highest_published": datetime.datetime(2024, 3, 31, 2, 27, 8),
-        "highest_version": Version("0.3.5"),
+        "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
+        "highest_version": Version("0.3.6"),
         "lateness": [
             (
                 "0.3.4",
@@ -81,6 +66,10 @@ def test_build_package_informations_with_requirement(settings):
             (
                 "0.3.5",
                 datetime.datetime(2024, 3, 31, 2, 27, 8),
+            ),
+            (
+                "0.3.6",
+                datetime.datetime(2024, 9, 1, 20, 1, 50),
             ),
         ],
         "marker": None,
@@ -98,7 +87,6 @@ def test_build_package_informations_with_requirement(settings):
     }
 
 
-@freeze_time("2024-01-15 10:00:00")
 def test_build_package_informations_without_requirement(settings):
     """
     Method should return computed informations for given package name without any
@@ -106,7 +94,7 @@ def test_build_package_informations_without_requirement(settings):
     package elligible version is assumed to be last released one)
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette")
     analyzer.build_package_informations(pkg)
@@ -117,8 +105,8 @@ def test_build_package_informations_without_requirement(settings):
 
     assert pkg.data() == {
         "extras": set(),
-        "highest_published": datetime.datetime(2024, 3, 31, 2, 27, 8),
-        "highest_version": Version("0.3.5"),
+        "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
+        "highest_version": Version("0.3.6"),
         "lateness": None,
         "marker": None,
         "name": "diskette",
@@ -135,22 +123,21 @@ def test_build_package_informations_without_requirement(settings):
     }
 
 
-@freeze_time("2024-01-15 10:00:00")
 def test_build_package_informations_with_exceed_requirement(settings):
     """
     If specifiers resolve to version higher than releases available on Pypi, no
     latest version can be found and lateness will be empty.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>0.4.0")
     analyzer.build_package_informations(pkg)
 
     assert pkg.data() == {
         "extras": set(),
-        "highest_published": datetime.datetime(2024, 3, 31, 2, 27, 8),
-        "highest_version": Version("0.3.5"),
+        "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
+        "highest_version": Version("0.3.6"),
         "lateness": None,
         "marker": None,
         "name": "diskette",
@@ -169,12 +156,11 @@ def test_build_package_informations_with_exceed_requirement(settings):
 
 def test_build_package_informations_status_check(settings):
     """
-    Given PackageRequirement object must have a "valid" status to be processed else
-    analyzer would try to request invalid packages (like unsupported stuff without a
-    package name). Also package object express validity through a property "is_valid"
+    Given PackageRequirement object must have a valid status to be processed. Also
+    package object express validity through a property "is_valid"
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>0.4.0")
     analyzer.build_package_informations(pkg)

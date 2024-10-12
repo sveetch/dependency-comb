@@ -1,0 +1,110 @@
+{
+    "alternate-locations": [],
+    "files": [
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.0.tar.gz",
+            "hashes": {
+                "sha256": "095b49f4b712e3b7f01ada2b6dcc6758365134fec646cbf77bc3587ef58b688a"
+            },
+            "requires-python": ">=3.9",
+            "size": 30121,
+            "upload-time": "2024-03-21T00:49:23.753096Z",
+            "url": "https://files.pythonhosted.org/packages/65/a5/f7d98a323188d197a8608bf10aa403ec6390f897ccc1fc9a272f1312f449/diskette-0.3.0.tar.gz",
+            "yanked": false
+        },
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.1.tar.gz",
+            "hashes": {
+                "sha256": "38df032f50d782e27e3544b824376d62cd5a1160ace8edc7e365fc99c5626603"
+            },
+            "requires-python": ">=3.9",
+            "size": 34147,
+            "upload-time": "2024-03-21T01:40:45.818528Z",
+            "url": "https://files.pythonhosted.org/packages/7e/c8/8d1af80c86471715047209214dac501c9e8ae2049a7c72f7e55f89298c3b/diskette-0.3.1.tar.gz",
+            "yanked": false
+        },
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.2.tar.gz",
+            "hashes": {
+                "sha256": "90c7af41ea031ae447978c6750c759de2506f2a67738f000ee6e6c163eeaaf11"
+            },
+            "requires-python": ">=3.9",
+            "size": 36636,
+            "upload-time": "2024-03-25T02:11:20.452002Z",
+            "url": "https://files.pythonhosted.org/packages/c8/67/9e3390d1b1d4f18dc1c20e9be07d5badcac59732db67ae0c80c87020be3a/diskette-0.3.2.tar.gz",
+            "yanked": false
+        },
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.3.tar.gz",
+            "hashes": {
+                "sha256": "0a1012bb922d6458a5328f6eb05cb942313ba46a5f4ef00328b36d5eef1f41e0"
+            },
+            "requires-python": ">=3.9",
+            "size": 37866,
+            "upload-time": "2024-03-28T15:46:54.627669Z",
+            "url": "https://files.pythonhosted.org/packages/87/62/5b30758f0662100311e6b4c9a0f3a8c9e8fd50156a2e36fd959119183beb/diskette-0.3.3.tar.gz",
+            "yanked": false
+        },
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.4.tar.gz",
+            "hashes": {
+                "sha256": "fd806fbbc31074a30e92250c6c840f09202a4ed1fe15523251fdb6632daa1250"
+            },
+            "requires-python": ">=3.9",
+            "size": 38124,
+            "upload-time": "2024-03-30T12:38:29.469580Z",
+            "url": "https://files.pythonhosted.org/packages/ed/ee/f7a86883faaa4207bb3defd2d11b397c06f1953dca80613dff518e0c9164/diskette-0.3.4.tar.gz",
+            "yanked": false
+        },
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.5.tar.gz",
+            "hashes": {
+                "sha256": "0c3f666c868a01d88e9c2c4ae57fe59fb71259d4a8ffbe9a70f09598cf420448"
+            },
+            "requires-python": ">=3.9",
+            "size": 38566,
+            "upload-time": "2024-03-31T02:27:08.982625Z",
+            "url": "https://files.pythonhosted.org/packages/f6/29/ddb675f4da6a4dc141c9802bb197e6f4df7a061a34e80b554769d805b736/diskette-0.3.5.tar.gz",
+            "yanked": false
+        },
+        {
+            "core-metadata": false,
+            "data-dist-info-metadata": false,
+            "filename": "diskette-0.3.6.tar.gz",
+            "hashes": {
+                "sha256": "7ae034645766854be147487455d3a7d060275d7e8c314d40d6eb4fe612bd916c"
+            },
+            "requires-python": ">=3.9",
+            "size": 38902,
+            "upload-time": "2024-09-01T20:01:50.845269Z",
+            "url": "https://files.pythonhosted.org/packages/2c/ea/b4a3aaca350a7af35cc89314cff3c06830f8b212be9ef5003ff7253653aa/diskette-0.3.6.tar.gz",
+            "yanked": false
+        }
+    ],
+    "meta": {
+        "_last-serial": 24835237,
+        "api-version": "1.2"
+    },
+    "name": "diskette",
+    "versions": [
+        "0.3.0",
+        "0.3.1",
+        "0.3.2",
+        "0.3.3",
+        "0.3.4",
+        "0.3.5",
+        "0.3.6"
+    ]
+}

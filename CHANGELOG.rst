@@ -3,6 +3,14 @@
 Changelog
 =========
 
+Development
+***********
+
+* Moving from Libraries.io API to Pypi API;
+
+  * [ ] Drop all libraries.io API (old analyzer, doc references, api key stuff, etc..);
+
+
 Version 0.3.0 - 2024/08/27
 **************************
 

@@ -1,6 +1,6 @@
 from packaging.version import Version
 
-from dependency_comb.analyzer import DependenciesAnalyzer
+from dependency_comb.new_analyzer import DependenciesAnalyzer
 
 
 def test_compute_lateness(settings):
@@ -10,7 +10,7 @@ def test_compute_lateness(settings):
 
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     versions = [
         {"number": Version("1.0.0"), "published_at": "evening"},

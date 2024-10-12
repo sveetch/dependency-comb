@@ -1,6 +1,6 @@
 import pytest
 
-from dependency_comb.analyzer import DependenciesAnalyzer
+from dependency_comb.new_analyzer import DependenciesAnalyzer
 
 
 @pytest.mark.parametrize("source, strict, environment, expected", [
@@ -90,9 +90,8 @@ def test_inspect(settings, source, strict, environment, expected):
     from given requirements and possible strict option and possible environment.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
     # analyzer = DependenciesAnalyzer(
-    #     settings.api_key(),
     #     cachedir=cachedir,
     #     api_pause=None
     # )
@@ -114,7 +113,7 @@ def test_build_inspection(settings):
     sample_source = settings.fixtures_path / "pip_syntax/requirements.txt"
     sample_analyzed = settings.fixtures_path / "pip_syntax/analyzed.json"
 
-    analyzer = DependenciesAnalyzer("dummy-key", cachedir=cachedir)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     packages = analyzer.inspect(sample_source)
     sample_analyzed.write_text(json.dumps(
