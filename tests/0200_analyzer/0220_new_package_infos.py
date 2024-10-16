@@ -5,7 +5,7 @@ import pytest
 from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
 
-from dependency_comb.new_analyzer import DependenciesAnalyzer
+from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.package import PackageRequirement
 
 

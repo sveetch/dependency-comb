@@ -19,23 +19,6 @@ from .. import __pkgname__
     metavar="SOURCE",
 )
 @click.option(
-    "--filekey",
-    type=click.Path(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        path_type=Path,
-        resolve_path=True,
-    ),
-    default="librariesio-key.txt",
-    metavar="FILEPATH",
-    help=(
-        "A simple text file which only contains the Libraries.io API key to use "
-        "to request the API. It is required since API is restricted. Default to "
-        "'librariesio-key.txt'."
-    ),
-)
-@click.option(
     "--cachedir",
     type=click.Path(
         exists=False,
@@ -71,8 +54,7 @@ from .. import __pkgname__
     help=(
         "The time in second to pause before an API requests. Default to 1 second "
         "that should be enough to follow the Libraries.io rate limit for a free "
-        "account. *DO NOT* set it to zero if you don't own an API key suitable to "
-        "override the API rate limit or you may be blocked."
+        "account."
     ),
 )
 @click.option(
@@ -139,7 +121,6 @@ def report_command(*args, **parameters):
 
     source = parameters["source"].read()
     # Analyzer opts
-    filekey = parameters["filekey"]
     cachedir = parameters["cachedir"]
     destination = parameters["destination"]
     environment = json.loads(parameters["env"].read_text()) if parameters["env"] else {}
@@ -159,11 +140,7 @@ def report_command(*args, **parameters):
             parameters["source"].name
         ).parent.resolve()
 
-    logger.debug("API file key: {}".format(filekey))
     logger.debug("Cache directory: {}".format(cachedir))
-
-    # Read API key
-    api_key = filekey.read_text()
 
     # Create cache directory if needed
     if cachedir and not cachedir.exists():
@@ -172,7 +149,6 @@ def report_command(*args, **parameters):
     # Analyze requirements
     try:
         analyzer = DependenciesAnalyzer(
-            api_key,
             cachedir=cachedir,
             api_pause=api_pause,
             api_timeout=api_timeout,

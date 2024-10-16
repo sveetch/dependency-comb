@@ -1,6 +1,5 @@
 import json
 import datetime
-import time
 
 from operator import itemgetter
 
@@ -15,15 +14,30 @@ from . import __pkgname__, __version__
 
 class DependenciesAnalyzer(RequirementParser):
     """
-    Analyzer is able to request libraries.io API to get informations for requirements.
-    """
-    PACKAGE_DETAIL_ENDPOINT = (
-        "https://libraries.io/api/{plateform}/{name}?api_key={key}"
-    )
+    TODO:
+    Analyzer that should be able to get required package infos from Pypi.
 
-    def __init__(self, api_key, cachedir=None, api_pause=1, api_timeout=None,
+    Opposed to the "libraries.io" analyzer, this one will need to make 2 requests to
+    get needed infos, since the package detail endpoint from new "JSON API" has
+    releases informations but it is deprecated in profit of the Legacy API.
+
+    Legacy API (also known as the "Simple API") return either a HTML or JSON response,
+    depending value of request header "Accept:".
+
+    Globally, the JSON API is a little bit more complicated to use but bring useful
+    data opposed to libraries.io that have also useful data but also many useless one,
+    and further more it is slow to respond and need an API key with usage limitations.
+
+    Hopefully Pypi APIs may have some limitations but there far away from libraries.io
+    since it is more an human action after seeing a huge serie of requests.
+
+    Finally, once achieved we will definitively drop libraries.io
+    """
+    PACKAGE_DETAIL_ENDPOINT = "https://pypi.org/pypi/{name}/json"
+    PACKAGE_RELEASES_ENDPOINT = "https://pypi.org/simple/{name}/"
+
+    def __init__(self, cachedir=None, api_pause=1, api_timeout=None,
                  logger=None, ignores=None):
-        self.api_key = api_key
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
         # Time in seconds to pause before an API request (to embrace limit of 60
@@ -45,33 +59,24 @@ class DependenciesAnalyzer(RequirementParser):
                 name=__pkgname__,
                 version=__version__,
             ),
+            # This specific 'accept' header (application/json won't work) is only
+            # required from Legacy API but JSON API ignores it, so let it be a global
+            # header
+            "Accept": "application/vnd.pypi.simple.v1+json",
         }
 
-    def endpoint_package_info(self, name):
+    def endpoint_package_detail(self, name):
         """
         Request package detail API endpoint for given package name.
         """
-        if self.api_pause:
-            time.sleep(self.api_pause)
-
-        endpoint_url = self.PACKAGE_DETAIL_ENDPOINT.format(
-            plateform="Pypi",
-            name=name,
-            key=self.api_key,
-        )
+        endpoint_url = self.PACKAGE_DETAIL_ENDPOINT.format(name=name)
         response = requests.get(
             endpoint_url,
             headers=self.request_headers(),
             timeout=self.api_timeout,
         )
 
-        # Manage custom error message for some well known errors
-        if response.status_code == 403:
-            raise AnalyzerAPIError(
-                "API responded a 403 error, your API key is probably invalid.",
-                http_status=403
-            )
-        elif response.status_code == 404:
+        if response.status_code == 404:
             raise AnalyzerAPIError(
                 (
                     "API responded a 404 error, package name '{}' is probably "
@@ -79,20 +84,128 @@ class DependenciesAnalyzer(RequirementParser):
                 ).format(name),
                 http_status=404
             )
-        elif response.status_code == 429:
-            raise AnalyzerAPIError(
-                "Analyzer exceeded API limit of 60 request per minute.",
-                http_status=429
-            )
 
-        # In case we an error status that is not taken in charge before
+        # In case we have an error status that is not taken in charge before
         response.raise_for_status()
 
         return response
 
+    def endpoint_releases_detail(self, name):
+        """
+        Request package releases API endpoint for given package name.
+        """
+        endpoint_url = self.PACKAGE_RELEASES_ENDPOINT.format(name=name)
+        response = requests.get(
+            endpoint_url,
+            headers=self.request_headers(),
+            timeout=self.api_timeout,
+        )
+
+        if response.status_code == 404:
+            raise AnalyzerAPIError(
+                (
+                    "API responded a 404 error, package name '{}' is probably "
+                    "invalid or not available on Pypi."
+                ).format(name),
+                http_status=404
+            )
+
+        # In case we have an error status that is not taken in charge before
+        response.raise_for_status()
+
+        return response
+
+    def get_cache_or_request(self, name, filename, method, label):
+        """
+        Helper to search for a cache before making request if there is none.
+
+        Arguments:
+            name (string):
+            filename (string):
+            method (callable): Callable that will perform a request to get JSON
+                payload. The callable is expected to accept a single argument which is
+                a package name to request.
+            label (string):
+
+        Returns:
+            dict: Returned payload from API or from stored cache.
+        """
+        self.logger.debug("Get package {label} for '{name}'".format(
+            label=label,
+            name=name or "Unknow"
+        ))
+
+        # Mostly impossible to be there but just in case there is an unexpected issue
+        if not name:
+            raise AnalyzerError("Package without name can not be requested.")
+
+        # Build expected cache file name if cache is enabled
+        cache_file = None
+        if self.cachedir:
+            cache_file = self.cachedir / filename
+
+        # Return cache if it exists
+        if cache_file and cache_file.exists():
+            self.logger.debug("Loading data from cache")
+            return json.loads(cache_file.read_text())
+
+        # Use given method name to request payload from API
+        response = method(name)
+
+        self.logger.debug("[{status}] API response from {url}".format(
+            status=response.status_code,
+            url=response.url.split("?")[0],
+        ))
+        output = response.json()
+
+        # Build cache file if cache is enabled
+        if self.cachedir:
+            self.logger.debug("Writing cache: {}".format(cache_file))
+            cache_file.write_text(json.dumps(output, indent=4))
+
+        return output
+
+    def format_releases_payload(self, payload):
+        """
+        Format package release payload to an useful one.
+
+        This means we just need each version with its uploading date, everything else
+        is useless from this application view.
+
+        .. Note::
+            Version data is only available from the files, since release tarball is
+            standardized well enough we naively parsing the file name to extract the
+            version number.
+
+        Arguments:
+            payload (dict): The package releases payload as returned from Legacy API
+                endpoint. For true we just need about the ``files`` item from this
+                dict.
+
+        Returns:
+            list: List of dictionnaries for all version, each one contain the ``number``
+            and ``published_at`` items.
+        """
+        return [
+            {
+                "number": item["filename"].replace(
+                    "-reupload",
+                    ""
+                ).split(
+                    "-"
+                )[-1].replace(
+                    ".tar.gz",
+                    ""
+                ),
+                "published_at": item["upload-time"],
+            }
+            for item in payload["files"]
+            if item["filename"].endswith(".tar.gz")
+        ]
+
     def get_package_data(self, name):
         """
-        Get package detail either from API or from cache if any.
+        Get package informations (detail and releases)
         """
         self.logger.info("Processing package: {name}".format(
             name=name or "Unknow"
@@ -101,30 +214,21 @@ class DependenciesAnalyzer(RequirementParser):
         if not name:
             raise AnalyzerError("Package without name can not be requested.")
 
-        # Build expected cache file name if cache is enabled
-        cache_file = None
-        if self.cachedir:
-            cache_file = self.cachedir / "{}.json".format(name)
-
-        # Use cache if exists without any condition
-        if cache_file and cache_file.exists():
-            self.logger.debug("Loading data from cache")
-            output = json.loads(cache_file.read_text())
-        else:
-            # Get payload from API
-            response = self.endpoint_package_info(name)
-
-            # Debug API url without API key
-            self.logger.debug("[{status}] API response from {url}".format(
-                status=response.status_code,
-                url=response.url.split("?")[0],
-            ))
-            output = response.json()
-
-            # Build cache if cache is enabled
-            if self.cachedir:
-                self.logger.debug("Writing cache: {}".format(cache_file))
-                cache_file.write_text(json.dumps(output, indent=4))
+        # Patch detail to inject released versions
+        output = self.get_cache_or_request(
+            name,
+            "{}.detail.json".format(name),
+            self.endpoint_package_detail,
+            "detail",
+        )
+        output["versions"] = self.format_releases_payload(
+            self.get_cache_or_request(
+                name,
+                "{}.releases.json".format(name),
+                self.endpoint_releases_detail,
+                "releases",
+            )
+        )
 
         return output
 
@@ -141,19 +245,20 @@ class DependenciesAnalyzer(RequirementParser):
             list: List of dictionnary for computed releases.
         """
         versions = []
+
         # Rebuild the version list to patch some values in useful types
         for item in data["versions"]:
             # Enforce real datetime
             item["published_at"] = datetime.datetime.fromisoformat(
                 item["published_at"].split(".")[0]
             )
-            # Coerce original number to a Version object
+
+            # Coerce original number to a Version object if possible
             try:
                 number = Version(item["number"])
             except InvalidVersion:
                 msg = (
-                    "Ignored package '{name}' invalid release version number "
-                    "'{version}'"
+                    "Ignored invalid version number '{version}' for package '{name}'"
                 )
                 self.logger.warning(msg.format(name=name, version=item["number"]))
                 continue
@@ -229,6 +334,28 @@ class DependenciesAnalyzer(RequirementParser):
             )
         ]
 
+    def get_package_urls(self, data):
+        """
+        This should try to get the relevant URLs from package metadatas.
+
+        However the ``project_urls`` item from package metadatas is not normalized
+        enough to quickly get relevant infos so here we should try to get them.
+        """
+        informations = data["info"]
+        urls = informations.get("project_urls", {})
+
+        repository_url = None
+        elligible_repo_url_names = ["repository", "source", "source code"]
+        for name, value in urls.items():
+            if name.lower() in elligible_repo_url_names:
+                repository_url = value
+                break
+
+        return {
+            "package": informations["package_url"],
+            "repository": repository_url,
+        }
+
     def build_package_informations(self, requirement):
         """
         Compute and set informations in a ``PackageRequirement`` object.
@@ -242,11 +369,12 @@ class DependenciesAnalyzer(RequirementParser):
         """
         if requirement.status == "parsed":
             data = self.get_package_data(requirement.name)
-            requirement.status = "analyzed"
+            urls = self.get_package_urls(data)
 
-            requirement.pypi_url = data["package_manager_url"]
-            requirement.repository_url = data["repository_url"]
-            requirement.highest_version = Version(data["latest_release_number"])
+            requirement.status = "analyzed"
+            requirement.pypi_url = urls["package"]
+            requirement.repository_url = urls["repository"]
+            requirement.highest_version = Version(data["info"]["version"])
 
             # Once numbers have been coerced they can be used to reorder versions
             # properly on number

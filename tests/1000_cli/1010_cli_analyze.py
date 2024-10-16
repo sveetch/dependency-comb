@@ -4,6 +4,7 @@ from freezegun import freeze_time
 
 from click.testing import CliRunner
 
+from dependency_comb import __pkgname__
 from dependency_comb.cli.entrypoint import cli_frontend
 
 
@@ -120,8 +121,8 @@ def test_analyze_to_file(caplog, tmp_path, settings):
     ]
     # There is some info logs
     assert caplog.record_tuples == [
-        ("dependency-comb", 20, "Processing package: django"),
-        ("dependency-comb", 20, "Processing package: diskette"),
+        (__pkgname__, 20, "Processing package: django"),
+        (__pkgname__, 20, "Processing package: diskette"),
     ]
 
 

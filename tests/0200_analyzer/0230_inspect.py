@@ -1,6 +1,6 @@
 import pytest
 
-from dependency_comb.new_analyzer import DependenciesAnalyzer
+from dependency_comb.analyzer import DependenciesAnalyzer
 
 
 @pytest.mark.parametrize("source, strict, environment, expected", [

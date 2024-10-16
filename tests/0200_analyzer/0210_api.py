@@ -1,31 +1,13 @@
 import pytest
 
-from dependency_comb.new_analyzer import DependenciesAnalyzer
+from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.exceptions import AnalyzerAPIError
 
 from tests.utils import skip_api_condition
 
 
 # Skip marker decorator for tests depending on a API key usage
-#api_allowed = pytest.mark.skipif(skip_api_condition, reason="API request is disabled")
-# TODO: Not sure yet if we still conditionnally disable tests with API call or not
-api_allowed = pytest.mark.skipif(False, reason="API request is disabled")
-
-
-#@api_allowed
-#def test_get_package_data_invalid_key():
-    #"""
-    #When given api key is invalid, the API respond with a Http 403 response
-    #"""
-    #analyzer = DependenciesAnalyzer(api_pause=None)
-
-    #with pytest.raises(AnalyzerAPIError) as excinfo:
-        #analyzer.get_package_data("project-composer")
-
-    #assert str(excinfo.value) == (
-        #"API responded a 403 error, your API key is probably invalid."
-    #)
-    #assert excinfo.value.http_status == 403
+api_allowed = pytest.mark.skipif(skip_api_condition, reason="API request is disabled")
 
 
 @api_allowed

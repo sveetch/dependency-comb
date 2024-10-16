@@ -7,7 +7,7 @@ import pytest
 
 import dependency_comb
 
-from tests.utils import get_api_key, skip_api_condition
+from tests.utils import skip_api_condition
 
 
 class FixturesSettingsTestMixin(object):
@@ -54,18 +54,6 @@ class FixturesSettingsTestMixin(object):
             FIXTURES=str(self.fixtures_path),
             VERSION=dependency_comb.__version__,
         )
-
-    @property
-    def api_key(self):
-        """
-        Get API key retrieved from file ``librariesio-key.txt`` expected in project
-        root.
-
-        Returns:
-            string: Either the API key found from file if it exists else return
-            None.
-        """
-        return get_api_key()
 
     @property
     def is_api_request_enabled(self):

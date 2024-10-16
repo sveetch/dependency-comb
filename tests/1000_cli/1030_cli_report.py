@@ -2,6 +2,7 @@ from freezegun import freeze_time
 
 from click.testing import CliRunner
 
+from dependency_comb import __pkgname__
 from dependency_comb.cli.entrypoint import cli_frontend
 
 
@@ -72,7 +73,7 @@ def test_report_without_failures_from_stdin(caplog, settings):
 @freeze_time("2024-07-25 10:00:00")
 def test_report_without_failures_to_file(caplog, tmp_path, settings):
     """
-    Command should should write JSON to a file instead of standard output and logging
+    Command should write JSON to a file instead of standard output and logging
     some messages.
     """
     cachedir = settings.fixtures_path / "api_cache"
@@ -92,10 +93,11 @@ def test_report_without_failures_to_file(caplog, tmp_path, settings):
     assert expected.read_text() == destination.read_text() + "\n"
 
     assert caplog.record_tuples == [
-        ("dependency-comb", 20, "Processing package: django"),
-        ("dependency-comb", 20, "Processing package: Pillow"),
-        ("dependency-comb", 20, "Processing package: djangorestframework"),
-        ("dependency-comb", 20, "Processing package: django-admin-shortcuts"),
-        ("dependency-comb", 20, "Processing package: requests"),
-        ("dependency-comb", 20, "Processing package: urllib3"),
+        (__pkgname__, 20, "Processing package: django"),
+        (__pkgname__, 20, "Processing package: Pillow"),
+        (__pkgname__, 30, "Ignored invalid version number 'rc1' for package 'Pillow'"),
+        (__pkgname__, 20, "Processing package: djangorestframework"),
+        (__pkgname__, 20, "Processing package: django-admin-shortcuts"),
+        (__pkgname__, 20, "Processing package: requests"),
+        (__pkgname__, 20, "Processing package: urllib3"),
     ]
