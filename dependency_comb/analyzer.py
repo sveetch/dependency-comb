@@ -1,5 +1,4 @@
 import json
-import datetime
 
 from operator import itemgetter
 
@@ -9,6 +8,7 @@ from packaging.version import Version, InvalidVersion
 from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
 from .utils.logger import NoOperationLogger
+from .utils.dates import safe_isoformat_parse
 from . import __pkgname__, __version__
 
 
@@ -270,9 +270,7 @@ class DependenciesAnalyzer(RequirementParser):
         # Rebuild the version list to patch some values in useful types
         for item in data["versions"]:
             # Enforce real datetime
-            item["published_at"] = datetime.datetime.fromisoformat(
-                item["published_at"].split(".")[0]
-            )
+            item["published_at"] = safe_isoformat_parse(item["published_at"])
 
             # Coerce original number to a Version object if possible
             try:

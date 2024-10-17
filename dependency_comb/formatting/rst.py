@@ -1,10 +1,10 @@
-import datetime
 from textwrap import TextWrapper
 
 import humanize
 from tabulate import tabulate
 
 from ..package import PackageRequirement
+from ..utils.dates import safe_isoformat_parse
 from .base import BaseFormatter
 
 
@@ -29,9 +29,7 @@ class RestructuredTextFormatter(BaseFormatter):
             return "Latest", None
 
         resolved_age = humanize.naturaldelta(
-            self.now_date - datetime.datetime.fromisoformat(
-                item["resolved_published"]
-            )
+            self.now_date - safe_isoformat_parse(item["resolved_published"])
         )
         return item["resolved_version"], resolved_age.capitalize()
 
@@ -61,9 +59,7 @@ class RestructuredTextFormatter(BaseFormatter):
             # Compute latest release label including humanized delta from current to
             # latest date
             latest_activity = humanize.naturaldelta(
-                self.now_date - datetime.datetime.fromisoformat(
-                    item["highest_published"]
-                )
+                self.now_date - safe_isoformat_parse(item["highest_published"])
             )
             latest_release = "{} - {} ago".format(
                 item["highest_version"],
@@ -122,6 +118,9 @@ class RestructuredTextFormatter(BaseFormatter):
                 wrapper.fill(resume),
             ])
 
+        if not rows:
+            return ""
+
         return str(tabulate(
             rows,
             tablefmt="grid",
@@ -166,8 +165,10 @@ class RestructuredTextFormatter(BaseFormatter):
         output.append(self.build_analyzed_table(analyzed_items))
 
         if with_failures:
-            output.append("\nFailures")
-            output.append("*" * len("Failures"))
-            output.append(self.build_errors_table(ignored_items))
+            failures_output = self.build_errors_table(ignored_items)
+            if failures_output:
+                output.append("\nFailures")
+                output.append("*" * len("Failures"))
+                output.append(self.build_errors_table(ignored_items))
 
         return "\n".join(output)

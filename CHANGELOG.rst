@@ -6,9 +6,11 @@ Changelog
 Development
 ***********
 
-* Moving from Libraries.io API to Pypi API;
+* Modified analyzer to use Pypi API instead of Libraries.io API;
+* File for API key is no more useful and commands have been modified to remove the
+  ``filekey`` argument;
+* Fixed RST formatter that failed when asked for failures but there was none;
 
-  * [ ] Drop all libraries.io API (old analyzer, doc references, api key stuff, etc..);
 
 
 Version 0.3.0 - 2024/08/27
