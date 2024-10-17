@@ -81,12 +81,9 @@ to start them on your current development install: ::
 
     make test
 
-A file ``librariesio-key.txt`` containing a valid Libraries.io API key is required to
-run the few tests that are requesting API.
-
-If you have the valid API key file but are running tests often without any changes
-around the API request method from analyzer you can also skip them using the specific
-tasks: ::
+A very few set of tests can perform some requests to Pypi API, if you don't to perform
+any request you can set the environment variable ``COMB_TEST_API_ENABLED`` to ``false``
+or just use the dedicated Makefile task: ::
 
     make test-no-api
 

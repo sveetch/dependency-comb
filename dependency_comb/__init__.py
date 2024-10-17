@@ -1,4 +1,4 @@
-"""A tool to analyze requirements with Libraries.io API"""
+"""A tool to analyze requirements with Pypi API"""
 from importlib.metadata import version
 
 

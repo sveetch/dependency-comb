@@ -1,3 +1,5 @@
+.. _Pypi API: https://warehouse.pypa.io/api-reference/index.html
+
 .. _overview_intro:
 
 ========
@@ -24,16 +26,12 @@ Concretely, a requirement file from Pip will just work except for some
 API
 ***
 
-Currently we use `Libraries.io <https://www.python.org/>`_ API that require an API key
-to works see  :ref:`install_apikey_intro` for details.
+Dependency comb use the `Pypi API`_ to get packages informations.
 
-.. Note::
-    Despite its useful package informations Libraries.io may be unresponsive sometime,
-    is not very fast to respond and has a limit rate for requests per minute.
-
-    We are currently looking to implement the
-    `API from Pypi <https://warehouse.pypa.io/api-reference/json.html>`_ itself that
-    should be more efficient.
+However commands have a ``--cachedir`` argument to store these informations and avoid
+performing the same requests on consecutive command executions. This is useful if you
+are debugging your project requirements but be aware that there is no way to manage
+cache persistence life except removing the cache files.
 
 
 Recursive included requirements
@@ -144,3 +142,35 @@ This will print the following output: ::
 
 Also you will have a lots of logging messages about processing, you may mute it with
 a command option see :ref:`cli_logging`.
+
+The following sections are the included RestructuredText output sample from before.
+
+Analyzed
+********
++-----+------------------------+------------+------------------------------+-----------------------+
+| #   | Name                   |  Lateness  |                     Required |        Latest release |
++=====+========================+============+==============================+=======================+
+| 1   | django                 |    178     |         1.11.9 - 6 years ago |  5.1a1 - 2 months ago |
++-----+------------------------+------------+------------------------------+-----------------------+
+| 2   | Pillow                 |     6      | 9.5.0 - 1 year, 3 months ago |  10.4.0 - 24 days ago |
++-----+------------------------+------------+------------------------------+-----------------------+
+| 3   | djangorestframework    |     -      |                       Latest |  3.15.2 - A month ago |
++-----+------------------------+------------+------------------------------+-----------------------+
+| 4   | django-admin-shortcuts |     4      |          1.2.6 - 9 years ago | 2.1.1 - 10 months ago |
++-----+------------------------+------------+------------------------------+-----------------------+
+| 5   | requests               |     56     |          2.8.1 - 8 years ago |  2.32.3 - A month ago |
++-----+------------------------+------------+------------------------------+-----------------------+
+| 6   | urllib3                |     -      |                       Latest | 1.26.19 - A month ago |
++-----+------------------------+------------+------------------------------+-----------------------+
+
+Failures
+********
++-----+------------------------------------------+-----------------------+-------------------------------------+
+| #   | Source                                   |        Status         | Resume                              |
++=====+==========================================+=======================+=====================================+
+| 1   | ./downloads/numpy-1.9.2-cp34-none-       | unsupported-localpath | Local package is not supported      |
+|     | win32.whl                                |                       |                                     |
++-----+------------------------------------------+-----------------------+-------------------------------------+
+| 2   | http://wxpython.org/Phoenix/snapshot-bui |    unsupported-url    | Direct package URL is not supported |
+|     | lds/wxPython_Phoenix-                    |                       |                                     |
++-----+------------------------------------------+-----------------------+-------------------------------------+

@@ -73,9 +73,6 @@ Usage: ::
             echo "django==3.2.1" | dependency_comb analyze -
 
     Options:
-    --filekey FILEPATH  A simple text file which only contains the Libraries.io
-                        API key to use to request the API. It is required since
-                        API is restricted. Default to 'librariesio-key.txt'.
     --cachedir DIRPATH  A directory where to look for API request cache. It is
                         looked for cache file per package and if any, avoid any
                         request for a package details. There is not any mechanic
@@ -87,15 +84,9 @@ Usage: ::
                         output.
     --indent INTEGER    Indentation level for JSON output. Default to 4 spaces.
     --pause INTEGER     The time in second to pause before an API requests.
-                        Default to 1 second that should be enough to follow the
-                        Libraries.io rate limit for a free account. *DO NOT* set
-                        it to zero if you don't own an API key suitable to
-                        override the API rate limit or you may be blocked.
-    --timeout INTEGER   Timeout in seconds for API requests. Sometime
-                        Libraries.io is unresponsive and the request may hang
-                        almost infinitely so this option may avoid this.The
-                        default timeout is set to 15 seconds, set it to 0 to
-                        disable timeout.
+                        Default to 1 second.
+    --timeout INTEGER   Timeout in seconds for API requests. The default timeout
+                        is set to 15 seconds, set it to 0 to disable timeout.
     --env FILEPATH      A JSON file for some environment variables to give to
                         analyzer. This will be used to resolve specifier
                         markers. If analyzer does not receive any environment
@@ -161,9 +152,6 @@ Usage: ::
             echo "django==3.2.1" | dependency_comb report -
 
     Options:
-    --filekey FILEPATH  A simple text file which only contains the Libraries.io
-                        API key to use to request the API. It is required since
-                        API is restricted. Default to 'librariesio-key.txt'.
     --cachedir DIRPATH  A directory where to look for API request cache. It is
                         looked for cache file per package and if any, avoid any
                         request for a package details. There is not any mechanic
@@ -174,15 +162,9 @@ Usage: ::
                         manifest. If not given the JSON will be sent to standard
                         output.
     --pause INTEGER     The time in second to pause before an API requests.
-                        Default to 1 second that should be enough to follow the
-                        Libraries.io rate limit for a free account. *DO NOT* set
-                        it to zero if you don't own an API key suitable to
-                        override the API rate limit or you may be blocked.
-    --timeout INTEGER   Timeout in seconds for API requests. Sometime
-                        Libraries.io is unresponsive and the request may hang
-                        almost infinitely so this option may avoid this.The
-                        default timeout is set to 15 seconds, set it to 0 to
-                        disable timeout.
+                        Default to 1 second.
+    --timeout INTEGER   Timeout in seconds for API requests. The default timeout
+                        is set to 15 seconds, set it to 0 to disable timeout.
     --env FILEPATH      A JSON file for some environment variables to give to
                         analyzer. This will be used to resolve specifier
                         markers. If analyzer does not receive any environment

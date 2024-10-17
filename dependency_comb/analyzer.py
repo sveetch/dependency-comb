@@ -14,24 +14,20 @@ from . import __pkgname__, __version__
 
 class DependenciesAnalyzer(RequirementParser):
     """
-    TODO:
-    Analyzer that should be able to get required package infos from Pypi.
+    Analyzer to get and compute package informations from Pypi for requirements.
 
-    Opposed to the "libraries.io" analyzer, this one will need to make 2 requests to
-    get needed infos, since the package detail endpoint from new "JSON API" has
-    releases informations but it is deprecated in profit of the Legacy API.
+    This will need to make 2 requests to get needed informations for each package since
+    the package detail endpoint from new "JSON API" has releases informations but it
+    is deprecated in profit of the Legacy API.
 
     Legacy API (also known as the "Simple API") return either a HTML or JSON response,
     depending value of request header "Accept:".
 
-    Globally, the JSON API is a little bit more complicated to use but bring useful
-    data opposed to libraries.io that have also useful data but also many useless one,
-    and further more it is slow to respond and need an API key with usage limitations.
-
-    Hopefully Pypi APIs may have some limitations but there far away from libraries.io
-    since it is more an human action after seeing a huge serie of requests.
-
-    Finally, once achieved we will definitively drop libraries.io
+    Attributes:
+        PACKAGE_DETAIL_ENDPOINT (string): Template string to build URL to the Pypi
+            JSON API to get package details.
+        PACKAGE_RELEASES_ENDPOINT (string): Template string to build URL to the Pypi
+            Legacy API to get package releases.
     """
     PACKAGE_DETAIL_ENDPOINT = "https://pypi.org/pypi/{name}/json"
     PACKAGE_RELEASES_ENDPOINT = "https://pypi.org/simple/{name}/"
@@ -40,8 +36,9 @@ class DependenciesAnalyzer(RequirementParser):
                  logger=None, ignores=None):
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
-        # Time in seconds to pause before an API request (to embrace limit of 60
-        # requests max per minute)
+        # Time in seconds to pause before an API request
+        # TODO: Pause time has been removed from this analyzer, it should be done on
+        # a lower lever instead.
         self.api_pause = api_pause
         # Time in seconds for timeout limit on API request
         self.api_timeout = api_timeout
@@ -53,6 +50,9 @@ class DependenciesAnalyzer(RequirementParser):
     def request_headers(self):
         """
         Define the custom headers to use in requests to the API.
+
+        Returns:
+            dict: Dictionnary of headers to use in a request.
         """
         return {
             "user-agent": "{name}/{version}".format(
@@ -68,6 +68,12 @@ class DependenciesAnalyzer(RequirementParser):
     def endpoint_package_detail(self, name):
         """
         Request package detail API endpoint for given package name.
+
+        Arguments:
+            name (string): The package name to search for.
+
+        Returns:
+            requests.Response: Response object from request.
         """
         endpoint_url = self.PACKAGE_DETAIL_ENDPOINT.format(name=name)
         response = requests.get(
@@ -93,6 +99,12 @@ class DependenciesAnalyzer(RequirementParser):
     def endpoint_releases_detail(self, name):
         """
         Request package releases API endpoint for given package name.
+
+        Arguments:
+            name (string): The package name to search for.
+
+        Returns:
+            requests.Response: Response object from request.
         """
         endpoint_url = self.PACKAGE_RELEASES_ENDPOINT.format(name=name)
         response = requests.get(
@@ -120,12 +132,14 @@ class DependenciesAnalyzer(RequirementParser):
         Helper to search for a cache before making request if there is none.
 
         Arguments:
-            name (string):
-            filename (string):
+            name (string): The package name to search for.
+            filename (string): Filename to write cache. It should include the label to
+                ensure they won't overwrite each other.
             method (callable): Callable that will perform a request to get JSON
                 payload. The callable is expected to accept a single argument which is
                 a package name to request.
-            label (string):
+            label (string): Label of informations kind. Commonly it is ``detail`` or
+                ``releases``.
 
         Returns:
             dict: Returned payload from API or from stored cache.
@@ -206,6 +220,13 @@ class DependenciesAnalyzer(RequirementParser):
     def get_package_data(self, name):
         """
         Get package informations (detail and releases)
+
+        Arguments:
+            name (string): The package name to search for.
+
+        Returns:
+            dict: A dictionnary that contain all useful package informations (detail
+            and releases).
         """
         self.logger.info("Processing package: {name}".format(
             name=name or "Unknow"
@@ -340,6 +361,13 @@ class DependenciesAnalyzer(RequirementParser):
 
         However the ``project_urls`` item from package metadatas is not normalized
         enough to quickly get relevant infos so here we should try to get them.
+
+        Arguments:
+            data (dict): Dictionnary of package informations as returned from
+            ``Analyzer.get_package_data()``.
+
+        Returns:
+            dict: A dictionnary that contains useful URLs.
         """
         informations = data["info"]
         urls = informations.get("project_urls", {})

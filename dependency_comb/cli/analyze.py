@@ -60,10 +60,7 @@ from .. import __pkgname__
     type=click.INT,
     default=1,
     help=(
-        "The time in second to pause before an API requests. Default to 1 second "
-        "that should be enough to follow the Libraries.io rate limit for a free "
-        "account. *DO NOT* set it to zero if you don't own an API key suitable to "
-        "override the API rate limit or you may be blocked."
+        "The time in second to pause before an API requests. Default to 1 second."
     ),
 )
 @click.option(
@@ -71,9 +68,8 @@ from .. import __pkgname__
     type=click.INT,
     default=15,
     help=(
-        "Timeout in seconds for API requests. Sometime Libraries.io is unresponsive "
-        "and the request may hang almost infinitely so this option may avoid this."
-        "The default timeout is set to 15 seconds, set it to 0 to disable timeout."
+        "Timeout in seconds for API requests. The default timeout is set to 15 "
+        "seconds, set it to 0 to disable timeout."
     ),
 )
 @click.option(

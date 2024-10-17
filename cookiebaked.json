@@ -12,7 +12,7 @@
     "init_git_repository": true,
     "package_name": "dependency-comb",
     "project_name": "Dependency comb",
-    "project_short_description": "A tool to analyze requirements with Libraries.io API",
+    "project_short_description": "A tool to analyze requirements with Pypi API",
     "pypi_username": "sveetch",
     "version": "0.1.0"
 }

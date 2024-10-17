@@ -4,7 +4,7 @@
 .. _semantic-version: https://www.python.org/
 .. _humanize: https://www.python.org/
 .. _packaging: https://www.python.org/
-.. _Libraries.io: https://www.python.org/
+.. _Pypi API: https://warehouse.pypa.io/api-reference/index.html
 .. _tabulate: https://pypi.org/project/tabulate/
 .. _colorlog: https://pypi.org/project/colorlog/
 
@@ -18,8 +18,7 @@ about project lateness and related packages activities.
 
 This can be especially useful when auditing an existing project.
 
-Currently the analyze is done using informations from `Libraries.io`_ API which require
-a private key to be used.
+Analyze is performed using informations from `Pypi API`_.
 
 
 Dependencies
