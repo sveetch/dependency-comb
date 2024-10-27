@@ -48,11 +48,22 @@ from .. import __pkgname__
     ),
 )
 @click.option(
+    "--chunk",
+    type=click.INT,
+    default=20,
+    help=(
+        "Amount of requirements to process in a chunk. Default to 20 requirements per "
+        "chunk. If zero, it means every requirements are processed in a single "
+        "job without no pause."
+    ),
+)
+@click.option(
     "--pause",
     type=click.INT,
     default=1,
     help=(
-        "The time in second to pause before an API requests. Default to 1 second."
+        "The time in second to pause before each chunk. Default to 1 second. If zero "
+        "it means no pause. Prefer to disable chunk if you don't want any pause."
     ),
 )
 @click.option(
@@ -121,6 +132,7 @@ def report_command(*args, **parameters):
     cachedir = parameters["cachedir"]
     destination = parameters["destination"]
     environment = json.loads(parameters["env"].read_text()) if parameters["env"] else {}
+    api_chunk = parameters["chunk"] or None
     api_pause = parameters["pause"] or None
     api_timeout = parameters["timeout"] or None
     # Formatter opts
@@ -147,6 +159,7 @@ def report_command(*args, **parameters):
     try:
         analyzer = DependenciesAnalyzer(
             cachedir=cachedir,
+            api_chunk=api_chunk,
             api_pause=api_pause,
             api_timeout=api_timeout,
             logger=logger,

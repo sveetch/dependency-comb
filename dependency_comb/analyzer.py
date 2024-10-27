@@ -1,4 +1,5 @@
 import json
+import time
 
 from operator import itemgetter
 
@@ -7,6 +8,7 @@ from packaging.version import Version, InvalidVersion
 
 from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
+from .utils.lists import split_to_chunks
 from .utils.logger import NoOperationLogger
 from .utils.dates import safe_isoformat_parse
 from . import __pkgname__, __version__
@@ -32,13 +34,14 @@ class DependenciesAnalyzer(RequirementParser):
     PACKAGE_DETAIL_ENDPOINT = "https://pypi.org/pypi/{name}/json"
     PACKAGE_RELEASES_ENDPOINT = "https://pypi.org/simple/{name}/"
 
-    def __init__(self, cachedir=None, api_pause=1, api_timeout=None,
+    def __init__(self, cachedir=None, api_pause=1, api_timeout=None, api_chunk=None,
                  logger=None, ignores=None):
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
+        # Amount of requirements to analyze by chunk
+        self.api_chunk = api_chunk or 10
         # Time in seconds to pause before an API request
-        # TODO: Pause time has been removed from this analyzer, it should be done on
-        # a lower lever instead.
+        # Pause time between chunks
         self.api_pause = api_pause
         # Time in seconds for timeout limit on API request
         self.api_timeout = api_timeout
@@ -455,7 +458,18 @@ class DependenciesAnalyzer(RequirementParser):
             basepath=basepath,
         )
 
-        for item in parsed_requirements:
-            pkginfos = self.build_package_informations(item)
-            if not strict or (strict and pkginfos.is_valid):
-                yield pkginfos
+        #
+        if self.api_chunk:
+            chunks = list(split_to_chunks(parsed_requirements, self.api_chunk))
+        else:
+            chunks = [parsed_requirements]
+
+        for i, chunk in enumerate(chunks, start=1):
+            for item in chunk:
+                pkginfos = self.build_package_informations(item)
+                if not strict or (strict and pkginfos.is_valid):
+                    yield pkginfos
+
+            if self.api_pause and i < len(chunks):
+                self.logger.debug("Making pause of {} second(s)".format(self.api_pause))
+                time.sleep(self.api_pause)
