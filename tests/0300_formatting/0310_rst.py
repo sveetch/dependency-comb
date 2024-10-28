@@ -10,6 +10,8 @@ def format_to_multline_str(content):
 
     Each line will contain a Flake8 bypass code for "line too long".
 
+    This is mostly an helper to rewrite test data fixtures during development.
+
     Arguments:
         content (string): The content to format.
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 
 from ..utils.logger import NoOperationLogger
-from ..formatting import RestructuredTextFormatter
+from ..formatting import RestructuredTextFormatter, RichFormatter
 from .. import __pkgname__
 
 
@@ -14,6 +14,13 @@ from .. import __pkgname__
     type=click.File(),
     default="requirements.txt",
     metavar="SOURCE",
+)
+@click.option(
+    "--format",
+    metavar="STRING",
+    type=click.Choice(["rst", "rich"]),
+    help="Format name.",
+    default="rst"
 )
 @click.option(
     "--destination",
@@ -53,14 +60,19 @@ def format_command(*args, **parameters):
 
     source = parameters["source"].read()
     destination = parameters["destination"]
+    format_name = parameters["format"]
     with_failures = parameters["failures"]
 
     # Disable logger when writing results to standard output
     if not destination:
         logger = NoOperationLogger()
 
-    reporter = RestructuredTextFormatter()
-    output = reporter.output(source, with_failures=with_failures)
+    if format_name == "rich":
+        formatter = RichFormatter()
+    else:
+        formatter = RestructuredTextFormatter()
+
+    output = formatter.output(source, with_failures=with_failures)
 
     if not destination:
         click.echo(output)

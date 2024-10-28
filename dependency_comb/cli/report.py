@@ -176,8 +176,8 @@ def report_command(*args, **parameters):
         raise click.Abort()
 
     # Output report
-    reporter = RestructuredTextFormatter()
-    output = reporter.output(
+    formatter = RestructuredTextFormatter()
+    output = formatter.output(
         json.dumps(payload, cls=ExtendedJsonEncoder),
         with_failures=with_failures
     )

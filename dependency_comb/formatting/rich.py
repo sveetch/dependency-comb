@@ -1,4 +1,3 @@
-import datetime
 import json
 
 from pathlib import Path
@@ -6,11 +5,16 @@ from textwrap import TextWrapper
 
 import humanize
 
+from rich import box
+from rich.panel import Panel
+from rich.table import Table
+
 from ..package import PackageRequirement
 from ..utils.dates import safe_isoformat_parse
+from .base import BaseFormatter
 
 
-class BaseFormatter:
+class RichFormatter(BaseFormatter):
     """
     Base formatter just defines some internal attributes and return Python object from
     given JSON.
@@ -20,9 +24,6 @@ class BaseFormatter:
             This datetime is used to compute the delta time between release and current
             date.
     """
-    def __init__(self, now_date=None):
-        self.now_date = now_date or datetime.datetime.now()
-
     def get_required_release(self, item):
         """
         Return a release labels for a requirement.
@@ -49,19 +50,25 @@ class BaseFormatter:
         Build the information table for properly analyzed requirements.
 
         Arguments:
-            items (list): List of requirement dict as returned from Analyzer. Only
-                items with status ``analyzed`` are processed here and all other status
-                items are ignored.
+            items (list): List of requirement dict as returned from Analyzer. All
+                given items should have a status "analyzed" else it would lead to
+                unexpected results or even errors.
 
         Returns:
-            list: A list of dictionnaries for each processed items.
+            string: An ASCII table built from given items.
         """
-        analyzed_items = [v for v in items if v["status"] == "analyzed"]
+        main_table = Table(
+            "#",
+            "Name",
+            "Lateness",
+            "Required",
+            "Latest release",
+            box=box.MINIMAL_HEAVY_HEAD,
+            #leading=True
+        )
 
-        rows = []
-
-        for i, item in enumerate(analyzed_items, start=1):
-            lateness = len(item["lateness"]) if item["lateness"] else "-"
+        for i, item in enumerate(items, start=1):
+            lateness = str(len(item["lateness"])) if item["lateness"] else "-"
 
             label, age = self.get_required_release(item)
             if age:
@@ -80,102 +87,88 @@ class BaseFormatter:
             )
 
             # Append column data to the requirement row
-            rows.append({
-                "key": i,
-                "name": item["name"],
-                "lateness": lateness,
-                "resolved_version": resolved_version,
-                "latest_release": latest_release,
-            })
+            main_table.add_row(
+                str(i),
+                item["name"],
+                lateness,
+                resolved_version,
+                latest_release,
+            )
 
-        return rows
+        return Panel.fit(main_table, title="Analyzed")
 
     def build_errors_table(self, items):
         """
         Build the information table for failed requirements analyze.
 
         Arguments:
-            items (list): List of requirement dict as returned from Analyzer. All items
-                are processed except the ones with status ``analyzed``.
+            items (list): List of requirement dict as returned from Analyzer. Given
+                items could have any status despite not very useful for properly
+                analyzed items.
 
         Returns:
-            list: A list of dictionnaries for each processed items.
+            string: An ASCII table built from given items.
         """
-        ignored_items = [v for v in items if v["status"] != "analyzed"]
+        main_table = Table(
+            "#",
+            "Source",
+            "Status",
+            "Resume",
+            box=box.MINIMAL_HEAVY_HEAD,
+            leading=True
+        )
 
         rows = []
         wrapper = TextWrapper(width=40, max_lines=2, placeholder="")
         default_label = PackageRequirement.STATUS_LABELS["unknown"]
 
-        for i, item in enumerate(ignored_items, start=1):
+        for i, item in enumerate(items, start=1):
             status = item["status"]
 
             resume = PackageRequirement.STATUS_LABELS.get(status, default_label)
             if status == "invalid":
                 resume += ": {}".format(item["parsing_error"])
 
-            rows.append({
-                "key": i,
-                "source": wrapper.fill(item["source"]),
-                "status": status,
-                "resume": wrapper.fill(resume),
-            })
+            main_table.add_row(
+                str(i),
+                wrapper.fill(item["source"]),
+                status,
+                wrapper.fill(resume),
+            )
 
-        return rows
+        return Panel.fit(main_table, title="Failures")
 
-    def output(self, content):
+    def output(self, content, with_failures=True):
         """
-        Parse given content and returns it as a Python list.
+        Output formatted analyze.
 
         Arguments:
             content (Path or string or list): JSON content as built from Analyzer. It
                 can be either:
 
-                * A string assumed as JSON to be parsed;
+                * A JSON as a string that will be parsed;
                 * A file Path that will be readed and parsed as JSON;
-                * A list that is expected to be directly the list of (dict) analyzed
+                * A list that is expected to be directly the list of analyzed
                   requirements, no parsing will be involved.
+            with_failures (boolean): If True, the report include both analyzed and
+                failures in different tables, both tables will have a title. If False,
+                only the table of analyzed items without a title.
 
         Returns:
-            list: The list of all (dict) requirements from given content.
+            string: Built report.
         """
-        if isinstance(content, list):
-            return content
+        data = super().output(content)
+        output = []
 
-        if isinstance(content, Path):
-            content = content.read_text()
+        analyzed_items = [v for v in data if v["status"] == "analyzed"]
+        ignored_items = [v for v in data if v["status"] != "analyzed"]
 
-        data = json.loads(content)
-
-        return data
-
-    def print(self, content, with_failures=True, printer=print):
-        """
-        TODO: Print out the analyzed and possibly failures
-        """
-        data = self.output(content)
-
-        success_output = self.build_analyzed_table(data)
-        printer(success_output)
+        from rich import print
+        success_output = self.build_analyzed_table(analyzed_items)
+        print(success_output)
 
         if with_failures:
-            failures_output = self.build_errors_table(data)
-            printer(failures_output)
+            failures_output = self.build_errors_table(ignored_items)
+            print(failures_output)
 
-    def write(self, content, destination, with_failures=True):
-        """
-        TODO: Write the analyzed and possibly failures into destination file.
-        """
-        data = self.output(content)
-
-        success_output = self.build_analyzed_table(data)
-        output = success_output
-
-        if with_failures:
-            failures_output = self.build_errors_table(data)
-            output += failures_output
-
-        # Write merged built lists as JSON
-        destination.write_text(json.dumps(output))
-
-        return destination
+        return None
