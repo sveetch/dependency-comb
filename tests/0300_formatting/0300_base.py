@@ -1,8 +1,11 @@
 import json
 
+from freezegun import freeze_time
+
 from dependency_comb.formatting import BaseFormatter
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_base_build_analyzed_table(settings):
     """
     Method should build a list of dictionnaries for all items with status 'analyzed'.
@@ -12,42 +15,41 @@ def test_base_build_analyzed_table(settings):
     formatter = BaseFormatter()
 
     output = formatter.build_analyzed_table(analyze_content)
-
     assert output == [
         {
             "key": 1,
             "name": "django",
             "lateness": 187,
             "resolved_version": "1.11.9 - 6 years ago",
-            "latest_release": "5.1.2 - 19 days ago"
+            "latest_release": "5.1.2 - 2 months ago"
         },
         {
             "key": 2,
             "name": "Pillow",
             "lateness": 6,
-            "resolved_version": "9.5.0 - 1 year, 6 months ago",
-            "latest_release": "10.4.0 - 3 months ago"
+            "resolved_version": "9.5.0 - 1 year, 3 months ago",
+            "latest_release": "10.4.0 - 24 days ago"
         },
         {
             "key": 3,
             "name": "djangorestframework",
             "lateness": "-",
             "resolved_version": "Latest",
-            "latest_release": "3.15.2 - 4 months ago"
+            "latest_release": "3.15.2 - A month ago"
         },
         {
             "key": 4,
             "name": "django-admin-shortcuts",
             "lateness": 6,
             "resolved_version": "1.2.6 - 9 years ago",
-            "latest_release": "3.0.1 - 2 months ago"
+            "latest_release": "3.0.1 - 4 days ago"
         },
         {
             "key": 5,
             "name": "requests",
             "lateness": 55,
-            "resolved_version": "2.8.1 - 9 years ago",
-            "latest_release": "2.32.3 - 4 months ago"
+            "resolved_version": "2.8.1 - 8 years ago",
+            "latest_release": "2.32.3 - A month ago"
         },
         {
             "key": 6,
@@ -59,6 +61,8 @@ def test_base_build_analyzed_table(settings):
     ]
 
 
+
+@freeze_time("2024-07-25 10:00:00")
 def test_base_build_errors_table(settings):
     """
     Method should build a list of dictionnaries for all items except the ones with
@@ -69,7 +73,6 @@ def test_base_build_errors_table(settings):
     formatter = BaseFormatter()
 
     output = formatter.build_errors_table(analyze_content)
-
     assert output == [
         {
             "key": 1,
@@ -95,7 +98,6 @@ def test_base_format_from_filepath(settings):
     formatter = BaseFormatter()
 
     output = formatter.output(analyze)
-
     assert len(output) == 8
     assert [v["source"] for v in output] == [
         "django>=1.11,<1.12",
@@ -121,7 +123,6 @@ def test_base_format_from_string(settings):
     formatter = BaseFormatter()
 
     output = formatter.output(analyze.read_text())
-
     assert len(output) == 8
     assert [v["source"] for v in output] == [
         "django>=1.11,<1.12",
@@ -138,6 +139,7 @@ def test_base_format_from_string(settings):
     ]
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_base_print(settings):
     """
     Printer method should write its result outputs into given printer function.
@@ -146,15 +148,13 @@ def test_base_print(settings):
     analyze_content = json.loads(analyze.read_text())
     formatter = BaseFormatter()
 
-    printted_out = []
-
-    # Dummy printer function to receive output into 'printted_out' to assert on it
+    # Dummy printer function to receive output into 'output' to assert on it
+    output = []
     def receiver(content):
-        printted_out.append(content)
+        output.append(content)
 
     formatter.print(analyze_content, printer=receiver, with_failures=True)
-
-    assert printted_out == [
+    assert output == [
         # The successfully analyzed output
         [
             {
@@ -162,35 +162,35 @@ def test_base_print(settings):
                 "name": "django",
                 "lateness": 187,
                 "resolved_version": "1.11.9 - 6 years ago",
-                "latest_release": "5.1.2 - 19 days ago"
+                "latest_release": "5.1.2 - 2 months ago"
             },
             {
                 "key": 2,
                 "name": "Pillow",
                 "lateness": 6,
-                "resolved_version": "9.5.0 - 1 year, 6 months ago",
-                "latest_release": "10.4.0 - 3 months ago"
+                "resolved_version": "9.5.0 - 1 year, 3 months ago",
+                "latest_release": "10.4.0 - 24 days ago"
             },
             {
                 "key": 3,
                 "name": "djangorestframework",
                 "lateness": "-",
                 "resolved_version": "Latest",
-                "latest_release": "3.15.2 - 4 months ago"
+                "latest_release": "3.15.2 - A month ago"
             },
             {
                 "key": 4,
                 "name": "django-admin-shortcuts",
                 "lateness": 6,
                 "resolved_version": "1.2.6 - 9 years ago",
-                "latest_release": "3.0.1 - 2 months ago"
+                "latest_release": "3.0.1 - 4 days ago"
             },
             {
                 "key": 5,
                 "name": "requests",
                 "lateness": 55,
-                "resolved_version": "2.8.1 - 9 years ago",
-                "latest_release": "2.32.3 - 4 months ago"
+                "resolved_version": "2.8.1 - 8 years ago",
+                "latest_release": "2.32.3 - A month ago"
             },
             {
                 "key": 6,
@@ -210,9 +210,7 @@ def test_base_print(settings):
             },
             {
                 "key": 2,
-                "source": (
-                    "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-"
-                ),
+                "source": "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
                 "status": "unsupported-url",
                 "resume": "Direct package URL is not supported"
             }
@@ -220,6 +218,7 @@ def test_base_print(settings):
     ]
 
 
+@freeze_time("2024-07-25 10:00:00")
 def test_base_write(settings, tmp_path):
     """
     Base writer method should write its result outputs as JSON into given file
@@ -231,42 +230,41 @@ def test_base_write(settings, tmp_path):
     formatter = BaseFormatter()
 
     formatter.write(analyze_content, destination, with_failures=True)
-
     assert json.loads(destination.read_text()) == [
         {
             "key": 1,
             "name": "django",
             "lateness": 187,
             "resolved_version": "1.11.9 - 6 years ago",
-            "latest_release": "5.1.2 - 19 days ago"
+            "latest_release": "5.1.2 - 2 months ago"
         },
         {
             "key": 2,
             "name": "Pillow",
             "lateness": 6,
-            "resolved_version": "9.5.0 - 1 year, 6 months ago",
-            "latest_release": "10.4.0 - 3 months ago"
+            "resolved_version": "9.5.0 - 1 year, 3 months ago",
+            "latest_release": "10.4.0 - 24 days ago"
         },
         {
             "key": 3,
             "name": "djangorestframework",
             "lateness": "-",
             "resolved_version": "Latest",
-            "latest_release": "3.15.2 - 4 months ago"
+            "latest_release": "3.15.2 - A month ago"
         },
         {
             "key": 4,
             "name": "django-admin-shortcuts",
             "lateness": 6,
             "resolved_version": "1.2.6 - 9 years ago",
-            "latest_release": "3.0.1 - 2 months ago"
+            "latest_release": "3.0.1 - 4 days ago"
         },
         {
             "key": 5,
             "name": "requests",
             "lateness": 55,
-            "resolved_version": "2.8.1 - 9 years ago",
-            "latest_release": "2.32.3 - 4 months ago"
+            "resolved_version": "2.8.1 - 8 years ago",
+            "latest_release": "2.32.3 - A month ago"
         },
         {
             "key": 6,

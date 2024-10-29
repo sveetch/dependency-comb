@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 
 from ..utils.logger import NoOperationLogger
-from ..formatting import RestructuredTextFormatter, RichFormatter
+from ..formatting import output_formatted_content
 from .. import __pkgname__
 
 
@@ -67,15 +67,14 @@ def format_command(*args, **parameters):
     if not destination:
         logger = NoOperationLogger()
 
-    if format_name == "rich":
-        formatter = RichFormatter()
-    else:
-        formatter = RestructuredTextFormatter()
-
-    output = formatter.output(source, with_failures=with_failures)
-
-    if not destination:
-        click.echo(output)
-    else:
-        destination.write_text(output)
+    # Output formatted content depending format and output method
+    output_formatted_content(
+        format_name,
+        source,
+        printer=click.echo,
+        printer_kwargs={"nl": False},
+        destination=destination,
+        with_failures=with_failures
+    )
+    if destination:
         logger.info("Formatted analyze to: {}".format(destination))

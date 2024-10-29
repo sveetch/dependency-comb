@@ -149,33 +149,42 @@ class BaseFormatter:
 
         return data
 
-    def print(self, content, with_failures=True, printer=print):
+    def print(self, content, printer=print, printer_kwargs=None, with_failures=True):
         """
-        TODO: Print out the analyzed and possibly failures
+        Print out the analyzed and possibly failures
         """
+        printer_kwargs = printer_kwargs or {}
+
         data = self.output(content)
 
-        success_output = self.build_analyzed_table(data)
-        printer(success_output)
+        printer(self.build_analyzed_table(data), **printer_kwargs)
 
         if with_failures:
-            failures_output = self.build_errors_table(data)
-            printer(failures_output)
+            printer(self.build_errors_table(data), **printer_kwargs)
+
+    def serialize_output(self, content):
+        """
+        Serialize output to be written in a file.
+
+        Formatters should commonly override it because the default implementation here
+        serializes content with JSON because internally the content is a list but this
+        is rarely the case with other formatters.
+        """
+        return json.dumps(content)
 
     def write(self, content, destination, with_failures=True):
         """
-        TODO: Write the analyzed and possibly failures into destination file.
+        Write the analyzed and possibly failures into destination file.
         """
         data = self.output(content)
 
-        success_output = self.build_analyzed_table(data)
-        output = success_output
+        output = self.build_analyzed_table(data)
 
         if with_failures:
-            failures_output = self.build_errors_table(data)
-            output += failures_output
+            output += self.build_errors_table(data)
 
         # Write merged built lists as JSON
-        destination.write_text(json.dumps(output))
+        destination.write_text(self.serialize_output(output))
+        #destination.write_text(json.dumps())
 
         return destination

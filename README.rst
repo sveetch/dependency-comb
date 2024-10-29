@@ -7,6 +7,7 @@
 .. _Pypi API: https://warehouse.pypa.io/api-reference/index.html
 .. _tabulate: https://pypi.org/project/tabulate/
 .. _colorlog: https://pypi.org/project/colorlog/
+.. _rich: https://rich.readthedocs.io/
 
 
 ===============
@@ -30,7 +31,8 @@ Dependencies
 * `humanize`_>=4.9.0;
 * `packaging`_>=24.0;
 * `tabulate`_>=0.9.0;
-* `colorlog`_>=6.8.2
+* `colorlog`_>=6.8.2;
+* `rich`_>=13.6.0 (optional);
 
 
 Links

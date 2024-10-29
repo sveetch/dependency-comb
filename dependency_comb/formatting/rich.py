@@ -24,27 +24,6 @@ class RichFormatter(BaseFormatter):
             This datetime is used to compute the delta time between release and current
             date.
     """
-    def get_required_release(self, item):
-        """
-        Return a release labels for a requirement.
-
-        Arguments:
-            item (dict): The requirement dictionnary.
-
-        Returns:
-            tuple: Respectively the version label and resolved age delta
-                computed from release publish date against date now. If
-                ``resolved_version`` is empty, the version label will just be
-                ``Latest`` and resolved delta will be null.
-        """
-        if not item["resolved_version"]:
-            return "Latest", None
-
-        resolved_age = humanize.naturaldelta(
-            self.now_date - safe_isoformat_parse(item["resolved_published"])
-        )
-        return item["resolved_version"], resolved_age.capitalize()
-
     def build_analyzed_table(self, items):
         """
         Build the information table for properly analyzed requirements.

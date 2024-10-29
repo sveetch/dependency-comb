@@ -43,11 +43,11 @@ def test_report_with_failures_from_stdin(caplog, settings):
     assert result.exit_code == 0
     assert caplog.record_tuples == []
 
-    assert result.output == formatted.read_text()
+    assert result.output + "\n" == formatted.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_report_without_failures_from_stdin(caplog, settings):
+def test_report_from_stdin(caplog, settings):
     """
     Command should succeed to analyze from standard input and return a
     RST format without failures included and titles. Logs are muted.
@@ -65,13 +65,13 @@ def test_report_without_failures_from_stdin(caplog, settings):
 
     assert result.exit_code == 0
 
-    assert result.output == formatted.read_text()
+    assert result.output + "\n" == formatted.read_text()
 
     assert caplog.record_tuples == []
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_report_without_failures_to_file(caplog, tmp_path, settings):
+def test_report_to_file(caplog, tmp_path, settings):
     """
     Command should write JSON to a file instead of standard output and logging
     some messages.
@@ -87,6 +87,14 @@ def test_report_without_failures_to_file(caplog, tmp_path, settings):
         ["report", "-", "--cachedir", str(cachedir), "--destination", str(destination)],
         input=requirements_file.read_text()
     )
+
+    # if result.exit_code > 0:
+    #     import traceback
+    #     klass, error, error_tb = result.exc_info
+    #     print(error)
+    #     traceback.print_tb(error_tb, limit=None)
+    #     raise error
+
     assert result.exit_code == 0
 
     # Written format contains have an additional newline character
@@ -100,4 +108,5 @@ def test_report_without_failures_to_file(caplog, tmp_path, settings):
         (__pkgname__, 20, "Processing package: django-admin-shortcuts"),
         (__pkgname__, 20, "Processing package: requests"),
         (__pkgname__, 20, "Processing package: urllib3"),
+        (__pkgname__, 20, "Analyze report written to: {}".format(destination)),
     ]

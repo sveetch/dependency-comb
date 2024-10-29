@@ -6,7 +6,7 @@ import click
 
 from ..analyzer import DependenciesAnalyzer
 from ..exceptions import DependencyCombError
-from ..formatting import RestructuredTextFormatter
+from ..formatting import output_formatted_content
 from ..utils.jsons import ExtendedJsonEncoder
 from .. import __pkgname__
 
@@ -36,6 +36,13 @@ from .. import __pkgname__
         "The given directory path will be created automatically if it does not "
         "exists yet."
     ),
+)
+@click.option(
+    "--format",
+    metavar="STRING",
+    type=click.Choice(["rst", "rich"]),
+    help="Format name.",
+    default="rst"
 )
 @click.option(
     "--destination",
@@ -136,6 +143,7 @@ def report_command(*args, **parameters):
     api_pause = parameters["pause"] or None
     api_timeout = parameters["timeout"] or None
     # Formatter opts
+    format_name = parameters["format"]
     with_failures = parameters["failures"]
 
     # Find the requirement basepath
@@ -175,14 +183,14 @@ def report_command(*args, **parameters):
         logger.critical(e)
         raise click.Abort()
 
-    # Output report
-    formatter = RestructuredTextFormatter()
-    output = formatter.output(
+    # Output formatted content depending format and output method
+    output_formatted_content(
+        format_name,
         json.dumps(payload, cls=ExtendedJsonEncoder),
+        printer=click.echo,
+        printer_kwargs={"nl": False},
+        destination=destination,
         with_failures=with_failures
     )
-
-    if not destination:
-        click.echo(output)
-    else:
-        destination.write_text(output)
+    if destination:
+        logger.info("Analyze report written to: {}".format(destination))

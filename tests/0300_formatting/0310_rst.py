@@ -51,6 +51,8 @@ def test_rst_build_analyzed_table(settings):
     # print()
 
     assert output == (
+        """Analyzed\n"""  # noqa: E501
+        """********\n"""  # noqa: E501
         """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
         """| #   | Name                   |  Lateness  |                     Required |       Latest release |\n"""  # noqa: E501
         """+=====+========================+============+==============================+======================+\n"""  # noqa: E501
@@ -141,6 +143,8 @@ def test_rst_build_errors_table():
     # print()
 
     assert output == (
+        """\n\nFailures\n"""
+        """********\n"""
         """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
         """| #   | Source                                   |        Status         | Resume                                 |\n"""  # noqa: E501
         """+=====+==========================================+=======================+========================================+\n"""  # noqa: E501
@@ -167,7 +171,7 @@ def test_rst_build_errors_table():
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_rst_output(settings):
+def test_rst_print(settings):
     """
     Without failures enabled the output should only contains the analyzed table.
     """
@@ -175,14 +179,13 @@ def test_rst_output(settings):
     formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
     formatter = RestructuredTextFormatter()
 
-    output = formatter.output(analyze, with_failures=False)
+    # Dummy printer function to receive output into 'output' to assert on it
+    output = []
+    def receiver(content):
+        output.append(content)
 
-    # Used to rebuild table when code or formatting have changed
-    # print()
-    # print(output)
-    # print()
-
-    assert output + "\n" == formatted.read_text()
+    formatter.print(analyze, printer=receiver, with_failures=False)
+    assert "".join(output) + "\n" == formatted.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -195,11 +198,10 @@ def test_rst_output_with_failures(settings):
     formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
     formatter = RestructuredTextFormatter()
 
-    output = formatter.output(analyze, with_failures=True)
+    # Dummy printer function to receive output into 'output' to assert on it
+    output = []
+    def receiver(content):
+        output.append(content)
 
-    # Used to rebuild table when code or formatting have changed
-    # print()
-    # print(output)
-    # print()
-
-    assert output + "\n" == formatted.read_text()
+    formatter.print(analyze, printer=receiver, with_failures=True)
+    assert "".join(output) + "\n" == formatted.read_text()
