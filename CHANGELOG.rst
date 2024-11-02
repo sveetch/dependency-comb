@@ -12,7 +12,7 @@ Development
 * Fixed RST formatter that failed when asked for failures but there was none;
 * Added new argument ``--chunk`` on analyze and report commands. It defines the
   amount of requirements to process before pausing;
-* Added Rich formatter;
+* Added optional Rich formatter;
 * Added JSON formatter;
 * Added CSV formatter;
 

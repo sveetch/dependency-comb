@@ -1,8 +1,13 @@
 from .base import BaseFormatter
 from .csv import CSVFormatter
 from .json_format import JSONFormatter
-from .rich import RichFormatter
 from .rst import RestructuredTextFormatter
+
+
+try:
+    from .rich import RichFormatter
+except ImportError:
+    RichFormatter = None
 
 
 __all__ = [
@@ -16,13 +21,14 @@ __all__ = [
 
 DEFAULT_FORMAT = "rst"
 
-
 AVAILABLE_FORMATS = {
     "csv": CSVFormatter,
     "json": JSONFormatter,
     "rst": RestructuredTextFormatter,
-    "rich": RichFormatter,
 }
+
+if RichFormatter:
+    AVAILABLE_FORMATS["rich"] = RichFormatter
 
 
 def output_formatted_content(name, content, printer=None, printer_kwargs=None,

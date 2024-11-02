@@ -1,10 +1,19 @@
 from io import StringIO
 
+import pytest
 from freezegun import freeze_time
 
 from dependency_comb.formatting import RichFormatter
 
 
+# Skip marker decorator for tests depending on a Rich installation
+rich_available = pytest.mark.skipif(
+    RichFormatter is None,
+    reason="Rich is not installed"
+)
+
+
+@rich_available
 @freeze_time("2024-07-25 10:00:00")
 def test_rich_print(settings):
     """
@@ -25,6 +34,7 @@ def test_rich_print(settings):
     assert console.file.getvalue() == formatted.read_text()
 
 
+@rich_available
 @freeze_time("2024-07-25 10:00:00")
 def test_rich_print_with_failures(settings):
     """
@@ -45,6 +55,7 @@ def test_rich_print_with_failures(settings):
     assert console.file.getvalue() == formatted.read_text()
 
 
+@rich_available
 @freeze_time("2024-07-25 10:00:00")
 def test_rich_write_with_failures(settings, tmp_path):
     """
