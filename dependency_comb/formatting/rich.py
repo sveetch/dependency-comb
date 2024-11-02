@@ -1,19 +1,10 @@
-import json
-from io import StringIO
-from pathlib import Path
-from textwrap import TextWrapper
-
-import humanize
-
-from rich import box, print as rich_print
+from rich import box
 from rich.console import Console
 from rich.padding import Padding
 from rich.panel import Panel
-from rich.table import Table, Column
+from rich.table import Table
 from rich.console import Group
 
-from ..package import PackageRequirement
-from ..utils.dates import safe_isoformat_parse
 from .base import BaseStringFormatter
 
 
@@ -21,9 +12,6 @@ class RichFormatter(BaseStringFormatter):
     """
     Format a requirements analyze to a report made with Rich library.
     """
-    def get_printer_function(self):
-        return self.printer or rich_print
-
     def build_analyzed_table(self, items):
         """
         Build the information table for properly analyzed requirements.
@@ -44,7 +32,6 @@ class RichFormatter(BaseStringFormatter):
             "Latest release",
             box=box.MINIMAL_HEAVY_HEAD,
         )
-
 
         for item in super().build_analyzed_table(items):
             table.add_row(
@@ -99,11 +86,12 @@ class RichFormatter(BaseStringFormatter):
         group_items.append(Padding("", (1, 2), expand=False))
         group_items.append(Panel(analyzed_table, title="[green]Analyzed[/green]"))
 
-
         if with_failures:
             failures = self.build_errors_table(data)
             group_items.append(Padding("", (1, 2), expand=False))
-            group_items.append(Panel(failures, title="[dark_orange3]Failures[/dark_orange3]"))
+            group_items.append(
+                Panel(failures, title="[dark_orange3]Failures[/dark_orange3]")
+            )
 
         panel_group = Group(*group_items)
         console.print(panel_group)
@@ -114,7 +102,7 @@ class RichFormatter(BaseStringFormatter):
         """
         Write the analyzed and possibly failures into destination file.
         """
-        console = self.print(
+        self.print(
             content,
             destination=destination.open("w"),
             with_failures=with_failures

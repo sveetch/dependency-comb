@@ -79,7 +79,6 @@ def test_base_build_analyzed_table(settings):
     ]
 
 
-
 @freeze_time("2024-07-25 10:00:00")
 def test_base_build_errors_table(settings):
     """
@@ -168,6 +167,7 @@ def test_base_print(settings):
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
+
     def receiver(content, *args, **kwargs):
         output.append(content)
 
@@ -248,7 +248,9 @@ def test_base_print(settings):
             },
             {
                 "key": 2,
-                "source": "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
+                "source": (
+                    "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-"
+                ),
                 "status": "unsupported-url",
                 "resume": "Direct package URL is not supported"
             }

@@ -224,4 +224,3 @@ class BaseStringFormatter(BaseFormatter):
         No specific serialization since it is already a proper string.
         """
         return content
-

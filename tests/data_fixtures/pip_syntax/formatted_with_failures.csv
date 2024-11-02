@@ -1,0 +1,12 @@
+"key","name","lateness","resolved_version","latest_release","latest_activity","release_label","release_age"
+"1","django","187","1.11.9 - 6 years ago","5.1.2 - 2 months ago","2 months","1.11.9","6 years"
+"2","Pillow","6","9.5.0 - 1 year, 3 months ago","10.4.0 - 24 days ago","24 days","9.5.0","1 year, 3 months"
+"3","djangorestframework","-","Latest","3.15.2 - A month ago","a month","Latest",""
+"4","django-admin-shortcuts","6","1.2.6 - 9 years ago","3.0.1 - 4 days ago","4 days","1.2.6","9 years"
+"5","requests","55","2.8.1 - 8 years ago","2.32.3 - A month ago","a month","2.8.1","8 years"
+"6","urllib3","-","Latest","2.2.3 - A month ago","a month","Latest",""
+"key","source","status","resume"
+"1","./downloads/numpy-1.9.2-cp34-none-
+win32.whl","unsupported-localpath","Local package is not supported"
+"2","http://wxpython.org/Phoenix/snapshot-bui
+lds/wxPython_Phoenix-","unsupported-url","Direct package URL is not supported"

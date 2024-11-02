@@ -2,7 +2,7 @@ from io import StringIO
 
 from freezegun import freeze_time
 
-from dependency_comb.formatting import BaseFormatter, RichFormatter
+from dependency_comb.formatting import RichFormatter
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -54,7 +54,7 @@ def test_rich_write_with_failures(settings, tmp_path):
     formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
     destination = tmp_path / "output.rich"
 
-    # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
-    console = formatter.write(analyze, destination=destination, with_failures=True)
+    formatter.write(analyze, destination=destination, with_failures=True)
+
     assert destination.read_text() == formatted.read_text()

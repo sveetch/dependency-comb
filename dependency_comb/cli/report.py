@@ -6,7 +6,7 @@ import click
 
 from ..analyzer import DependenciesAnalyzer
 from ..exceptions import DependencyCombError
-from ..formatting import output_formatted_content
+from ..formatting import DEFAULT_FORMAT, AVAILABLE_FORMATS, output_formatted_content
 from ..utils.jsons import ExtendedJsonEncoder
 from .. import __pkgname__
 
@@ -40,9 +40,9 @@ from .. import __pkgname__
 @click.option(
     "--format",
     metavar="STRING",
-    type=click.Choice(["rst", "rich"]),
+    type=click.Choice(AVAILABLE_FORMATS.keys()),
     help="Format name.",
-    default="rst"
+    default=DEFAULT_FORMAT
 )
 @click.option(
     "--destination",
@@ -190,5 +190,6 @@ def report_command(*args, **parameters):
         destination=destination,
         with_failures=with_failures
     )
+
     if destination:
         logger.info("Analyze report written to: {}".format(destination))

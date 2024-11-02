@@ -180,6 +180,7 @@ def test_rst_print(settings):
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
+
     def receiver(content, *args, **kwargs):
         output.append(content)
 
@@ -200,6 +201,7 @@ def test_rst_output_with_failures(settings):
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
+
     def receiver(content, *args, **kwargs):
         output.append(content)
 
@@ -221,5 +223,5 @@ def test_rst_write_without_failures(settings, tmp_path):
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RestructuredTextFormatter()
-    console = formatter.write(analyze, destination=destination, with_failures=False)
+    formatter.write(analyze, destination=destination, with_failures=False)
     assert destination.read_text() == formatted.read_text()

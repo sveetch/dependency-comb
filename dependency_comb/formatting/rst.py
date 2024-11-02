@@ -1,10 +1,5 @@
-from textwrap import TextWrapper
-
-import humanize
 from tabulate import tabulate
 
-from ..package import PackageRequirement
-from ..utils.dates import safe_isoformat_parse
 from .base import BaseStringFormatter
 
 
