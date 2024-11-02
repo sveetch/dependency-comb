@@ -7,7 +7,7 @@ Development
 ***********
 
 * Modified analyzer to use Pypi API instead of Libraries.io API;
-* File for API key is no more useful and commands have been modified to remove the
+* There is no need anymore for an API key and commands have been modified to remove the
   ``filekey`` argument;
 * Fixed RST formatter that failed when asked for failures but there was none;
 * Added new argument ``--chunk`` on analyze and report commands. It defines the

@@ -5,19 +5,13 @@ from tabulate import tabulate
 
 from ..package import PackageRequirement
 from ..utils.dates import safe_isoformat_parse
-from .base import BaseFormatter
+from .base import BaseStringFormatter
 
 
-class RestructuredTextFormatter(BaseFormatter):
+class RestructuredTextFormatter(BaseStringFormatter):
     """
     Format a requirements analyze to a RestructuredText report.
     """
-    def serialize_output(self, content):
-        """
-        No specific serialization since it is already a proper string.
-        """
-        return content
-
     def build_analyzed_table(self, items):
         """
         Build the information table for properly analyzed requirements.
@@ -80,7 +74,7 @@ class RestructuredTextFormatter(BaseFormatter):
         if not rows:
             return ""
 
-        head = "\n\nFailures" + "\n" + ("*" * len("Failures")) + "\n"
+        head = "\nFailures" + "\n" + ("*" * len("Failures")) + "\n"
         return head + str(tabulate(
             rows,
             tablefmt="grid",

@@ -34,9 +34,16 @@ def test_format_from_stdin(caplog, settings):
     runner = CliRunner()
     result = runner.invoke(cli_frontend, ["format", "-"], input=analyze.read_text())
 
+    # if result.exit_code > 0:
+    #     import traceback
+    #     klass, error, error_tb = result.exc_info
+    #     print(error)
+    #     traceback.print_tb(error_tb, limit=None)
+    #     raise error
+
     assert result.exit_code == 0
     assert caplog.record_tuples == []
-    assert result.output + "\n" == formatted.read_text()
+    assert result.output == formatted.read_text() + "\n"
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -57,7 +64,7 @@ def test_format_with_failures_from_stdin(caplog, settings):
 
     assert result.exit_code == 0
     assert caplog.record_tuples == []
-    assert result.output + "\n" == formatted.read_text()
+    assert result.output == formatted.read_text() + "\n"
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -80,7 +87,7 @@ def test_format_to_file(caplog, tmp_path, settings):
     assert result.exit_code == 0
 
     # Written format contains have an additional newline character
-    assert expected.read_text() == destination.read_text() + "\n"
+    assert expected.read_text() == destination.read_text()
 
     assert caplog.record_tuples == [
         ("dependency-comb", 20, "Formatted analyze to: {}".format(destination)),

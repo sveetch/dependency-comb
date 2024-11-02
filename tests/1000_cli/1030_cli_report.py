@@ -43,7 +43,7 @@ def test_report_with_failures_from_stdin(caplog, settings):
     assert result.exit_code == 0
     assert caplog.record_tuples == []
 
-    assert result.output + "\n" == formatted.read_text()
+    assert result.output == formatted.read_text() + "\n"
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -65,7 +65,7 @@ def test_report_from_stdin(caplog, settings):
 
     assert result.exit_code == 0
 
-    assert result.output + "\n" == formatted.read_text()
+    assert result.output == formatted.read_text() + "\n"
 
     assert caplog.record_tuples == []
 
@@ -98,7 +98,7 @@ def test_report_to_file(caplog, tmp_path, settings):
     assert result.exit_code == 0
 
     # Written format contains have an additional newline character
-    assert expected.read_text() == destination.read_text() + "\n"
+    assert expected.read_text() == destination.read_text()
 
     assert caplog.record_tuples == [
         (__pkgname__, 20, "Processing package: django"),

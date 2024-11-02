@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from textwrap import TextWrapper
 
+import click
 import humanize
 
 from ..package import PackageRequirement
@@ -12,16 +13,48 @@ from ..utils.dates import safe_isoformat_parse
 
 class BaseFormatter:
     """
-    Base formatter just defines some internal attributes and return Python object from
-    given JSON.
+    Base formatter abstract.
+
+    This is not a useful formatter since finally it will write computed data as
+    JSON with its ``write()`` method.
+
+    Concrete formatters would commonly prefer to inherit from ``BaseStringFormatter``.
 
     Arguments:
         now_date (datetime): A datetime to set instead of default ``datetime.now()``.
             This datetime is used to compute the delta time between release and current
             date.
+        printer (callable):
+        printer_kwargs (dict):
     """
-    def __init__(self, now_date=None):
+    def __init__(self, now_date=None, printer=None, printer_kwargs=None):
         self.now_date = now_date or datetime.datetime.now()
+        self.printer = printer
+        self.printer_kwargs = printer_kwargs
+
+    def get_printer_function(self):
+        return self.printer or click.echo
+
+    def get_printer_kwargs(self):
+        return self.printer_kwargs or None
+
+    def printer_call(self, content):
+        klass = self.get_printer_function()
+        opts = self.get_printer_kwargs()
+        if opts:
+            klass(content, **opts)
+        else:
+            klass(content)
+
+    def serialize_output(self, content):
+        """
+        Serialize output to be written in a file.
+
+        Formatters should commonly override it because the default implementation here
+        serializes content with JSON because internally the content is a list but this
+        is rarely the case with other formatters.
+        """
+        return json.dumps(content)
 
     def get_required_release(self, item):
         """
@@ -86,6 +119,9 @@ class BaseFormatter:
                 "lateness": lateness,
                 "resolved_version": resolved_version,
                 "latest_release": latest_release,
+                "latest_activity": latest_activity,
+                "release_label": label,
+                "release_age": age,
             })
 
         return rows
@@ -149,28 +185,16 @@ class BaseFormatter:
 
         return data
 
-    def print(self, content, printer=print, printer_kwargs=None, with_failures=True):
+    def print(self, content, with_failures=True):
         """
         Print out the analyzed and possibly failures
         """
-        printer_kwargs = printer_kwargs or {}
-
         data = self.output(content)
 
-        printer(self.build_analyzed_table(data), **printer_kwargs)
+        self.printer_call(self.build_analyzed_table(data))
 
         if with_failures:
-            printer(self.build_errors_table(data), **printer_kwargs)
-
-    def serialize_output(self, content):
-        """
-        Serialize output to be written in a file.
-
-        Formatters should commonly override it because the default implementation here
-        serializes content with JSON because internally the content is a list but this
-        is rarely the case with other formatters.
-        """
-        return json.dumps(content)
+            self.printer_call(self.build_errors_table(data))
 
     def write(self, content, destination, with_failures=True):
         """
@@ -185,6 +209,19 @@ class BaseFormatter:
 
         # Write merged built lists as JSON
         destination.write_text(self.serialize_output(output))
-        #destination.write_text(json.dumps())
 
         return destination
+
+
+class BaseStringFormatter(BaseFormatter):
+    """
+    Alternative base formatter where content is assumed to be written as a string.
+
+    This is commonly the one to inherit from.
+    """
+    def serialize_output(self, content):
+        """
+        No specific serialization since it is already a proper string.
+        """
+        return content
+

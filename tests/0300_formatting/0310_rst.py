@@ -143,7 +143,7 @@ def test_rst_build_errors_table():
     # print()
 
     assert output == (
-        """\n\nFailures\n"""
+        """\nFailures\n"""
         """********\n"""
         """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
         """| #   | Source                                   |        Status         | Resume                                 |\n"""  # noqa: E501
@@ -177,15 +177,16 @@ def test_rst_print(settings):
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
     formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
-    formatter = RestructuredTextFormatter()
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
-    def receiver(content):
+    def receiver(content, *args, **kwargs):
         output.append(content)
 
-    formatter.print(analyze, printer=receiver, with_failures=False)
-    assert "".join(output) + "\n" == formatted.read_text()
+    formatter = RestructuredTextFormatter(printer=receiver)
+
+    formatter.print(analyze, with_failures=False)
+    assert "\n".join(output) == formatted.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -196,12 +197,29 @@ def test_rst_output_with_failures(settings):
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
     formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
-    formatter = RestructuredTextFormatter()
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
-    def receiver(content):
+    def receiver(content, *args, **kwargs):
         output.append(content)
 
-    formatter.print(analyze, printer=receiver, with_failures=True)
-    assert "".join(output) + "\n" == formatted.read_text()
+    formatter = RestructuredTextFormatter(printer=receiver)
+    formatter.print(analyze, with_failures=True)
+
+    assert "\n".join(output) == formatted.read_text()
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_rst_write_without_failures(settings, tmp_path):
+    """
+    RST writer method should write the output formatted as RST in given destination
+    file.
+    """
+    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    destination = tmp_path / "output.rst"
+
+    # Dummy printer function to receive output into 'output' to assert on it
+    formatter = RestructuredTextFormatter()
+    console = formatter.write(analyze, destination=destination, with_failures=False)
+    assert destination.read_text() == formatted.read_text()

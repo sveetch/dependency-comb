@@ -187,8 +187,6 @@ def report_command(*args, **parameters):
     output_formatted_content(
         format_name,
         json.dumps(payload, cls=ExtendedJsonEncoder),
-        printer=click.echo,
-        printer_kwargs={"nl": False},
         destination=destination,
         with_failures=with_failures
     )
