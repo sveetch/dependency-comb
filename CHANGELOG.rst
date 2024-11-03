@@ -15,6 +15,8 @@ Development
 * Added optional Rich formatter;
 * Added JSON formatter;
 * Added CSV formatter;
+* Format and Report commands now includes failures table by default, it can still be
+  disabled with option ``--no-failures``;
 
 
 Version 0.3.0 - 2024/08/27

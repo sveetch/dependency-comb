@@ -20,7 +20,8 @@ from .. import __pkgname__
     metavar="STRING",
     type=click.Choice(AVAILABLE_FORMATS.keys()),
     help="Format name.",
-    default=DEFAULT_FORMAT
+    default=DEFAULT_FORMAT,
+    show_default=True,
 )
 @click.option(
     "--destination",
@@ -33,8 +34,9 @@ from .. import __pkgname__
     ),
 )
 @click.option(
-    "--failures",
+    "--failures/--no-failures",
     is_flag=True,
+    default=True,
     help=(
         "Include requirement analyze failures in a different table, also each table"
         "will have its own title."
@@ -43,14 +45,14 @@ from .. import __pkgname__
 @click.pass_context
 def format_command(*args, **parameters):
     """
-    Build a report from a requirement analyze.
+    Format an existing analyze.
 
     Analyze is expected to be a valid JSON as outputted from 'analyze' command.
 
     Arguments:
 
     \b
-    source
+    SOURCE
         Computed analyze in a JSON file path. Instead of a file path you can also give
         a requirements file content from standard input using '-'. For example:
 

@@ -46,8 +46,8 @@ class DependenciesAnalyzer(RequirementParser):
         # Time in seconds for timeout limit on API request
         self.api_timeout = api_timeout
         # TODO: Currently not implemented, it should be a list of package names to
-        # ignore from analyze, dont know the state it will end in. It will be helpful
-        # to bypass some erroneous requirements without break the whole analyze.
+        # ignore from analyze, dont know the state it will end in. It could be helpful
+        # for bypassing some erroneous requirements without breaking the whole analyze.
         self.ignores = ignores or []
 
     def request_headers(self):

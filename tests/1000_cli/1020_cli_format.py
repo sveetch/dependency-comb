@@ -23,13 +23,13 @@ def test_format_default(caplog):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_format_from_stdin(caplog, settings):
+def test_format_with_failures_from_stdin(caplog, settings):
     """
     Command should succeed to get JSON analyze from standard input and return a
     RST format without failures included and titles.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(cli_frontend, ["format", "-"], input=analyze.read_text())
@@ -47,18 +47,18 @@ def test_format_from_stdin(caplog, settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_format_with_failures_from_stdin(caplog, settings):
+def test_format_without_failures_from_stdin(caplog, settings):
     """
     Command should succeed to get JSON analyze from standard input and return a full
     RST format with failures included.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
+    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["format", "-", "--failures"],
+        ["format", "-", "--no-failures"],
         input=analyze.read_text()
     )
 
@@ -68,7 +68,7 @@ def test_format_with_failures_from_stdin(caplog, settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_format_to_file(caplog, tmp_path, settings):
+def test_format_without_failures_to_file(caplog, tmp_path, settings):
     """
     Command should should write JSON to a file instead of standard output and logging
     some messages.
@@ -80,7 +80,7 @@ def test_format_to_file(caplog, tmp_path, settings):
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["format", "-", "--destination", str(destination)],
+        ["format", "-", "--no-failures", "--destination", str(destination)],
         input=analyze.read_text()
     )
 

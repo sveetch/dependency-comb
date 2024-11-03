@@ -90,7 +90,7 @@ class RichFormatter(BaseStringFormatter):
             failures = self.build_errors_table(data)
             group_items.append(Padding("", (1, 2), expand=False))
             group_items.append(
-                Panel(failures, title="[dark_orange3]Failures[/dark_orange3]")
+                Panel(failures, title="[red]Failures[/red]")
             )
 
         panel_group = Group(*group_items)

@@ -36,7 +36,7 @@ def test_report_with_failures_from_stdin(caplog, settings):
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["-v", "0", "report", "-", "--cachedir", str(cachedir), "--failures"],
+        ["-v", "0", "report", "-", "--cachedir", str(cachedir)],
         input=requirements_file.read_text()
     )
 
@@ -59,7 +59,7 @@ def test_report_from_stdin(caplog, settings):
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["-v", "0", "report", "-", "--cachedir", str(cachedir)],
+        ["-v", "0", "report", "-", "--no-failures", "--cachedir", str(cachedir)],
         input=requirements_file.read_text()
     )
 
@@ -84,7 +84,15 @@ def test_report_to_file(caplog, tmp_path, settings):
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["report", "-", "--cachedir", str(cachedir), "--destination", str(destination)],
+        [
+            "report",
+            "-",
+            "--no-failures",
+            "--cachedir",
+            str(cachedir),
+            "--destination",
+            str(destination)
+        ],
         input=requirements_file.read_text()
     )
 

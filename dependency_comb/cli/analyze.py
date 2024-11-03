@@ -60,9 +60,8 @@ from .. import __pkgname__
     type=click.INT,
     default=20,
     help=(
-        "Amount of requirements to process in a chunk. Default to 20 requirements per "
-        "chunk. If zero, it means every requirements are processed in a single "
-        "job without no pause."
+        "Amount of requirements to process in a chunk. If zero, it means every "
+        "requirements are processed in a single job without no pause."
     ),
 )
 @click.option(
@@ -70,7 +69,7 @@ from .. import __pkgname__
     type=click.INT,
     default=1,
     help=(
-        "The time in second to pause before each chunk. Default to 1 second. If zero "
+        "The time in second to pause before each chunk. If zero "
         "it means no pause. Prefer to disable chunk if you don't want any pause."
     ),
 )
@@ -79,8 +78,7 @@ from .. import __pkgname__
     type=click.INT,
     default=15,
     help=(
-        "Timeout in seconds for API requests. The default timeout is set to 15 "
-        "seconds, set it to 0 to disable timeout."
+        "Timeout in seconds for API requests. Set it to 0 to disable timeout."
     ),
 )
 @click.option(
@@ -111,7 +109,7 @@ def analyze_command(*args, **parameters):
     Arguments:
 
     \b
-    source
+    SOURCE
         Pip requirements file to parse and analyze.
         Instead of a file path you can also give a requirements file content from
         standard input using '-'. For example using the Pip freeze output:

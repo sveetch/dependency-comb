@@ -24,7 +24,8 @@ class RequirementParser:
         """
         parts = line.split()
 
-        # When there is the inclusion argument without following requirement file path.
+        # When there is the inclusion argument without a following requirement file
+        # path, we just ignore the inclusion line
         if len(parts) < 2:
             return None
 
