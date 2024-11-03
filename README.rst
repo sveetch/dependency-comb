@@ -14,12 +14,14 @@
 Dependency comb
 ===============
 
-A tool to read project requirements and check packages informations to build a report
-about project lateness and related packages activities.
+This tool will read given project requirements and check packages informations to build
+a report about project lateness and related packages activities.
 
-This can be especially useful when auditing an existing project.
+Analyze is performed using informations from `Pypi API`_ and can be formatted to various
+formats (ReStructuredText, JSON, CSV, Rich).
 
-Analyze is performed using informations from `Pypi API`_.
+This is commonly used when auditing an existing project to know about its dependencies
+states.
 
 
 Dependencies

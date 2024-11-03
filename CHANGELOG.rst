@@ -3,10 +3,10 @@
 Changelog
 =========
 
-Development
-***********
+Version 0.4.0 - 2024/11/03
+**************************
 
-* Modified analyzer to use Pypi API instead of Libraries.io API;
+* Modified analyzer to use **Pypi API** instead of Libraries.io API;
 * There is no need anymore for an API key and commands have been modified to remove the
   ``filekey`` argument;
 * Fixed RST formatter that failed when asked for failures but there was none;
@@ -17,6 +17,7 @@ Development
 * Added CSV formatter;
 * Format and Report commands now includes failures table by default, it can still be
   disabled with option ``--no-failures``;
+* Updated script to freeze local dependencies;
 
 
 Version 0.3.0 - 2024/08/27

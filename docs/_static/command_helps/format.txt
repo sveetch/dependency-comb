@@ -1,0 +1,23 @@
+Usage: dependency_comb format [OPTIONS] SOURCE
+
+  Format an existing analyze.
+
+  Analyze is expected to be a valid JSON as outputted from 'analyze' command.
+
+  Arguments:
+
+  SOURCE
+      Computed analyze in a JSON file path. Instead of a file path you can also give
+      a requirements file content from standard input using '-'. For example:
+
+          dependency_comb analyze requirements.txt | dependency_comb report -
+
+Options:
+  --format STRING             Format name.  [default: rst]
+  --destination FILE          File path destination where to write serialized
+                              JSON manifest. If not given the JSON will be
+                              sent to standard output.
+  --failures / --no-failures  Include requirement analyze failures in a
+                              different table, also each tablewill have its
+                              own title.
+  -h, --help                  Show this message and exit.

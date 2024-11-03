@@ -1,0 +1,43 @@
+Usage: dependency_comb analyze [OPTIONS] SOURCE
+
+  Analyze package releases from a requirements file and output computed
+  statistics as JSON.
+
+  Arguments:
+
+  SOURCE
+      Pip requirements file to parse and analyze.
+      Instead of a file path you can also give a requirements file content from
+      standard input using '-'. For example using the Pip freeze output:
+
+          pip freeze | dependency_comb analyze -
+
+      Or to analyze an unique package:
+
+          echo "django==3.2.1" | dependency_comb analyze -
+
+Options:
+  --cachedir DIRPATH  A directory where to look for API request cache. It is
+                      looked for cache file per package and if any, avoid any
+                      request for a package details. There is not any mechanic
+                      to invalidate or update cache except than to remove
+                      cache files. The given directory path will be created
+                      automatically if it does not exists yet.
+  --destination FILE  File path destination where to write serialized JSON
+                      manifest. If not given the JSON will be sent to standard
+                      output.
+  --indent INTEGER    Indentation level for JSON output. Default to 4 spaces.
+  --chunk INTEGER     Amount of requirements to process in a chunk. If zero,
+                      it means every requirements are processed in a single
+                      job without no pause.
+  --pause INTEGER     The time in second to pause before each chunk. If zero
+                      it means no pause. Prefer to disable chunk if you don't
+                      want any pause.
+  --timeout INTEGER   Timeout in seconds for API requests. Set it to 0 to
+                      disable timeout.
+  --env FILEPATH      A JSON file for some environment variables to give to
+                      analyzer. This will be used to resolve specifier
+                      markers. If analyzer does not receive any environment
+                      variable all specifier markers are ignored (so its
+                      requirement is always considered valid).
+  -h, --help          Show this message and exit.

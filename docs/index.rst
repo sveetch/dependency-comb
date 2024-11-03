@@ -1,5 +1,3 @@
-
-
 .. include:: ../README.rst
 
 
@@ -11,8 +9,10 @@ Contents
 
    install.rst
    overview.rst
+   formatters.rst
    cli.rst
    references/index.rst
+
 
 About the project
 *****************

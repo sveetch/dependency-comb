@@ -4,7 +4,11 @@
 Install
 =======
 
-Install package in your environment : ::
+Install package in your environment with every features: ::
+
+    pip install dependency-comb[rich]
+
+Or if you don't want to use the Rich format: ::
 
     pip install dependency-comb
 
