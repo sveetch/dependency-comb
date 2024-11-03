@@ -3,6 +3,12 @@
 Changelog
 =========
 
+Development
+***********
+
+* Added templates for Github issues;
+
+
 Version 0.4.0 - 2024/11/03
 **************************
 

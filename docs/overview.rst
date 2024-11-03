@@ -23,6 +23,10 @@ which follows `PEP 425 <https://peps.python.org/pep-0425/>`_.
 Concretely, a requirement file from Pip will just work except for some
 `Unsupported requirement specifiers`_.
 
+.. Note::
+    There is no need for analyzed project or packages to be installed because the
+    analyze only needs informations from `Pypi API`_.
+
 API
 ***
 
