@@ -7,6 +7,7 @@ Development
 ***********
 
 * Added templates for Github issues;
+* Fixed issue with packages that don't define anything in ``project_urls``;
 
 
 Version 0.4.0 - 2024/11/03

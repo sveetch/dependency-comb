@@ -43,6 +43,44 @@ def test_get_latest_specified_release(settings, source, expected):
     assert analyzer.get_latest_specified_release(pkg.specifier, versions) == expected
 
 
+def test_get_package_urls(settings):
+    """
+    Method should not fail when there is not enough info and should returns the proper
+    data when useful infos are available.
+    """
+    cachedir = settings.fixtures_path / "api_cache"
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
+
+    assert analyzer.get_package_urls({}) == {"package": None, "repository": None}
+
+    data = {"info": None}
+    assert analyzer.get_package_urls(data) == {"package": None, "repository": None}
+
+    data = {"info": {"project_urls": None}}
+    assert analyzer.get_package_urls(data) == {"package": None, "repository": None}
+
+    data = {
+        "info": {
+            "project_urls": {"repository": "repository", "source code": "source code"}
+        }
+    }
+    assert analyzer.get_package_urls(data) == {
+        "package": None,
+        "repository": "repository"
+    }
+
+    data = {
+        "info": {
+            "package_url": "package_url",
+            "project_urls": {"repository": "repository", "source code": "source code"}
+        }
+    }
+    assert analyzer.get_package_urls(data) == {
+        "package": "package_url",
+        "repository": "repository"
+    }
+
+
 def test_build_package_informations_with_requirement(settings):
     """
     Method should return computed informations for given package name and version

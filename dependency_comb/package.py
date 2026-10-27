@@ -47,7 +47,7 @@ class PackageRequirement:
         name (string): Package name parsed from source.
         parsed (packaging.requirements.Requirement): Requirement object parsed from
             source.
-        pypi_url (string): Possible package URL collected from API after the parsed
+        pypi_url (string): Possible package URLs collected from API after the parsed
             source.
         repository_url (string): Possible repository URL collected from API after the
             parsed source.

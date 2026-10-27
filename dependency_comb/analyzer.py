@@ -358,10 +358,10 @@ class DependenciesAnalyzer(RequirementParser):
 
     def get_package_urls(self, data):
         """
-        This should try to get the relevant URLs from package metadatas.
+        Try to get the relevant URLs from package metadatas.
 
         However the ``project_urls`` item from package metadatas is not normalized
-        enough to quickly get relevant infos so here we should try to get them.
+        enough to quickly get relevant infos so here we try to do so.
 
         Arguments:
             data (dict): Dictionnary of package informations as returned from
@@ -370,9 +370,10 @@ class DependenciesAnalyzer(RequirementParser):
         Returns:
             dict: A dictionnary that contains useful URLs.
         """
-        informations = data["info"]
-        urls = informations.get("project_urls", {})
+        informations = data.get("info") or {}
+        urls = informations.get("project_urls") or {}
 
+        # Try to get repo url from the first found common names
         repository_url = None
         elligible_repo_url_names = ["repository", "source", "source code"]
         for name, value in urls.items():
@@ -381,7 +382,7 @@ class DependenciesAnalyzer(RequirementParser):
                 break
 
         return {
-            "package": informations["package_url"],
+            "package": informations.get("package_url"),
             "repository": repository_url,
         }
 
