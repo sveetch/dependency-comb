@@ -72,6 +72,15 @@ class BaseFormatter:
         if not item["resolved_version"]:
             return "Latest", None
 
+        # NOTE: Temporary prints until 'delta date' #12 issue is resolved
+        # print("🥚 self.now_date:", self.now_date)
+        # print("💚 get_required_release for:", item["name"])
+        # print("  🥚 resolved_version:", item["resolved_version"])
+        # print("  🥚 resolved_published:", item["resolved_published"])
+        # print(
+        #     "  🙈 timedelta:",
+        #     self.now_date - safe_isoformat_parse(item["resolved_published"])
+        # )
         resolved_age = humanize.naturaldelta(
             self.now_date - safe_isoformat_parse(item["resolved_published"])
         )

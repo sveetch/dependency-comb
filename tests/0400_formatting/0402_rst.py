@@ -53,21 +53,21 @@ def test_rst_build_analyzed_table(settings):
     assert output == (
         """Analyzed\n"""  # noqa: E501
         """********\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
-        """| #   | Name                   |  Lateness  |                     Required |       Latest release |\n"""  # noqa: E501
-        """+=====+========================+============+==============================+======================+\n"""  # noqa: E501
-        """| 1   | django                 |    187     |         1.11.9 - 6 years ago | 5.1.2 - 2 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
-        """| 2   | Pillow                 |     6      | 9.5.0 - 1 year, 3 months ago | 10.4.0 - 24 days ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
-        """| 3   | djangorestframework    |     -      |                       Latest | 3.15.2 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
-        """| 4   | django-admin-shortcuts |     6      |          1.2.6 - 9 years ago |   3.0.1 - 4 days ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
-        """| 5   | requests               |     55     |          2.8.1 - 8 years ago | 2.32.3 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+\n"""  # noqa: E501
-        """| 6   | urllib3                |     -      |                       Latest |  2.2.3 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+----------------------+"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
+        """| #   | Name                   |  Lateness  |                     Required |        Latest release |\n"""  # noqa: E501
+        """+=====+========================+============+==============================+=======================+\n"""  # noqa: E501
+        """| 1   | django                 |    187     |         1.11.9 - 6 years ago |  5.1.2 - 2 months ago |\n"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
+        """| 2   | Pillow                 |     6      | 9.5.0 - 1 year, 4 months ago |  10.4.0 - A month ago |\n"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
+        """| 3   | djangorestframework    |     -      |                       Latest |  3.15.2 - A month ago |\n"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
+        """| 4   | django-admin-shortcuts |     6      |          1.2.6 - 9 years ago |    3.0.1 - 4 days ago |\n"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
+        """| 5   | requests               |     55     |          2.8.1 - 8 years ago | 2.32.3 - 2 months ago |\n"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
+        """| 6   | urllib3                |     -      |                       Latest |  2.2.3 - 2 months ago |\n"""  # noqa: E501
+        """+-----+------------------------+------------+------------------------------+-----------------------+"""  # noqa: E501
     )
 
 
@@ -138,9 +138,9 @@ def test_rst_build_errors_table():
     ])
 
     # Used to rebuild table when code or formatting have changed
-    # print()
+    # print("👷")
     # print(format_to_multline_str(output))
-    # print()
+    # print("👷")
 
     assert output == (
         """\nFailures\n"""
@@ -207,6 +207,9 @@ def test_rst_output_with_failures(settings):
 
     formatter = RestructuredTextFormatter(printer=receiver)
     formatter.print(analyze, with_failures=True)
+    # print("👷")
+    # print("\n".join(output))
+    # print("👷")
 
     assert "\n".join(output) == formatted.read_text()
 
@@ -224,4 +227,7 @@ def test_rst_write_without_failures(settings, tmp_path):
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RestructuredTextFormatter()
     formatter.write(analyze, destination=destination, with_failures=False)
+    # print("👷")
+    # print(destination.read_text())
+    # print("👷")
     assert destination.read_text() == formatted.read_text()

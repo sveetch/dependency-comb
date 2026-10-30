@@ -19,6 +19,9 @@ def test_csv_print(settings):
 
     formatter = CSVFormatter(printer=receiver)
     formatter.print(analyze, with_failures=False)
+    print("👷")
+    print("\n".join(output))
+    print("👷")
 
     assert "".join(output) == formatted.read_text()
 

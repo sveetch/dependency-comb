@@ -57,7 +57,7 @@ class PackageRequirement:
             available on Pypi.
         lateness (list): List of tuples of version string and datetime for each
             released version that are higher than the resolved version. This means all
-            available package versions that could upgraded to.
+            available package versions that could be upgraded to.
         resolved_version (string): Resolved release version from specifiers in parsed
             source. Specifiers are used against collected release version
             available on Pypi. This value will be null if no specifier can be found.

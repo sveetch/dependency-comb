@@ -21,6 +21,9 @@ def test_json_print(settings):
 
     formatter = JSONFormatter(printer=receiver)
     formatter.print(analyze, with_failures=False)
+    # print("👷")
+    # print("\n".join(output))
+    # print("👷")
 
     assert "".join(output) == formatted.read_text()
 
@@ -40,7 +43,7 @@ def test_json_print_with_failures(settings):
         output.append(content)
 
     formatter = JSONFormatter(printer=receiver)
-    formatter.print(analyze, with_failures=False)
+    formatter.print(analyze, with_failures=True)
 
     assert "".join(output) == formatted.read_text()
 
@@ -57,4 +60,11 @@ def test_json_write_with_failures(settings, tmp_path):
     formatter = JSONFormatter()
     formatter.write(analyze, destination=destination, with_failures=True)
 
+    # print("👷")
+    # print(
+    #     json.dumps(
+    #         json.loads(destination.read_text()), indent=4
+    #     )
+    # )
+    # print("👷")
     assert json.loads(destination.read_text()) == json.loads(formatted.read_text())

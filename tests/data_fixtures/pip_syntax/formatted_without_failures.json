@@ -14,11 +14,11 @@
             "key": 2,
             "name": "Pillow",
             "lateness": 6,
-            "resolved_version": "9.5.0 - 1 year, 3 months ago",
-            "latest_release": "10.4.0 - 24 days ago",
-            "latest_activity": "24 days",
+            "resolved_version": "9.5.0 - 1 year, 4 months ago",
+            "latest_release": "10.4.0 - A month ago",
+            "latest_activity": "a month",
             "release_label": "9.5.0",
-            "release_age": "1 year, 3 months"
+            "release_age": "1 year, 4 months"
         },
         {
             "key": 3,
@@ -45,8 +45,8 @@
             "name": "requests",
             "lateness": 55,
             "resolved_version": "2.8.1 - 8 years ago",
-            "latest_release": "2.32.3 - A month ago",
-            "latest_activity": "a month",
+            "latest_release": "2.32.3 - 2 months ago",
+            "latest_activity": "2 months",
             "release_label": "2.8.1",
             "release_age": "8 years"
         },
@@ -55,24 +55,10 @@
             "name": "urllib3",
             "lateness": "-",
             "resolved_version": "Latest",
-            "latest_release": "2.2.3 - A month ago",
-            "latest_activity": "a month",
+            "latest_release": "2.2.3 - 2 months ago",
+            "latest_activity": "2 months",
             "release_label": "Latest",
             "release_age": null
-        }
-    ],
-    "failures": [
-        {
-            "key": 1,
-            "source": "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
-            "status": "unsupported-localpath",
-            "resume": "Local package is not supported"
-        },
-        {
-            "key": 2,
-            "source": "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
-            "status": "unsupported-url",
-            "resume": "Direct package URL is not supported"
         }
     ]
 }

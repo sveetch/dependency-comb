@@ -8,6 +8,8 @@ Development
 
 * Added templates for Github issues;
 * Fixed issue with packages that don't define anything in ``project_urls``;
+* Fixed again data fixtures for some delta date changes;
+* Fixed JSONFormatter that was not forgotting 'with_failures' argument;
 
 
 Version 0.4.0 - 2024/11/03

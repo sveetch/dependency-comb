@@ -31,6 +31,9 @@ def test_rich_print(settings):
     formatter = RichFormatter()
 
     console = formatter.print(analyze, destination=StringIO(), with_failures=False)
+    # print("👷")
+    # print(console.file.getvalue())
+    # print("👷")
     assert console.file.getvalue() == formatted.read_text()
 
 

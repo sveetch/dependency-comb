@@ -98,7 +98,7 @@
         "lateness": null,
         "marker": null,
         "name": "urllib3",
-        "parsed": "urllib3@ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
+        "parsed": "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
         "pypi_url": null,
         "repository_url": null,
         "source": "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",

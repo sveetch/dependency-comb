@@ -27,12 +27,16 @@ class JSONFormatter(BaseFormatter):
         """
         Print out the analyzed and possibly failures
         """
-        self.printer_call(json.dumps(self.build(content), indent=4))
+        self.printer_call(
+            json.dumps(self.build(content, with_failures=with_failures), indent=4)
+        )
 
     def write(self, content, destination, with_failures=True):
         """
         Write the analyzed and possibly failures into destination file.
         """
-        destination.write_text(json.dumps(self.build(content)))
+        destination.write_text(
+            json.dumps(self.build(content, with_failures=with_failures))
+        )
 
         return destination
