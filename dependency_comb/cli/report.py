@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 
 from ..analyzer import DependenciesAnalyzer
-from ..exceptions import DependencyCombError
+from ..exceptions import DependencyCombError, FormatterEmptyContentError
 from ..formatting import DEFAULT_FORMAT, AVAILABLE_FORMATS, output_formatted_content
 from ..utils.jsons import ExtendedJsonEncoder
 from .. import __pkgname__
@@ -185,12 +185,16 @@ def report_command(*args, **parameters):
         raise click.Abort()
 
     # Output formatted content depending format and output method
-    output_formatted_content(
-        format_name,
-        json.dumps(payload, cls=ExtendedJsonEncoder),
-        destination=destination,
-        with_failures=with_failures
-    )
+    try:
+        output_formatted_content(
+            format_name,
+            json.dumps(payload, cls=ExtendedJsonEncoder),
+            destination=destination,
+            with_failures=with_failures
+        )
+    except FormatterEmptyContentError as e:
+        logger.critical(e)
+        raise click.Abort()
 
     if destination:
         logger.info("Analyze report written to: {}".format(destination))

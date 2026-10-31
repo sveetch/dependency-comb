@@ -4,6 +4,7 @@ from .json_format import JSONFormatter
 from .rst import RestructuredTextFormatter
 
 
+# Manage optional Rich formatter
 try:
     from .rich import RichFormatter
 except ImportError:
@@ -19,6 +20,7 @@ __all__ = [
 ]
 
 
+# Build default and available formatters
 DEFAULT_FORMAT = "rst"
 
 AVAILABLE_FORMATS = {
@@ -27,6 +29,7 @@ AVAILABLE_FORMATS = {
     "rst": RestructuredTextFormatter,
 }
 
+# If Rich is enabled
 if RichFormatter:
     AVAILABLE_FORMATS["rich"] = RichFormatter
 
@@ -34,7 +37,8 @@ if RichFormatter:
 def output_formatted_content(name, content, printer=None, printer_kwargs=None,
                              destination=None, with_failures=True):
     """
-    Helper to output formatted content either with a printer or written to a file.
+    Helper function to output formatted content either with a printer or written to a
+    file.
     """
     if name not in AVAILABLE_FORMATS:
         raise ValueError("Given formatter name is unknowed: {}".format(name))

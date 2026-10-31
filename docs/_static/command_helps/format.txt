@@ -2,7 +2,7 @@ Usage: dependency_comb format [OPTIONS] SOURCE
 
   Format an existing analyze.
 
-  Analyze is expected to be a valid JSON as outputted from 'analyze' command.
+  Analyze is expected to be a valid JSON like output from 'analyze' command.
 
   Arguments:
 

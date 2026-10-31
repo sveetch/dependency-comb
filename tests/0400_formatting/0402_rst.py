@@ -41,7 +41,7 @@ def test_rst_build_analyzed_table(settings):
 
     output = formatter.build_analyzed_table([
         v
-        for v in base_formatter.output(analyze)
+        for v in base_formatter.open_content(analyze)
         if v["status"] == "analyzed"
     ])
 

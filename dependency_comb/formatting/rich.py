@@ -22,8 +22,13 @@ class RichFormatter(BaseStringFormatter):
                 unexpected results or even errors.
 
         Returns:
-            string:
+            rich.table.Table:
         """
+        results = super().build_analyzed_table(items)
+
+        if not results:
+            return None
+
         table = Table(
             "#",
             "Name",
@@ -33,7 +38,7 @@ class RichFormatter(BaseStringFormatter):
             box=box.MINIMAL_HEAVY_HEAD,
         )
 
-        for item in super().build_analyzed_table(items):
+        for item in results:
             table.add_row(
                 str(item["key"]),
                 item["name"],
@@ -54,8 +59,13 @@ class RichFormatter(BaseStringFormatter):
                 analyzed items.
 
         Returns:
-            string:
+            rich.table.Table:
         """
+        results = super().build_errors_table(items)
+
+        if not results:
+            return None
+
         table = Table(
             "#",
             "Source",
@@ -64,7 +74,7 @@ class RichFormatter(BaseStringFormatter):
             box=box.MINIMAL_HEAVY_HEAD,
         )
 
-        for item in super().build_errors_table(items):
+        for item in results:
             table.add_row(
                 str(item["key"]),
                 item["source"],
@@ -78,16 +88,16 @@ class RichFormatter(BaseStringFormatter):
         """
         Print out the analyzed and possible failures
         """
-        data = self.output(content)
+        succeeds, failures = self.build(content, with_failures=with_failures)
+
         console = Console(width=100, file=destination)
         group_items = []
 
-        analyzed_table = self.build_analyzed_table(data)
-        group_items.append(Padding("", (1, 2), expand=False))
-        group_items.append(Panel(analyzed_table, title="[green]Analyzed[/green]"))
+        if succeeds:
+            group_items.append(Padding("", (1, 2), expand=False))
+            group_items.append(Panel(succeeds, title="[green]Analyzed[/green]"))
 
-        if with_failures:
-            failures = self.build_errors_table(data)
+        if failures:
             group_items.append(Padding("", (1, 2), expand=False))
             group_items.append(
                 Panel(failures, title="[red]Failures[/red]")

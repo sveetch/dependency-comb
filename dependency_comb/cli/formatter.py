@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 
+from ..exceptions import FormatterEmptyContentError
 from ..utils.logger import NoOperationLogger
 from ..formatting import DEFAULT_FORMAT, AVAILABLE_FORMATS, output_formatted_content
 from .. import __pkgname__
@@ -47,7 +48,7 @@ def format_command(*args, **parameters):
     """
     Format an existing analyze.
 
-    Analyze is expected to be a valid JSON as outputted from 'analyze' command.
+    Analyze is expected to be a valid JSON like output from 'analyze' command.
 
     Arguments:
 
@@ -70,12 +71,16 @@ def format_command(*args, **parameters):
         logger = NoOperationLogger()
 
     # Output formatted content depending format and output method
-    output_formatted_content(
-        format_name,
-        source,
-        destination=destination,
-        with_failures=with_failures
-    )
+    try:
+        output_formatted_content(
+            format_name,
+            source,
+            destination=destination,
+            with_failures=with_failures
+        )
+    except FormatterEmptyContentError as e:
+        click.echo(str(e))
+        raise click.Abort()
 
     if destination:
         logger.info("Formatted analyze to: {}".format(destination))

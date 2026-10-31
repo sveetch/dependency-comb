@@ -19,6 +19,11 @@ class RestructuredTextFormatter(BaseStringFormatter):
         Returns:
             string: An ASCII table built from given items.
         """
+        results = super().build_analyzed_table(items)
+
+        if not results:
+            return
+
         rows = [
             [
                 item["key"],
@@ -27,10 +32,11 @@ class RestructuredTextFormatter(BaseStringFormatter):
                 item["resolved_version"],
                 item["latest_release"],
             ]
-            for item in super().build_analyzed_table(items)
+            for item in results
         ]
 
         head = "Analyzed" + "\n" + ("*" * len("Analyzed")) + "\n"
+
         return head + str(tabulate(
             rows,
             tablefmt="grid",
@@ -56,6 +62,11 @@ class RestructuredTextFormatter(BaseStringFormatter):
         Returns:
             string: An ASCII table built from given items.
         """
+        results = super().build_errors_table(items)
+
+        if not results:
+            return ""
+
         rows = [
             [
                 item["key"],
@@ -63,13 +74,11 @@ class RestructuredTextFormatter(BaseStringFormatter):
                 item["status"],
                 item["resume"],
             ]
-            for item in super().build_errors_table(items)
+            for item in results
         ]
 
-        if not rows:
-            return ""
-
         head = "\nFailures" + "\n" + ("*" * len("Failures")) + "\n"
+
         return head + str(tabulate(
             rows,
             tablefmt="grid",

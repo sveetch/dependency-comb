@@ -3,6 +3,7 @@ import json
 import pytest
 from freezegun import freeze_time
 
+from dependency_comb.exceptions import FormatterEmptyContentError
 from dependency_comb.formatting import BaseFormatter
 
 
@@ -56,7 +57,7 @@ def test_freezer(settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_base_build_analyzed_table(settings):
+def test_build_analyzed_table(settings):
     """
     Method should build a list of dictionnaries for all items with status 'analyzed'.
 
@@ -143,7 +144,7 @@ def test_base_build_analyzed_table(settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_base_build_errors_table(settings):
+def test_build_errors_table(settings):
     """
     Method should build a list of dictionnaries for all items except the ones with
     status 'analyzed'.
@@ -169,7 +170,7 @@ def test_base_build_errors_table(settings):
     ]
 
 
-def test_base_format_from_filepath(settings):
+def test_open_content_from_filepath(settings):
     """
     Base formatter is able to open analyze from a file path but just returns
     deserialized JSON to Python data.
@@ -177,9 +178,9 @@ def test_base_format_from_filepath(settings):
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
     formatter = BaseFormatter()
 
-    output = formatter.output(analyze)
-    assert len(output) == 8
-    assert [v["source"] for v in output] == [
+    content = formatter.open_content(analyze)
+    assert len(content) == 8
+    assert [v["source"] for v in content] == [
         "django>=1.11,<1.12",
         "Pillow>=3.1.1",
         "djangorestframework",
@@ -194,7 +195,7 @@ def test_base_format_from_filepath(settings):
     ]
 
 
-def test_base_format_from_string(settings):
+def test_open_content_from_string(settings):
     """
     Base formatter is able to open analyze from a string but just returns deserialized
     JSON to Python data.
@@ -202,10 +203,10 @@ def test_base_format_from_string(settings):
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
 
     formatter = BaseFormatter()
-    output = formatter.output(analyze.read_text())
+    content = formatter.open_content(analyze.read_text())
 
-    assert len(output) == 8
-    assert [v["source"] for v in output] == [
+    assert len(content) == 8
+    assert [v["source"] for v in content] == [
         "django>=1.11,<1.12",
         "Pillow>=3.1.1",
         "djangorestframework",
@@ -220,8 +221,73 @@ def test_base_format_from_string(settings):
     ]
 
 
+@pytest.mark.parametrize("source, success, failed, with_failures", [
+    (
+        "minimal_success_and_failure.json",
+        ["django"],
+        ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
+        True,
+    ),
+    (
+        "minimal_success_and_failure.json",
+        ["django"],
+        [],
+        False,
+    ),
+    (
+        "failure_only.json",
+        [],
+        ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
+        True,
+    ),
+    (
+        "success_only.json",
+        ["django"],
+        [],
+        True,
+    ),
+    (
+        "success_only.json",
+        ["django"],
+        [],
+        False,
+    ),
+])
+def test_build(settings, source, success, failed, with_failures):
+    """
+    Build method should return found success and possibly failures (according to
+    option).
+    """
+    analyzes = settings.fixtures_path / "pip_syntax/analyzes"
+
+    formatter = BaseFormatter()
+
+    succeeds, failures = formatter.build(analyzes / source, with_failures=with_failures)
+    assert [v["name"] for v in succeeds] == success
+    assert [v["source"] for v in failures] == failed
+
+
+def test_build_empty(settings):
+    """
+    Build method should raise an error if there is no success and failures.
+    """
+    formatter = BaseFormatter()
+
+    # If content is empty
+    with pytest.raises(FormatterEmptyContentError):
+        formatter.build([])
+
+    # If there is only failures but they are disabled from option, this lead to empty
+    # result
+    with pytest.raises(FormatterEmptyContentError):
+        formatter.build(
+            settings.fixtures_path / "pip_syntax/analyzes/failure_only.json",
+            with_failures=False
+        )
+
+
 @freeze_time("2024-07-25 10:00:00")
-def test_base_print(settings):
+def test_print(settings):
     """
     Printer method should write its result outputs into given printer function.
     """
@@ -320,7 +386,7 @@ def test_base_print(settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_base_write(settings, tmp_path):
+def test_write(settings, tmp_path):
     """
     Base writer method should write its result outputs as JSON into given file
     destination.

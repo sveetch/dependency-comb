@@ -7,6 +7,7 @@ from textwrap import TextWrapper
 import click
 import humanize
 
+from ..exceptions import FormatterEmptyContentError
 from ..package import PackageRequirement
 from ..utils.dates import safe_isoformat_parse
 
@@ -39,6 +40,13 @@ class BaseFormatter:
         return self.printer_kwargs or None
 
     def printer_call(self, content):
+        """
+        Print method wrapper.
+
+        Formatter class may override ``get_printer_function``, ``get_printer_kwargs``,
+        ``BaseFormatter.printer`` or ``BaseFormatter.printer`` to set another printer
+        function. Default behavior is to use ``Click.echo()``.
+        """
         klass = self.get_printer_function()
         opts = self.get_printer_kwargs()
         if opts:
@@ -51,10 +59,49 @@ class BaseFormatter:
         Serialize output to be written in a file.
 
         Formatters should commonly override it because the default implementation here
-        serializes content with JSON because internally the content is a list but this
-        is rarely the case with other formatters.
+        serializes content with JSON because internally the content is just a list but
+        this is rarely the case with other formatters.
+
+        Arguments:
+            content (Any):
+
+        Returns:
+            string: JSON dump of given content.
         """
         return json.dumps(content)
+
+    def open_content(self, content):
+        """
+        Open content, parse it and returns it as a list of requirement dict.
+
+        It is helpful since formatter can receive content to parse from different
+        tools.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. It
+                can be either:
+
+                * A list that is expected to be directly the list of (dict) analyzed
+                  requirements, no JSON parsing is involved. Commonly for some internals
+                  like tests that don't work with intermediary JSON content;
+                * A file Path that will be readed and parsed as JSON when dump path has
+                  to be readen an parsed. Commonly when a processor does not need to
+                  open it before;
+                * Else it is assumed to be a JSON string to be parsed. Commonly when an
+                  analyze dump is already in memory.
+
+        Returns:
+            list: The list of all (dict) requirements from given content.
+        """
+        if isinstance(content, list):
+            return content
+
+        if isinstance(content, Path):
+            content = content.read_text()
+
+        data = json.loads(content)
+
+        return data
 
     def get_required_release(self, item):
         """
@@ -144,7 +191,9 @@ class BaseFormatter:
                 are processed except the ones with status ``analyzed``.
 
         Returns:
-            list: A list of dictionnaries for each processed items.
+            list: A list of dictionnaries for each processed items. Dict items
+            ``source`` and ``resume`` will be wrapped to fit on line of 40 characters
+            max and only for two lines (all other lines are replaced with an elipsis).
         """
         ignored_items = [v for v in items if v["status"] != "analyzed"]
 
@@ -168,53 +217,51 @@ class BaseFormatter:
 
         return rows
 
-    def output(self, content):
+    def build(self, content, with_failures=True):
         """
-        Parse given content and returns it as a Python list.
-
-        Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. It
-                can be either:
-
-                * A string assumed as JSON to be parsed;
-                * A file Path that will be readed and parsed as JSON;
-                * A list that is expected to be directly the list of (dict) analyzed
-                  requirements, no parsing will be involved.
-
-        Returns:
-            list: The list of all (dict) requirements from given content.
+        Build 'succeeds' and 'failures' payloads of analyze for concrete formatter
+        method.
         """
-        if isinstance(content, list):
-            return content
+        data = self.open_content(content)
 
-        if isinstance(content, Path):
-            content = content.read_text()
+        succeeds = self.build_analyzed_table(data)
 
-        data = json.loads(content)
+        failures = [] if with_failures is False else self.build_errors_table(data)
 
-        return data
+        if not succeeds and not failures:
+            raise FormatterEmptyContentError("There was no data to format.")
+
+        return succeeds, failures
 
     def print(self, content, with_failures=True):
         """
         Print out the analyzed and possibly failures
         """
-        data = self.output(content)
+        succeeds, failures = self.build(content, with_failures=with_failures)
 
-        self.printer_call(self.build_analyzed_table(data))
+        if succeeds:
+            self.printer_call(succeeds)
 
-        if with_failures:
-            self.printer_call(self.build_errors_table(data))
+        if failures:
+            self.printer_call(failures)
 
     def write(self, content, destination, with_failures=True):
         """
         Write the analyzed and possibly failures into destination file.
         """
-        data = self.output(content)
+        succeeds, failures = self.build(content, with_failures=with_failures)
 
-        output = self.build_analyzed_table(data)
+        # Base output type fit to 'succeeds' type because different formatter
+        if isinstance(succeeds, str):
+            output = ""
+        else:
+            output = []
 
-        if with_failures:
-            output += self.build_errors_table(data)
+        if succeeds:
+            output += succeeds
+
+        if failures:
+            output += failures
 
         # Write merged built lists as JSON
         destination.write_text(self.serialize_output(output))
@@ -226,7 +273,8 @@ class BaseStringFormatter(BaseFormatter):
     """
     Alternative base formatter where content is assumed to be written as a string.
 
-    This is commonly the one to inherit from.
+    This is commonly the one to inherit from because BaseFormatter is intended for
+    formatters that need to conserve Python objects.
     """
     def serialize_output(self, content):
         """

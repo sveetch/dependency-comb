@@ -3,13 +3,26 @@
 Changelog
 =========
 
+Unplanned
+*********
+
+* [ ] Formatters docstring are missing a lot of arguments/returns;
+* [ ] Add optional extra requirement 'rich-click';
+* [ ] Reporter command should exit with code 1 if there is failure and new option
+  "--exit-1" is enabled;
+
+
 Development
 ***********
 
+* [ ] Restructurate Formatter build with common 'build()' and ensure empty are well
+  managed;
 * Added templates for Github issues;
 * Fixed issue with packages that don't define anything in ``project_urls``;
 * Fixed again data fixtures for some delta date changes;
 * Fixed JSONFormatter that was not forgotting 'with_failures' argument;
+* Reworked Formatter to properly manage when success and failures parts are empty,
+  fix #7;
 
 
 Version 0.4.0 - 2024/11/03

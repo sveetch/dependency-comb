@@ -1,11 +1,13 @@
 from freezegun import freeze_time
 
+import pytest
+
 from click.testing import CliRunner
 
 from dependency_comb.cli.entrypoint import cli_frontend
 
 
-def test_format_default(caplog):
+def test_default(caplog):
     """
     Command should fail without requirement arguments/options.
     """
@@ -23,13 +25,13 @@ def test_format_default(caplog):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_format_with_failures_from_stdin(caplog, settings):
+def test_with_failures_from_stdin(caplog, settings):
     """
     Command should succeed to get JSON analyze from standard input and return a
     RST format without failures included and titles.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
+    expected = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(cli_frontend, ["format", "-"], input=analyze.read_text())
@@ -43,17 +45,17 @@ def test_format_with_failures_from_stdin(caplog, settings):
 
     assert result.exit_code == 0
     assert caplog.record_tuples == []
-    assert result.output == formatted.read_text() + "\n"
+    assert result.output == expected.read_text() + "\n"
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_format_without_failures_from_stdin(caplog, settings):
+def test_without_failures_from_stdin(caplog, settings):
     """
     Command should succeed to get JSON analyze from standard input and return a full
     RST format with failures included.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -64,11 +66,11 @@ def test_format_without_failures_from_stdin(caplog, settings):
 
     assert result.exit_code == 0
     assert caplog.record_tuples == []
-    assert result.output == formatted.read_text() + "\n"
+    assert result.output == expected.read_text() + "\n"
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_format_without_failures_to_file(caplog, tmp_path, settings):
+def test_without_failures_to_file(caplog, tmp_path, settings):
     """
     Command should should write JSON to a file instead of standard output and logging
     some messages.
@@ -87,8 +89,40 @@ def test_format_without_failures_to_file(caplog, tmp_path, settings):
     assert result.exit_code == 0
 
     # Written format contains have an additional newline character
-    assert expected.read_text() == destination.read_text()
+    assert destination.read_text() == expected.read_text()
 
     assert caplog.record_tuples == [
         ("dependency-comb", 20, "Formatted analyze to: {}".format(destination)),
     ]
+
+
+@pytest.mark.parametrize("format_name", [
+    "csv",
+    "rst",
+    "rich",
+    # JSON formatter behavior is not to raise error on empty
+    "json",
+])
+def test_empty(caplog, settings, format_name):
+    """
+    TODO: should be runned on multiple formatters ?
+    rst and json are still to be adapted to new Formatter.build().
+    """
+    analyze = settings.fixtures_path / "pip_syntax/analyzes/failure_only.json"
+
+    runner = CliRunner()
+
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "format",
+            "-",
+            "--no-failures",
+            "--format", format_name,
+        ],
+        input=analyze.read_text()
+    )
+    print(result.output)
+    assert result.exit_code == 1
+    assert result.output == "There was no data to format.\nAborted!\n"
+    assert caplog.record_tuples == []

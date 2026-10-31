@@ -6,22 +6,23 @@ from .base import BaseFormatter
 class JSONFormatter(BaseFormatter):
     """
     Format a requirements analyze to a JSON report.
+
+    .. Note::
+        Opposed to other formatters, this one won't raise error if there was not any
+        data from analyze or failure. 'analyzed' and 'failures' are always in returned
+        JSON object even if they are empty.
     """
 
     def build(self, content, with_failures=True):
         """
         Build dictionnary of analyzed and possibles failures
         """
-        data = self.output(content)
+        succeeds, failures = super().build(content, with_failures=with_failures)
 
-        payload = {}
-
-        payload["analyzed"] = self.build_analyzed_table(data)
-
-        if with_failures:
-            payload["failures"] = self.build_errors_table(data)
-
-        return payload
+        return {
+            "analyzed": succeeds,
+            "failures": failures,
+        }
 
     def print(self, content, with_failures=True):
         """

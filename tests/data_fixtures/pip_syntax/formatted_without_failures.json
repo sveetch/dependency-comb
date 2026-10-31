@@ -60,5 +60,6 @@
             "release_label": "Latest",
             "release_age": null
         }
-    ]
+    ],
+    "failures": []
 }

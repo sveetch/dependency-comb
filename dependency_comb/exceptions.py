@@ -46,3 +46,10 @@ class RequirementParserError(DependencyCombError):
     When parser encounter invalid syntax on given content.
     """
     pass
+
+
+class FormatterEmptyContentError(DependencyCombError):
+    """
+    When formatter was given an analyze which have empty succeeds and failures data.
+    """
+    pass
