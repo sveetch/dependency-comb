@@ -27,7 +27,7 @@
         "parsed": "Pillow>=3.1.1",
         "pypi_url": null,
         "repository_url": null,
-        "source": "Pillow>=3.1.1",
+        "source": "Pillow>=3.1.1 # With useless comment",
         "specifier": ">=3.1.1",
         "status": "parsed",
         "url": null,

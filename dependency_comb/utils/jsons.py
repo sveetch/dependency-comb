@@ -3,7 +3,7 @@ import datetime
 
 from pathlib import Path
 
-from packaging.requirements import Requirement, SpecifierSet
+from packaging.requirements import InvalidRequirement, Requirement, SpecifierSet
 from packaging.version import Version
 from packaging.markers import Marker
 
@@ -12,7 +12,7 @@ from ..package import PackageRequirement
 
 class ExtendedJsonEncoder(json.JSONEncoder):
     """
-    Additional opiniated support for more basic object types.
+    Additional support for more object types.
 
     Usage sample: ::
 
@@ -35,6 +35,9 @@ class ExtendedJsonEncoder(json.JSONEncoder):
         # Support for dependency-comb objects
         if isinstance(obj, PackageRequirement):
             return obj.data()
+        # Support for dependency-comb objects
+        if isinstance(obj, InvalidRequirement):
+            return str(obj)
 
         # Let the base class default method raise the TypeError
         return json.JSONEncoder.default(self, obj)

@@ -6,10 +6,10 @@ from .package import PackageRequirement
 
 class RequirementParser:
     """
-    Parse a requirements file content to resolve each requirement line as a
-    ``PackageRequirement`` object.
+    Parse a requirements file to resolve each lines as a ``PackageRequirement`` object.
 
-    Multiline directive is not supported.
+    .. Note::
+        Multiline for a requirement directive is not supported.
     """
     def get_nested_content(self, line, basepath):
         """

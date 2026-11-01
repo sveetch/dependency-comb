@@ -16,7 +16,15 @@ Unplanned
 * [ ] Add support to read a dump from pip-tool to include security issues. It should be
   done flexible enough to possibly add support also from
   'uv audit --output-format json';
+* [ ] Failures should not be in a table that is not suitable for long text. Rather it
+  should be something like a 'definition list' (HTML). Starting with untruncated
+  'source', then on a new line the 'resume';
+* [ ] Failures should use more space for long text, it should be in a table in the
+  form: ::
 
+        | #id | 'status'
+        |     | untruncated 'source'
+        |     | 'resume'
 
 Development
 ***********
@@ -29,6 +37,7 @@ Development
   fix #11;
 * Changed Rich formatter so the table is not restrained to its panel container and
   package 'name' display are never truncated in analyzes, fix #7;
+* Fixed requirement line parser to ignore comment part, fix #6;
 
 
 Version 0.4.0 - 2024/11/03

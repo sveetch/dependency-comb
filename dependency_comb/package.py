@@ -26,7 +26,8 @@ class PackageRequirement:
         status (string): Computed requirement status from parsing process. Status can
             be:
 
-            * ``parsed``: requirement has been properly parsed as supported syntax;
+            * ``parsed``: requirement has been properly parsed as supported syntax. This
+              is a temporary status that analyzer will overwrite to another one;
             * ``analyzed``: requirement has been parsed and has been processed by
               the Analyzer;
             * ``unsupported-argument``: unsupported Pip argument, aborted parsing;
@@ -40,8 +41,7 @@ class PackageRequirement:
               parsed source;
 
             Commonly to get all valid requirements that have been properly analyzed,
-            you will just seek for items with status ``analyzed``. ``parsed`` status
-            should never occurs when analyzer has been involved.
+            you will just seek for items with status ``analyzed``.
 
         marker (packaging.markers.Marker): Marker object parsed from source.
         name (string): Package name parsed from source.
@@ -119,7 +119,8 @@ class PackageRequirement:
             self.status = "unsupported-url"
         else:
             try:
-                self.parsed = Requirement(self.source)
+                # Parse source with possible comment part removed
+                self.parsed = Requirement(source.split(" #")[0].strip())
             except InvalidRequirement as e:
                 self.status = "invalid"
                 self.parsing_error = e
