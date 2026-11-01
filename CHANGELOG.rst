@@ -10,19 +10,25 @@ Unplanned
 * [ ] Add optional extra requirement 'rich-click';
 * [ ] Reporter command should exit with code 1 if there is failure and new option
   "--exit-1" is enabled;
+* [ ] Reporter is not tested for empty results alike Formatter;
+* [ ] Restructure data fixtures: 'analyzed.json' in 'analyzes/complete.json' and
+  'formatted_XXX.json' as 'formatted/XXX.json';
+* [ ] Add support to read a dump from pip-tool to include security issues. It should be
+  done flexible enough to possibly add support also from
+  'uv audit --output-format json';
 
 
 Development
 ***********
 
-* [ ] Restructurate Formatter build with common 'build()' and ensure empty are well
-  managed;
 * Added templates for Github issues;
 * Fixed issue with packages that don't define anything in ``project_urls``;
 * Fixed again data fixtures for some delta date changes;
 * Fixed JSONFormatter that was not forgotting 'with_failures' argument;
 * Reworked Formatter to properly manage when success and failures parts are empty,
-  fix #7;
+  fix #11;
+* Changed Rich formatter so the table is not restrained to its panel container and
+  package 'name' display are never truncated in analyzes, fix #7;
 
 
 Version 0.4.0 - 2024/11/03

@@ -25,7 +25,7 @@ def test_rich_print(settings):
     be careful when editing the '*.rich' files.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rich"
+    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rich"
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
@@ -34,7 +34,7 @@ def test_rich_print(settings):
     # print("👷")
     # print(console.file.getvalue())
     # print("👷")
-    assert console.file.getvalue() == formatted.read_text()
+    assert console.file.getvalue() == expected.read_text()
 
 
 @rich_available
@@ -49,13 +49,16 @@ def test_rich_print_with_failures(settings):
     be careful when editing the '*.rich' files.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
+    expected = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
 
     console = formatter.print(analyze, destination=StringIO(), with_failures=True)
-    assert console.file.getvalue() == formatted.read_text()
+    # print("👷")
+    # print(console.file.getvalue())
+    # print("👷")
+    assert console.file.getvalue() == expected.read_text()
 
 
 @rich_available
@@ -65,10 +68,12 @@ def test_rich_write_with_failures(settings, tmp_path):
     Rich writer method should write the console output in given destination file.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
+    expected = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
     destination = tmp_path / "output.rich"
 
     formatter = RichFormatter()
     formatter.write(analyze, destination=destination, with_failures=True)
 
-    assert destination.read_text() == formatted.read_text()
+    # expected.write_text(destination.read_text())
+
+    assert destination.read_text() == expected.read_text()

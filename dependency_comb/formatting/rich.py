@@ -87,20 +87,24 @@ class RichFormatter(BaseStringFormatter):
     def print(self, content, destination=None, with_failures=True):
         """
         Print out the analyzed and possible failures
+
+        TODO: Console width should not be hardcoded
         """
         succeeds, failures = self.build(content, with_failures=with_failures)
 
-        console = Console(width=100, file=destination)
+        console = Console(width=300, file=destination)
         group_items = []
 
         if succeeds:
             group_items.append(Padding("", (1, 2), expand=False))
-            group_items.append(Panel(succeeds, title="[green]Analyzed[/green]"))
+            group_items.append(
+                Panel(succeeds, title="[green]Analyzed[/green]", expand=False)
+            )
 
         if failures:
             group_items.append(Padding("", (1, 2), expand=False))
             group_items.append(
-                Panel(failures, title="[red]Failures[/red]")
+                Panel(failures, title="[red]Failures[/red]", expand=False)
             )
 
         panel_group = Group(*group_items)

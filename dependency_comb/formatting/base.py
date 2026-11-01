@@ -63,7 +63,7 @@ class BaseFormatter:
         this is rarely the case with other formatters.
 
         Arguments:
-            content (Any):
+            content (string or list): Content to serialize.
 
         Returns:
             string: JSON dump of given content.
@@ -186,6 +186,10 @@ class BaseFormatter:
         """
         Build the information table for failed requirements analyze.
 
+        Because failures can be some long local paths, source name is wrapped on
+        two lines if it is over 40 characters, it means a source of +80 characters will
+        be cut to 80.
+
         Arguments:
             items (list): List of requirement dict as returned from Analyzer. All items
                 are processed except the ones with status ``analyzed``.
@@ -221,6 +225,16 @@ class BaseFormatter:
         """
         Build 'succeeds' and 'failures' payloads of analyze for concrete formatter
         method.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
+
+        Return:
+            tuple: Success and failures parts from analyze.
         """
         data = self.open_content(content)
 
@@ -236,6 +250,13 @@ class BaseFormatter:
     def print(self, content, with_failures=True):
         """
         Print out the analyzed and possibly failures
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
         """
         succeeds, failures = self.build(content, with_failures=with_failures)
 
@@ -248,6 +269,16 @@ class BaseFormatter:
     def write(self, content, destination, with_failures=True):
         """
         Write the analyzed and possibly failures into destination file.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
+
+        Return:
+            Path: Path of created file.
         """
         succeeds, failures = self.build(content, with_failures=with_failures)
 
