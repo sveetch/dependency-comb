@@ -6,10 +6,15 @@ Changelog
 Unplanned
 *********
 
+* [ ] Upgrade support to Python 3.13;
+* [ ] Add (to format and report cli) a final resume like:
+  "78 packages, 3 late, 8 failures.";,
 * [ ] Formatters docstring are missing a lot of arguments/returns;
 * [ ] Add optional extra requirement 'rich-click';
 * [ ] Reporter command should exit with code 1 if there is failure and new option
   "--exit-1" is enabled;
+* [ ] Log warning like "Ignored invalid version number 'rc1' for package 'django-axes'"
+  should be a debug instead;
 * [ ] Reporter is not tested for empty results alike Formatter;
 * [ ] Restructure data fixtures: 'analyzed.json' in 'analyzes/complete.json' and
   'formatted_XXX.json' as 'formatted/XXX.json';
@@ -38,6 +43,8 @@ Development
 * Changed Rich formatter so the table is not restrained to its panel container and
   package 'name' display are never truncated in analyzes, fix #7;
 * Fixed requirement line parser to ignore comment part, fix #6;
+* Fixed requirement parser to raise error when there is circular reference in
+  included requirement files, fix #4;
 
 
 Version 0.4.0 - 2024/11/03

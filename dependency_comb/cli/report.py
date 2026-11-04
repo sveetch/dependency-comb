@@ -147,16 +147,16 @@ def report_command(*args, **parameters):
     format_name = parameters["format"]
     with_failures = parameters["failures"]
 
-    # Find the requirement basepath
+    # Find the source path and its basepath
+    requirements_path = None
     if parameters["source"].name == "<stdin>":
         # Since stdin cannot have a basepath like a file we assume the current working
         # directory
-        requirement_basepath = Path.cwd()
+        basepath = Path.cwd()
     else:
+        requirements_path = Path(parameters["source"].name).resolve()
         # Resolve basepath from file parent directory
-        requirement_basepath = Path(
-            parameters["source"].name
-        ).parent.resolve()
+        basepath = requirements_path.parent.resolve()
 
     logger.debug("Cache directory: {}".format(cachedir))
 
@@ -175,9 +175,10 @@ def report_command(*args, **parameters):
         )
         packages = analyzer.inspect(
             source,
+            path=requirements_path,
             environment=environment,
             strict=False,
-            basepath=requirement_basepath,
+            basepath=basepath,
         )
         payload = [pkg.data() for pkg in packages]
     except DependencyCombError as e:

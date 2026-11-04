@@ -432,7 +432,8 @@ class DependenciesAnalyzer(RequirementParser):
 
         return requirement
 
-    def inspect(self, requirements, environment=None, strict=False, basepath=None):
+    def inspect(self, requirements, path=None, environment=None, strict=False,
+                basepath=None):
         """
         Inspect given requirement to get their informations.
 
@@ -441,6 +442,8 @@ class DependenciesAnalyzer(RequirementParser):
                 directly requirements content as a string.
 
         Keyword Arguments:
+            path (Path): Path of requirement file if available. This is used to avoid
+                circular references and must be an absolute path.
             environment (dict): Optionnal dictionnary of environment variables to use
             with possible specifier marker resolution.
             strict (boolean): If True only the valid requirements (see
@@ -455,6 +458,7 @@ class DependenciesAnalyzer(RequirementParser):
         """
         parsed_requirements = self.parse_requirements(
             requirements,
+            path=path,
             environment=environment,
             basepath=basepath,
         )

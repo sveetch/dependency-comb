@@ -96,12 +96,12 @@ def test_report_to_file(caplog, tmp_path, settings):
         input=requirements_file.read_text()
     )
 
-    # if result.exit_code > 0:
-    #     import traceback
-    #     klass, error, error_tb = result.exc_info
-    #     print(error)
-    #     traceback.print_tb(error_tb, limit=None)
-    #     raise error
+    if result.exit_code > 0:
+        import traceback
+        klass, error, error_tb = result.exc_info
+        print(error)
+        traceback.print_tb(error_tb, limit=None)
+        raise error
 
     assert result.exit_code == 0
 

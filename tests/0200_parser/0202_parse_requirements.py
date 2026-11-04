@@ -245,3 +245,23 @@ def test_parse_inclusion_directive_notfound(settings):
     assert str(excinfo.value) == (
         "Unable to find included source: {}".format(included_source)
     )
+
+
+def test_circular(settings):
+    """
+    Parser should detect a circular reference in included requirement files and raise
+    an error.
+    """
+    sample_source = settings.fixtures_path / "nested_requirements/circular_parent.txt"
+    parser = RequirementParser()
+
+    with pytest.raises(RequirementParserError) as excinfo:
+        parser.parse_requirements(
+            sample_source,
+            basepath=settings.fixtures_path / "nested_requirements",
+        )
+
+    assert str(excinfo.value) == (
+        "File 'circular_leaf.txt' try to include the parent file 'circular_parent.txt' "
+        "that would lead to a circular reference."
+    )

@@ -147,6 +147,12 @@ def test_analyze_with_env(caplog, settings):
             "--env", str(environment_file),
         ],
     )
+    if result.exit_code > 0:
+        import traceback
+        klass, error, error_tb = result.exc_info
+        print(error)
+        traceback.print_tb(error_tb, limit=None)
+        raise error
     assert result.exit_code == 0
 
     results = json.loads(result.output)

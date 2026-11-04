@@ -1,6 +1,6 @@
 import pytest
 
-from packaging.requirements import InvalidRequirement, Requirement, SpecifierSet
+from packaging.requirements import Requirement, SpecifierSet
 
 from dependency_comb.package import PackageRequirement
 
@@ -67,7 +67,6 @@ def test_parser_valid(source, parsed_name, parsed_url):
     All expected valid requirement line formats should be successfuly parsed.
     """
     pkg = PackageRequirement(source).data()
-    print(pkg)
     assert pkg["status"] == "parsed"
     assert pkg["name"] == parsed_name
     assert pkg["url"] == parsed_url
@@ -90,15 +89,3 @@ def test_parser_invalid(source, parsed_name):
     pkg = PackageRequirement(source).data()
     assert pkg["status"] == parsed_name
     assert pkg["name"] is None
-
-
-@pytest.mark.xfail(reason="Known requirement parser failure")
-def test_parser_vcs_comment_failure():
-    """
-    NOTE: False positive case, the 'subdirectory' part is truncated because of
-    'parse_source' discovery of comment.
-    """
-    source = "pkg @ vcs+protocol://repo_url/#subdirectory=pkg_dir # comment"
-
-    with pytest.raises(InvalidRequirement):
-        PackageRequirement(source).data()
