@@ -5,6 +5,7 @@ import pytest
 from click.testing import CliRunner
 
 from dependency_comb.cli.entrypoint import cli_frontend
+from dependency_comb.formatting import AVAILABLE_FORMATS
 
 
 def test_default(caplog):
@@ -96,17 +97,10 @@ def test_without_failures_to_file(caplog, tmp_path, settings):
     ]
 
 
-@pytest.mark.parametrize("format_name", [
-    "csv",
-    "rst",
-    "rich",
-    # JSON formatter behavior is not to raise error on empty
-    "json",
-])
+@pytest.mark.parametrize("format_name", AVAILABLE_FORMATS)
 def test_empty(caplog, settings, format_name):
     """
-    TODO: should be runned on multiple formatters ?
-    rst and json are still to be adapted to new Formatter.build().
+    Ensure empty analyze is properly managed.
     """
     analyze = settings.fixtures_path / "pip_syntax/analyzes/failure_only.json"
 
@@ -122,7 +116,7 @@ def test_empty(caplog, settings, format_name):
         ],
         input=analyze.read_text()
     )
-    print(result.output)
+    # print(result.output)
     assert result.exit_code == 1
     assert result.output == "There was no data to format.\nAborted!\n"
     assert caplog.record_tuples == []

@@ -5,9 +5,11 @@ from .rst import RestructuredTextFormatter
 
 
 # Manage optional Rich formatter
-try:
+from ..compat.rich_support import RICH_ENABLED
+
+if RICH_ENABLED is True:
     from .rich import RichFormatter
-except ImportError:
+else:
     RichFormatter = None
 
 
@@ -15,8 +17,8 @@ __all__ = [
     "BaseFormatter",
     "CSVFormatter",
     "JSONFormatter",
-    "RichFormatter",
     "RestructuredTextFormatter",
+    "RichFormatter",
 ]
 
 
@@ -29,8 +31,8 @@ AVAILABLE_FORMATS = {
     "rst": RestructuredTextFormatter,
 }
 
-# If Rich is enabled
-if RichFormatter:
+# If Rich is enabled, formatter is available and become the default one
+if RICH_ENABLED is True:
     AVAILABLE_FORMATS["rich"] = RichFormatter
 
 

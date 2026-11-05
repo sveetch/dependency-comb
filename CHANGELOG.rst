@@ -7,7 +7,6 @@ Planned
 *******
 
 * [ ] Uniqueness on final package list is not enforced #8;
-* [ ] Upgrade support to Python 3.13;
 * [ ] Formatters docstring are missing a lot of arguments/returns;
 * [ ] Restructure data fixtures: 'analyzed.json' in 'analyzes/complete.json' and
   'formatted_XXX.json' as 'formatted/XXX.json';
@@ -51,6 +50,8 @@ Development
 * Fixed requirement parser to raise error when there is circular reference in
   included requirement files, fix #4;
 * Renamed command from ``dependency_comb`` to ``dependency-comb``, fix #1;
+* Upgraded official Python support up to 3.14;
+* Updated Tox configuration to match Python support and optional Rich;
 
 
 Version 0.4.0 - 2024/11/03
