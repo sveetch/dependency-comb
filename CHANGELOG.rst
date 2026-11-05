@@ -3,29 +3,34 @@
 Changelog
 =========
 
-Unplanned
-*********
+Planned
+*******
 
+* [ ] Uniqueness on final package list is not enforced #8;
 * [ ] Upgrade support to Python 3.13;
-* [ ] Add (to format and report cli) a final resume like:
-  "78 packages, 3 late, 8 failures.";,
 * [ ] Formatters docstring are missing a lot of arguments/returns;
+* [ ] Restructure data fixtures: 'analyzed.json' in 'analyzes/complete.json' and
+  'formatted_XXX.json' as 'formatted/XXX.json';
 * [ ] Add optional extra requirement 'rich-click';
 * [ ] Reporter command should exit with code 1 if there is failure and new option
-  "--exit-1" is enabled;
+  "--exit-1" is enabled, related to #2;
 * [ ] Log warning like "Ignored invalid version number 'rc1' for package 'django-axes'"
   should be a debug instead;
 * [ ] Reporter is not tested for empty results alike Formatter;
-* [ ] Restructure data fixtures: 'analyzed.json' in 'analyzes/complete.json' and
-  'formatted_XXX.json' as 'formatted/XXX.json';
 * [ ] Add support to read a dump from pip-tool to include security issues. It should be
   done flexible enough to possibly add support also from
   'uv audit --output-format json';
-* [ ] Failures should not be in a table that is not suitable for long text. Rather it
-  should be something like a 'definition list' (HTML). Starting with untruncated
-  'source', then on a new line the 'resume';
-* [ ] Failures should use more space for long text, it should be in a table in the
-  form: ::
+* [ ] Improve report informations and readability
+
+  * [ ] #5;
+  * [ ] Add (to format and report cli) a final resume like:
+    "78 packages, 3 late, 8 failures.";,
+  * [ ] Python version should be displayed in rst and rich;
+  * [ ] Failures should not be in a table that is not suitable for long text. Rather it
+    should be something like a 'definition list' (HTML). Starting with untruncated
+    'source', then on a new line the 'resume';
+  * [ ] Failures should use more space for long text, it should be in a table in the
+    form: ::
 
         | #id | 'status'
         |     | untruncated 'source'
@@ -45,6 +50,7 @@ Development
 * Fixed requirement line parser to ignore comment part, fix #6;
 * Fixed requirement parser to raise error when there is circular reference in
   included requirement files, fix #4;
+* Renamed command from ``dependency_comb`` to ``dependency-comb``, fix #1;
 
 
 Version 0.4.0 - 2024/11/03

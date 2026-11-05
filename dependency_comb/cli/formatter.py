@@ -57,7 +57,7 @@ def format_command(*args, **parameters):
         Computed analyze in a JSON file path. Instead of a file path you can also give
         a requirements file content from standard input using '-'. For example:
 
-            dependency_comb analyze requirements.txt | dependency_comb report -
+            dependency-comb analyze requirements.txt | dependency-comb report -
     """
     logger = logging.getLogger(__pkgname__)
 

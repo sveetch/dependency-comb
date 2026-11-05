@@ -9,7 +9,7 @@ Usage
 
 Once installed on your system you can use the tool directly: ::
 
-    dependency_comb
+    dependency-comb
 
 This entrypoint don't perform any tasks, see its available commands.
 
@@ -20,7 +20,7 @@ Logging level
 
 The entrypoint is where you can set the verbosity level from commands like this: ::
 
-    dependency_comb -v 0 [COMMAND]..
+    dependency-comb -v 0 [COMMAND]..
 
 The value is an integer between 0 and 5 where 0 is to mute everything except critical
 errors and 5 is to output everything.
@@ -35,11 +35,11 @@ Help
 
 There is a base tool help for global options: ::
 
-    dependency_comb -h
+    dependency-comb -h
 
 And if you use ``-h`` after a command name you will get its specific help: ::
 
-    dependency_comb analyze -h
+    dependency-comb analyze -h
 
 Analyze
 *******

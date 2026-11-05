@@ -1,4 +1,4 @@
-Usage: dependency_comb format [OPTIONS] SOURCE
+Usage: dependency-comb format [OPTIONS] SOURCE
 
   Format an existing analyze.
 
@@ -10,7 +10,7 @@ Usage: dependency_comb format [OPTIONS] SOURCE
       Computed analyze in a JSON file path. Instead of a file path you can also give
       a requirements file content from standard input using '-'. For example:
 
-          dependency_comb analyze requirements.txt | dependency_comb report -
+          dependency-comb analyze requirements.txt | dependency-comb report -
 
 Options:
   --format STRING             Format name.  [default: rst]

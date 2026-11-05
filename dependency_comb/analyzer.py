@@ -388,11 +388,11 @@ class DependenciesAnalyzer(RequirementParser):
 
     def build_package_informations(self, requirement):
         """
-        Compute and set informations in a ``PackageRequirement`` object.
+        Compute and set informations on a ``PackageRequirement`` object.
 
         Arguments:
-            requirement (PackageRequirement): The package object for to search
-                informations from Pypi.
+            requirement (PackageRequirement): The package object where to complete
+                informations.
 
         Returns:
             PackageRequirement: The package object.

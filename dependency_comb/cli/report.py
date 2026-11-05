@@ -126,11 +126,11 @@ def report_command(*args, **parameters):
         Instead of a file path you can also give a requirements file content from
         standard input using '-'. For example using the Pip freeze output:
 
-            pip freeze | dependency_comb report -
+            pip freeze | dependency-comb report -
 
         Or to make a report for an unique package:
 
-            echo "django==3.2.1" | dependency_comb report -
+            echo "django==3.2.1" | dependency-comb report -
 
     """
     logger = logging.getLogger(__pkgname__)

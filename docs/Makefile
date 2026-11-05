@@ -16,9 +16,9 @@ help:
 .PHONY: help Makefile
 
 build_command_helps:
-	$(VENV_PATH)/bin/dependency_comb analyze -h > _static/command_helps/analyze.txt
-	$(VENV_PATH)/bin/dependency_comb format -h > _static/command_helps/format.txt
-	$(VENV_PATH)/bin/dependency_comb report -h > _static/command_helps/report.txt
+	$(VENV_PATH)/bin/dependency-comb analyze -h > _static/command_helps/analyze.txt
+	$(VENV_PATH)/bin/dependency-comb format -h > _static/command_helps/format.txt
+	$(VENV_PATH)/bin/dependency-comb report -h > _static/command_helps/report.txt
 .PHONY: build_command_helps
 
 # Catch-all target: route all unknown targets to Sphinx using the new

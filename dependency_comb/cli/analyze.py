@@ -114,11 +114,11 @@ def analyze_command(*args, **parameters):
         Instead of a file path you can also give a requirements file content from
         standard input using '-'. For example using the Pip freeze output:
 
-            pip freeze | dependency_comb analyze -
+            pip freeze | dependency-comb analyze -
 
         Or to analyze an unique package:
 
-            echo "django==3.2.1" | dependency_comb analyze -
+            echo "django==3.2.1" | dependency-comb analyze -
 
     """
     logger = logging.getLogger(__pkgname__)
