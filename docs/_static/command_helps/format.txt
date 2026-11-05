@@ -1,23 +1,22 @@
-Usage: dependency-comb format [OPTIONS] SOURCE
-
-  Format an existing analyze.
-
-  Analyze is expected to be a valid JSON like output from 'analyze' command.
-
-  Arguments:
-
-  SOURCE
-      Computed analyze in a JSON file path. Instead of a file path you can also give
-      a requirements file content from standard input using '-'. For example:
-
-          dependency-comb analyze requirements.txt | dependency-comb report -
-
-Options:
-  --format STRING             Format name.  [default: rst]
-  --destination FILE          File path destination where to write serialized
-                              JSON manifest. If not given the JSON will be
-                              sent to standard output.
-  --failures / --no-failures  Include requirement analyze failures in a
-                              different table, also each tablewill have its
-                              own title.
-  -h, --help                  Show this message and exit.
+                                                                                                                                                                                                                                            
+ Usage: dependency-comb format [OPTIONS] SOURCE                                                                                                                                                                                             
+                                                                                                                                                                                                                                            
+ Format an existing analyze.                                                                                                                                                                                                                
+ Analyze is expected to be a valid JSON like output from 'analyze' command.                                                                                                                                                                 
+ Arguments:                                                                                                                                                                                                                                 
+ SOURCE                                                                                                                                                                                                                                     
+     Computed analyze in a JSON file path. Instead of a file path you can also give                                                                                                                                                         
+     a requirements file content from standard input using '-'. For example:                                                                                                                                                                
+                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                            
+         dependency-comb analyze requirements.txt | dependency-comb report -                                                                                                                                                                
+                                                                                                                                                                                                                                            
+╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ SOURCE  FILENAME                                                                                                                                                                                                                         │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --format                      STRING  Format name. [default: rst]                                                                                                                                                                        │
+│ --destination                 FILE    File path destination where to write serialized JSON manifest. If not given the JSON will be sent to standard output.                                                                              │
+│ --failures/--no-failures              Include requirement analyze failures in a different table, also each tablewill have its own title.                                                                                                 │
+│ --help                    -h          Show this message and exit.                                                                                                                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

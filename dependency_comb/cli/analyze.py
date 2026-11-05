@@ -2,9 +2,8 @@ import json
 import logging
 from pathlib import Path
 
-import click
-
 from ..analyzer import DependenciesAnalyzer
+from ..compat.click_support import click
 from ..exceptions import DependencyCombError
 from ..utils.jsons import ExtendedJsonEncoder
 from ..utils.logger import NoOperationLogger

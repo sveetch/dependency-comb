@@ -1,8 +1,7 @@
 import logging
 from pathlib import Path
 
-import click
-
+from ..compat.click_support import click
 from ..exceptions import FormatterEmptyContentError
 from ..utils.logger import NoOperationLogger
 from ..formatting import DEFAULT_FORMAT, AVAILABLE_FORMATS, output_formatted_content

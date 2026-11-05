@@ -7,7 +7,6 @@ Planned
 *******
 
 * [ ] Uniqueness on final package list is not enforced #8;
-* [ ] Add optional extra requirement 'rich-click';
 * [ ] Reporter command should exit with code 1 if there is failure and new option
   "--exit-1" is enabled, related to #2;
 * [ ] Log warning like "Ignored invalid version number 'rc1' for package 'django-axes'"
@@ -31,6 +30,7 @@ Planned
         |     | untruncated 'source'
         |     | 'resume'
 
+
 Development
 ***********
 
@@ -49,6 +49,9 @@ Development
 * Upgraded official Python support up to 3.14;
 * Updated Tox configuration to match Python support and optional Rich;
 * Restructured test data fixtures files;
+* Added 'rich-click' to extra requirement 'rich' so the command interface has some
+  display improvements when the Rich stack is available;
+* Added basic compatibility module for when rich and rich-click are available or not;
 
 
 Version 0.4.0 - 2024/11/03

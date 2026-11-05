@@ -6,6 +6,7 @@ from click.testing import CliRunner
 
 from dependency_comb.cli.entrypoint import cli_frontend
 from dependency_comb.formatting import AVAILABLE_FORMATS
+from dependency_comb.compat.click_support import ABORT_ENDING
 
 
 def test_default(caplog):
@@ -16,8 +17,7 @@ def test_default(caplog):
     result = runner.invoke(cli_frontend, ["format"])
 
     msg = (
-        "Error: Invalid value for 'SOURCE': 'requirements.txt': No such file or "
-        "directory"
+        "Invalid value for 'SOURCE': 'requirements.txt': No such file or directory"
     )
 
     assert result.exit_code == 2
@@ -118,5 +118,7 @@ def test_empty(caplog, settings, format_name):
     )
     # print(result.output)
     assert result.exit_code == 1
-    assert result.output == "There was no data to format.\nAborted!\n"
+    assert result.output == (
+        "There was no data to format.\nAborted{}\n".format(ABORT_ENDING)
+    )
     assert caplog.record_tuples == []

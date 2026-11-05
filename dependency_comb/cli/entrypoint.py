@@ -1,7 +1,7 @@
 """
 Main entrance to commandline actions
 """
-import click
+from ..compat.click_support import RICH_CLICK_ENABLED, click
 
 from ..utils.logger import init_logger
 
@@ -9,6 +9,11 @@ from .version import version_command
 from .analyze import analyze_command
 from .formatter import format_command
 from .report import report_command
+
+
+if RICH_CLICK_ENABLED:
+    # This is a rich-click option only to show arguments in help
+    click.rich_click.SHOW_ARGUMENTS = True
 
 
 # Help alias on "-h" argument

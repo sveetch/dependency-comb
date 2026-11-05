@@ -1,4 +1,4 @@
-import click
+from ..compat.click_support import click
 
 from .. import __version__
 

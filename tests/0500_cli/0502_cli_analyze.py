@@ -16,7 +16,7 @@ def test_analyze_default(caplog):
     result = runner.invoke(cli_frontend, ["analyze"])
 
     msg = (
-        "Error: Invalid value for 'SOURCE': 'requirements.txt': No such file or "
+        "Invalid value for 'SOURCE': 'requirements.txt': No such file or "
         "directory"
     )
 

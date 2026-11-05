@@ -14,7 +14,7 @@ def test_report_default(caplog):
     result = runner.invoke(cli_frontend, ["report"])
 
     msg = (
-        "Error: Invalid value for 'SOURCE': 'requirements.txt': No such file or "
+        "Invalid value for 'SOURCE': 'requirements.txt': No such file or "
         "directory"
     )
 
