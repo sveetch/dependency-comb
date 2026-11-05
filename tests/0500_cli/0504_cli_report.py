@@ -30,8 +30,8 @@ def test_report_with_failures_from_stdin(caplog, settings):
     RST format with failures included.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
-    requirements_file = settings.fixtures_path / "pip_syntax/requirements.txt"
+    formatted = settings.fixtures_path / "formatted/with_failures.rst"
+    requirements_file = settings.fixtures_path / "requirements_basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -53,8 +53,8 @@ def test_report_from_stdin(caplog, settings):
     RST format without failures included and titles. Logs are muted.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
-    requirements_file = settings.fixtures_path / "pip_syntax/requirements.txt"
+    formatted = settings.fixtures_path / "formatted/no_failures.rst"
+    requirements_file = settings.fixtures_path / "requirements_basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -78,8 +78,8 @@ def test_report_to_file(caplog, tmp_path, settings):
     """
     cachedir = settings.fixtures_path / "api_cache"
     destination = tmp_path / "format.rst"
-    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
-    requirements_file = settings.fixtures_path / "pip_syntax/requirements.txt"
+    expected = settings.fixtures_path / "formatted/no_failures.rst"
+    requirements_file = settings.fixtures_path / "requirements_basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(

@@ -35,7 +35,7 @@ def test_rst_build_analyzed_table(settings):
     """
     Method should build a table for succeeded analyzed items with proper informations.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     base_formatter = BaseFormatter()
     formatter = RestructuredTextFormatter()
 
@@ -175,8 +175,8 @@ def test_rst_print(settings):
     """
     Without failures enabled the output should only contains the analyzed table.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/no_failures.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -196,8 +196,8 @@ def test_rst_output_with_failures(settings):
     With failures enabled the output should contains both analyzed and failed tables
     each with a title.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/with_failures.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -220,8 +220,8 @@ def test_rst_write_without_failures(settings, tmp_path):
     RST writer method should write the output formatted as RST in given destination
     file.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/no_failures.rst"
     destination = tmp_path / "output.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it

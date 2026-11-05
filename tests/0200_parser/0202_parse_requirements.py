@@ -14,8 +14,8 @@ def test_parse_content(settings):
     Parser should be able to parse requirements with valid Pip syntax from a string
     then return requirements objects.
     """
-    sample_source = settings.fixtures_path / "pip_syntax/requirements.txt"
-    sample_parsed = settings.fixtures_path / "pip_syntax/parsed.json"
+    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    sample_parsed = settings.fixtures_path / "parsed_requirements_basic.json"
     parser = RequirementParser()
 
     # As a string

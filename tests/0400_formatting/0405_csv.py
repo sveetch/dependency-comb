@@ -8,8 +8,8 @@ def test_csv_print(settings):
     """
     Without failures enabled the output should only contains the analyzed table.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.csv"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/no_failures.csv"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -31,8 +31,8 @@ def test_csv_print_with_failures(settings):
     """
     With failures enabled the output should contains the analyzed and failures tables.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.csv"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/with_failures.csv"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -52,8 +52,8 @@ def test_csv_write_with_failures(settings, tmp_path):
     """
     CSV writer method should write output in given destination file.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.csv"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/with_failures.csv"
     destination = tmp_path / "output.csv"
 
     formatter = CSVFormatter()

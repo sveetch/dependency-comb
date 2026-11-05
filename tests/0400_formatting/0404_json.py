@@ -10,8 +10,8 @@ def test_json_print(settings):
     """
     Without failures enabled the output should only contains the analyzed table.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_without_failures.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/no_failures.json"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -33,8 +33,8 @@ def test_json_print_with_failures(settings):
     """
     With failures enabled the output should contains the analyzed and failures tables.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/with_failures.json"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -53,8 +53,8 @@ def test_json_write_with_failures(settings, tmp_path):
     """
     JSON writer method should write JSON data into given destination file.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    formatted = settings.fixtures_path / "pip_syntax/formatted_with_failures.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatted = settings.fixtures_path / "formatted/with_failures.json"
     destination = tmp_path / "output.json"
 
     formatter = JSONFormatter()

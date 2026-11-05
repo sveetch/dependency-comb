@@ -74,7 +74,7 @@ def test_build_analyzed_table(settings):
         * Computer date may be tampered to see what it would involves on delta
           computation;
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     analyze_content = json.loads(analyze.read_text())
     formatter = BaseFormatter()
 
@@ -149,7 +149,7 @@ def test_build_errors_table(settings):
     Method should build a list of dictionnaries for all items except the ones with
     status 'analyzed'.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     analyze_content = json.loads(analyze.read_text())
     formatter = BaseFormatter()
 
@@ -175,7 +175,7 @@ def test_open_content_from_filepath(settings):
     Base formatter is able to open analyze from a file path but just returns
     deserialized JSON to Python data.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     formatter = BaseFormatter()
 
     content = formatter.open_content(analyze)
@@ -200,7 +200,7 @@ def test_open_content_from_string(settings):
     Base formatter is able to open analyze from a string but just returns deserialized
     JSON to Python data.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
 
     formatter = BaseFormatter()
     content = formatter.open_content(analyze.read_text())
@@ -258,7 +258,7 @@ def test_build(settings, source, success, failed, with_failures):
     Build method should return found success and possibly failures (according to
     option).
     """
-    analyzes = settings.fixtures_path / "pip_syntax/analyzes"
+    analyzes = settings.fixtures_path / "analyzes"
 
     formatter = BaseFormatter()
 
@@ -281,7 +281,7 @@ def test_build_empty(settings):
     # result
     with pytest.raises(FormatterEmptyContentError):
         formatter.build(
-            settings.fixtures_path / "pip_syntax/analyzes/failure_only.json",
+            settings.fixtures_path / "analyzes/failure_only.json",
             with_failures=False
         )
 
@@ -291,7 +291,7 @@ def test_print(settings):
     """
     Printer method should write its result outputs into given printer function.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     analyze_content = json.loads(analyze.read_text())
 
     # Dummy printer function to receive output into 'output' to assert on it
@@ -391,7 +391,7 @@ def test_write(settings, tmp_path):
     Base writer method should write its result outputs as JSON into given file
     destination.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     analyze_content = json.loads(analyze.read_text())
     destination = tmp_path / "output.json"
 

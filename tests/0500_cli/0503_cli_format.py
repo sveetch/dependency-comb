@@ -31,8 +31,8 @@ def test_with_failures_from_stdin(caplog, settings):
     Command should succeed to get JSON analyze from standard input and return a
     RST format without failures included and titles.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    expected = settings.fixtures_path / "pip_syntax/formatted_with_failures.rst"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    expected = settings.fixtures_path / "formatted/with_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(cli_frontend, ["format", "-"], input=analyze.read_text())
@@ -55,8 +55,8 @@ def test_without_failures_from_stdin(caplog, settings):
     Command should succeed to get JSON analyze from standard input and return a full
     RST format with failures included.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    expected = settings.fixtures_path / "formatted/no_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -76,9 +76,9 @@ def test_without_failures_to_file(caplog, tmp_path, settings):
     Command should should write JSON to a file instead of standard output and logging
     some messages.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
     destination = tmp_path / "format.rst"
-    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rst"
+    expected = settings.fixtures_path / "formatted/no_failures.rst"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -102,7 +102,7 @@ def test_empty(caplog, settings, format_name):
     """
     Ensure empty analyze is properly managed.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzes/failure_only.json"
+    analyze = settings.fixtures_path / "analyzes/failure_only.json"
 
     runner = CliRunner()
 

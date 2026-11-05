@@ -24,8 +24,8 @@ def test_rich_print(settings):
     NOTE: Rich can make some empty line with some whitespace that can not be visible,
     be careful when editing the '*.rich' files.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    expected = settings.fixtures_path / "pip_syntax/formatted_without_failures.rich"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    expected = settings.fixtures_path / "formatted/no_failures.rich"
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
@@ -48,8 +48,8 @@ def test_rich_print_with_failures(settings):
     NOTE: Rich can make some empty line with some whitespace that can not be visible,
     be careful when editing the '*.rich' files.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    expected = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    expected = settings.fixtures_path / "formatted/with_failures.rich"
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
@@ -67,8 +67,8 @@ def test_rich_write_with_failures(settings, tmp_path):
     """
     Rich writer method should write the console output in given destination file.
     """
-    analyze = settings.fixtures_path / "pip_syntax/analyzed.json"
-    expected = settings.fixtures_path / "pip_syntax/formatted_with_failures.rich"
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    expected = settings.fixtures_path / "formatted/with_failures.rich"
     destination = tmp_path / "output.rich"
 
     formatter = RichFormatter()

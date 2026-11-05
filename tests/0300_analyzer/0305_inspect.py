@@ -104,14 +104,14 @@ def test_inspect(settings, source, strict, environment, expected):
 @pytest.mark.skip("Just for test development")
 def test_build_inspection(settings):
     """
-    A non test routine to rebuild 'pip_syntax/analyzed.json' fixture file content.
+    A non test routine to rebuild 'analyzes/basic.json' fixture file content.
     """
     import json
     from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
     cachedir = settings.fixtures_path / "api_cache"
-    sample_source = settings.fixtures_path / "pip_syntax/requirements.txt"
-    sample_analyzed = settings.fixtures_path / "pip_syntax/analyzed.json"
+    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    sample_analyzed = settings.fixtures_path / "analyzes/basic.json"
 
     analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
