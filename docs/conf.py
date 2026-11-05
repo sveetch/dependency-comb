@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 
 # Get the module version
 from dependency_comb import __version__ as dependency_comb_version
@@ -17,8 +18,9 @@ from dependency_comb import __version__ as dependency_comb_version
 
 # -- Project information -----------------------------------------------------
 
+now = datetime.date.today()
 project = "dependency-comb"
-copyright = "2024, David Thenon"
+copyright = "2024-{}, David Thenon".format(now.year)
 author = "David Thenon"
 
 # The short X.Y version

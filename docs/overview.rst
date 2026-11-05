@@ -94,7 +94,7 @@ Demonstration
 
 With the following requirements file ``requirements.txt``:
 
-.. include:: ../tests/data_fixtures/pip_syntax/requirements.txt
+.. include:: ../tests/data_fixtures/requirements_basic.txt
     :code: text
 
 We can build a report like this: ::
@@ -103,7 +103,7 @@ We can build a report like this: ::
 
 This will print the following output:
 
-.. include:: ../tests/data_fixtures/pip_syntax/formatted_with_failures.rst
+.. include:: ../tests/data_fixtures/formatted/with_failures.rst
     :code: text
 
 .. Note::
@@ -114,4 +114,4 @@ a command option see :ref:`cli_logging`.
 
 The following sections are the included RestructuredText output sample from before.
 
-.. include:: ../tests/data_fixtures/pip_syntax/formatted_with_failures.rst
+.. include:: ../tests/data_fixtures/formatted/with_failures.rst

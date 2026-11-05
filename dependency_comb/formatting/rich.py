@@ -22,7 +22,7 @@ class RichFormatter(BaseStringFormatter):
                 unexpected results or even errors.
 
         Returns:
-            rich.table.Table:
+            rich.table.Table: A Rich table object with successful requirement analyzes.
         """
         results = super().build_analyzed_table(items)
 
@@ -59,7 +59,7 @@ class RichFormatter(BaseStringFormatter):
                 analyzed items.
 
         Returns:
-            rich.table.Table:
+            rich.table.Table: A Rich table object with failed requirement analyzes.
         """
         results = super().build_errors_table(items)
 
@@ -89,6 +89,13 @@ class RichFormatter(BaseStringFormatter):
         Print out the analyzed and possible failures
 
         TODO: Console width should not be hardcoded
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
         """
         succeeds, failures = self.build(content, with_failures=with_failures)
 
@@ -115,6 +122,16 @@ class RichFormatter(BaseStringFormatter):
     def write(self, content, destination, with_failures=True):
         """
         Write the analyzed and possibly failures into destination file.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
+
+        Return:
+            Path: Path of created file.
         """
         self.print(
             content,

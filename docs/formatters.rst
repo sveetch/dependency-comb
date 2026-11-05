@@ -20,7 +20,7 @@ can include in your RST documents.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/pip_syntax/formatted_with_failures.rst
+.. include:: ../tests/data_fixtures/formatted/with_failures.rst
     :code: text
 
 
@@ -40,7 +40,7 @@ commands then you didn't installed Rich.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/pip_syntax/formatted_with_failures.rich
+.. include:: ../tests/data_fixtures/formatted/with_failures.rich
     :code: text
 
 
@@ -58,7 +58,7 @@ yourself.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/pip_syntax/formatted_with_failures.csv
+.. include:: ../tests/data_fixtures/formatted/with_failures.csv
     :code: text
 
 
@@ -70,6 +70,6 @@ It will output analyze and possibles failures in a JSON structure.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/pip_syntax/formatted_with_failures.json
+.. include:: ../tests/data_fixtures/formatted/with_failures.json
     :code: text
 

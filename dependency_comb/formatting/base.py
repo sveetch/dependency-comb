@@ -25,8 +25,10 @@ class BaseFormatter:
         now_date (datetime): A datetime to set instead of default ``datetime.now()``.
             This datetime is used to compute the delta time between release and current
             date.
-        printer (callable):
-        printer_kwargs (dict):
+        printer (callable): Function to use to print content. The function accept a
+            an argument for the content and commonly return a string just like
+            ``print()``. On default this will use ``click.echo()``.
+        printer_kwargs (dict): Possible kwargs to pass to the printer function.
     """
     def __init__(self, now_date=None, printer=None, printer_kwargs=None):
         self.now_date = now_date or datetime.datetime.now()
@@ -43,9 +45,12 @@ class BaseFormatter:
         """
         Print method wrapper.
 
-        Formatter class may override ``get_printer_function``, ``get_printer_kwargs``,
+        A concrete class may override ``get_printer_function``, ``get_printer_kwargs``,
         ``BaseFormatter.printer`` or ``BaseFormatter.printer`` to set another printer
         function. Default behavior is to use ``Click.echo()``.
+
+        Arguments:
+            content (string): Content to print out.
         """
         klass = self.get_printer_function()
         opts = self.get_printer_kwargs()
@@ -309,6 +314,6 @@ class BaseStringFormatter(BaseFormatter):
     """
     def serialize_output(self, content):
         """
-        No specific serialization since it is already a proper string.
+        No specific serialization since it should be already a string.
         """
         return content

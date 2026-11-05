@@ -7,7 +7,6 @@ Planned
 *******
 
 * [ ] Uniqueness on final package list is not enforced #8;
-* [ ] Formatters docstring are missing a lot of arguments/returns;
 * [ ] Add optional extra requirement 'rich-click';
 * [ ] Reporter command should exit with code 1 if there is failure and new option
   "--exit-1" is enabled, related to #2;
@@ -24,10 +23,7 @@ Planned
 
         "78 packages, 3 late, 8 failures."
 
-  * [ ] Python version should be displayed in rst and rich;
-  * [ ] Failures should not be in a table that is not suitable for long text. Rather it
-    should be something like a 'definition list' (HTML). Starting with untruncated
-    'source', then on a new line the 'resume';
+  * [ ] Python version should be included in json, rst and rich formats;
   * [ ] Failures should use more space for long text, it should be in a table in the
     form: ::
 

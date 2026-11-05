@@ -19,7 +19,7 @@ class CSVFormatter(BaseStringFormatter):
                 unexpected results or even errors.
 
         Returns:
-            string:
+            string: A CSV table with successful requirement analyzes.
         """
         payload = StringIO()
 
@@ -53,7 +53,7 @@ class CSVFormatter(BaseStringFormatter):
                 analyzed items.
 
         Returns:
-            string:
+            string: A CSV table with failed requirement analyzes.
         """
         payload = StringIO()
 

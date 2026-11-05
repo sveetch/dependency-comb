@@ -16,6 +16,14 @@ class JSONFormatter(BaseFormatter):
     def build(self, content, with_failures=True):
         """
         Build dictionnary of analyzed and possibles failures
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
+
         """
         succeeds, failures = super().build(content, with_failures=with_failures)
 
@@ -27,6 +35,13 @@ class JSONFormatter(BaseFormatter):
     def print(self, content, with_failures=True):
         """
         Print out the analyzed and possibly failures
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
         """
         self.printer_call(
             json.dumps(self.build(content, with_failures=with_failures), indent=4)
@@ -35,6 +50,16 @@ class JSONFormatter(BaseFormatter):
     def write(self, content, destination, with_failures=True):
         """
         Write the analyzed and possibly failures into destination file.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
+
+        Return:
+            Path: Path of created file.
         """
         destination.write_text(
             json.dumps(self.build(content, with_failures=with_failures))
