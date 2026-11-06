@@ -282,7 +282,7 @@ class DependenciesAnalyzer(RequirementParser):
                 msg = (
                     "Ignored invalid version number '{version}' for package '{name}'"
                 )
-                self.logger.warning(msg.format(name=name, version=item["number"]))
+                self.logger.debug(msg.format(name=name, version=item["number"]))
                 continue
             else:
                 item["number"] = number

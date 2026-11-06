@@ -111,7 +111,6 @@ def test_report_to_file(caplog, tmp_path, settings):
     assert caplog.record_tuples == [
         (__pkgname__, 20, "Processing package: django"),
         (__pkgname__, 20, "Processing package: Pillow"),
-        (__pkgname__, 30, "Ignored invalid version number 'rc1' for package 'Pillow'"),
         (__pkgname__, 20, "Processing package: djangorestframework"),
         (__pkgname__, 20, "Processing package: django-admin-shortcuts"),
         (__pkgname__, 20, "Processing package: requests"),

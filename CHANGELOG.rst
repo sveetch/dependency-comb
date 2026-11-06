@@ -6,6 +6,7 @@ Changelog
 Planned
 *******
 
+* [ ] Compute statistics for requirement and global analyzes results;
 * [ ] Uniqueness on final package list is not enforced #8;
 * [ ] Reporter command should exit with code 1 if there is failure and new option
   "--exit-1" is enabled, related to #2;
@@ -52,6 +53,8 @@ Development
 * Added 'rich-click' to extra requirement 'rich' so the command interface has some
   display improvements when the Rich stack is available;
 * Added basic compatibility module for when rich and rich-click are available or not;
+* Invalid version number found from Analyzer are now logged with 'debug' status instead
+  of previously 'warning';
 
 
 Version 0.4.0 - 2024/11/03
