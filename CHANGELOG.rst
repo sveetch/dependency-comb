@@ -7,14 +7,11 @@ Planned
 *******
 
 * [ ] Compute statistics for requirement and global analyzes results;
-* [ ] Uniqueness on final package list is not enforced #8;
 * [ ] Reporter command should exit with code 1 if there is failure and new option
   "--exit-1" is enabled, related to #2;
-* [ ] Log warning like "Ignored invalid version number 'rc1' for package 'django-axes'"
-  should be a debug instead;
-* [ ] Reporter is not tested for empty results (alike with Formatter);
+* [ ] Uniqueness on final package list is not enforced #8;
 * [ ] Add support to read a dump from 'pip-audit' to include security issues. It should
-  be done flexible enough to possibly add support also from
+  be done flexible enough to possibly add support also for
   'uv audit --output-format json';
 * [ ] Improve report informations and readability
 
@@ -31,9 +28,10 @@ Planned
         |     | untruncated 'source'
         |     | 'resume'
 
+* [ ] Reporter is not tested for empty results (alike with Formatter);
 
-Development
-***********
+Version 0.5.0 - 2026/11/06
+**************************
 
 * Added templates for Github issues;
 * Fixed issue with packages that don't define anything in ``project_urls``;
