@@ -3,35 +3,20 @@
 Changelog
 =========
 
-Planned
-*******
+Version 0.5.1 - 2026/11/06
+**************************
 
-* [ ] Compute statistics for requirement and global analyzes results;
-* [ ] Reporter command should exit with code 1 if there is failure and new option
-  "--exit-1" is enabled, related to #2;
-* [ ] Uniqueness on final package list is not enforced #8;
-* [ ] Add support to read a dump from 'pip-audit' to include security issues. It should
-  be done flexible enough to possibly add support also for
-  'uv audit --output-format json';
-* [ ] Improve report informations and readability
+Minor fix version without any changes.
 
-  * [ ] #5;
-  * [ ] Add (to format and report cli) a final resume like: ::
+* Fixed package specifiers for support Python versions;
+* Cleaned changelog from todo list;
 
-        "78 packages, 3 late, 8 failures."
-
-  * [ ] Python version should be included in json, rst and rich formats;
-  * [ ] Failures should use more space for long text, it should be in a table in the
-    form: ::
-
-        | #id | 'status'
-        |     | untruncated 'source'
-        |     | 'resume'
-
-* [ ] Reporter is not tested for empty results (alike with Formatter);
 
 Version 0.5.0 - 2026/11/06
 **************************
+
+Major version to upgrade Python support, fix many issues and some minor features. No
+breaking changes here.
 
 * Added templates for Github issues;
 * Fixed issue with packages that don't define anything in ``project_urls``;

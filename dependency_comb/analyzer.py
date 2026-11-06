@@ -18,12 +18,24 @@ class DependenciesAnalyzer(RequirementParser):
     """
     Analyzer to get and compute package informations from Pypi for requirements.
 
-    This will need to make 2 requests to get needed informations for each package since
-    the package detail endpoint from new "JSON API" has releases informations but it
-    is deprecated in profit of the Legacy API.
+    Each package will need to make two requests to get needed informations because
+    API don't include all useful informations from the detail endpoint and so we need
+    also to collect infos from Legacy API to get more complete releases data.
 
     Legacy API (also known as the "Simple API") return either a HTML or JSON response,
     depending value of request header "Accept:".
+
+    Keyword Arguments:
+        cachedir (Path): Directory path where to search and create cache files for
+            requested packages on API. Given path must already exists.
+        api_pause (integer): Pause time in seconds between two request chunks.
+        api_timeout (integer): Time in seconds to wait for a request response, if
+            response takes more time, it will raise a timeout error.
+        api_chunk (integer): How many packages each chunk can process. Concretely the
+            full package list to request will be cutted in chunks using this value.
+        logger (logging.Logger): Logger object to use.
+        ignores (boolean): Unused yet, it should be a list of patterns to ignore when
+            collecting packages from requirements.
 
     Attributes:
         PACKAGE_DETAIL_ENDPOINT (string): Template string to build URL to the Pypi

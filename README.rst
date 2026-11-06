@@ -8,14 +8,15 @@
 .. _tabulate: https://pypi.org/project/tabulate/
 .. _colorlog: https://pypi.org/project/colorlog/
 .. _rich: https://rich.readthedocs.io/
+.. _rich-click: https://github.com/ewels/rich-click
 
 
 ===============
 Dependency comb
 ===============
 
-This tool will read given project requirements and check packages informations to build
-a report about project lateness and related packages activities.
+This tool will read given project Python requirements and check packages informations
+to build a report about project lateness and related packages activities.
 
 Analyze is performed using informations from `Pypi API`_ and can be formatted to various
 formats (ReStructuredText, JSON, CSV, Rich).
@@ -35,6 +36,7 @@ Dependencies
 * `tabulate`_>=0.9.0;
 * `colorlog`_>=6.8.2;
 * `rich`_>=13.6.0 (optional);
+* `rich-click`_>=1.9.9 (optional);
 
 
 Links
