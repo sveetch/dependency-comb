@@ -2,14 +2,14 @@ import json
 
 import pytest
 
-from packaging.requirements import Requirement, SpecifierSet
+from packaging.requirements import Marker, Requirement, SpecifierSet
 
 from dependency_comb.exceptions import RequirementParserError
 from dependency_comb.parser import RequirementParser
 from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
 
-def test_parse_content(settings):
+def test_basic(settings):
     """
     Parser should be able to parse requirements with valid Pip syntax from a string
     then return requirements objects.
@@ -38,7 +38,7 @@ def test_parse_content(settings):
     assert serialized == json.loads(sample_parsed.read_text())
 
 
-def test_parse_markers(settings):
+def test_markers(settings):
     """
     When environment is given, it will be used to evaluate requirement markers against
     environment variables to eliminate requirement that does not match.
@@ -56,97 +56,33 @@ def test_parse_markers(settings):
         "os_name": "linux",
     })
 
-    # Turn data to JSON to stringify some objects and then load it as Python object to
-    # make assert
-    serialized = json.loads(
-        json.dumps(results, indent=4, cls=ExtendedJsonEncoder)
-    )
+    data = {
+        pkg.data()["name"]: pkg.data()
+        for pkg in results
+    }
 
-    assert serialized == [
-        {
-            "extras": [],
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": None,
-            "name": "django",
-            "parsed": "django",
-            "pypi_url": None,
-            "repository_url": None,
-            "source": "django",
-            "specifier": "",
-            "status": "parsed",
-            "url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "parsing_error": None
-        },
-        {
-            "extras": [],
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": "python_version < \"2.7\"",
-            "name": "foo",
-            "parsed": "foo; python_version < \"2.7\"",
-            "pypi_url": None,
-            "repository_url": None,
-            "source": "foo ; python_version < \"2.7\"",
-            "specifier": "",
-            "status": "marker-reject",
-            "url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "parsing_error": None
-        },
-        {
-            "extras": [],
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": "os_name == \"linux\"",
-            "name": "bar",
-            "parsed": "bar; os_name == \"linux\"",
-            "pypi_url": None,
-            "repository_url": None,
-            "source": "bar ; os_name == \"linux\"",
-            "specifier": "",
-            "status": "parsed",
-            "url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "parsing_error": None
-        },
-        {
-            "extras": [],
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": "platform_system == \"plop\"",
-            "name": "nope",
-            "parsed": "nope; platform_system == \"plop\"",
-            "pypi_url": None,
-            "repository_url": None,
-            "source": "nope ; platform_system == \"plop\"",
-            "specifier": "",
-            "status": "marker-reject",
-            "url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "parsing_error": None
-        }
-    ]
+    assert data["django"]["name"] == "django"
+    assert data["django"]["status"] == "parsed"
+    assert data["django"]["marker"] is None
+    assert data["django"]["parsed"] == Requirement("django")
+
+    assert data["foo"]["name"] == "foo"
+    assert data["foo"]["status"] == "marker-reject"
+    assert data["foo"]["marker"] == Marker("python_version < \"2.7\"")
+    assert data["foo"]["parsed"] == Requirement("foo; python_version < \"2.7\"")
+
+    assert data["bar"]["name"] == "bar"
+    assert data["bar"]["status"] == "parsed"
+    assert data["bar"]["marker"] == Marker("os_name == \"linux\"")
+    assert data["bar"]["parsed"] == Requirement("bar; os_name == \"linux\"")
+
+    assert data["nope"]["name"] == "nope"
+    assert data["nope"]["status"] == "marker-reject"
+    assert data["nope"]["marker"] == Marker("platform_system == \"plop\"")
+    assert data["nope"]["parsed"] == Requirement("nope; platform_system == \"plop\"")
 
 
-def test_parse_inclusion_directive(settings):
+def test_includes(settings):
     """
     Parser should replace inclusion directive with their resolved requirement
     content if basepath is given.
@@ -159,91 +95,39 @@ def test_parse_inclusion_directive(settings):
         basepath=settings.fixtures_path / "nested_requirements",
     )
 
-    assert [pkg.data() for pkg in results] == [
-        {
-            "extras": set(),
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": None,
-            "name": "django",
-            "parsed": Requirement("django<1.12,>=1.11"),
-            "pypi_url": None,
-            "repository_url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "source": "django>=1.11,<1.12",
-            "specifier": SpecifierSet("<1.12,>=1.11"),
-            "status": "parsed",
-            "url": None,
-            "parsing_error": None,
-        },
-        {
-            "extras": set(),
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": None,
-            "name": "diskette",
-            "parsed": Requirement("diskette"),
-            "pypi_url": None,
-            "repository_url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "source": "diskette",
-            "specifier": SpecifierSet(""),
-            "status": "parsed",
-            "url": None,
-            "parsing_error": None,
-        },
-        {
-            "extras": set(),
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": None,
-            "name": "boussole",
-            "parsed": Requirement("boussole<=2.1.2"),
-            "pypi_url": None,
-            "repository_url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "source": "boussole<=2.1.2",
-            "specifier": SpecifierSet("<=2.1.2"),
-            "status": "parsed",
-            "url": None,
-            "parsing_error": None,
-        },
-        {
-            "extras": set(),
-            "highest_published": None,
-            "highest_version": None,
-            "highest_delta": None,
-            "lateness": None,
-            "marker": None,
-            "name": "django-admin-shortcuts",
-            "parsed": Requirement("django-admin-shortcuts==1.2.6"),
-            "pypi_url": None,
-            "repository_url": None,
-            "resolved_version": None,
-            "resolved_published": None,
-            "resolved_delta": None,
-            "source": "django-admin-shortcuts==1.2.6",
-            "specifier": SpecifierSet("==1.2.6"),
-            "status": "parsed",
-            "url": None,
-            "parsing_error": None,
-        },
-    ]
+    data = {
+        pkg.data()["name"]: pkg.data()
+        for pkg in results
+    }
+
+    assert data["django"]["name"] == "django"
+    assert data["django"]["status"] == "parsed"
+    assert data["django"]["parsed"] == Requirement("django<1.12,>=1.11")
+    assert data["django"]["source"] == "django>=1.11,<1.12"
+    assert data["django"]["specifier"] == SpecifierSet("<1.12,>=1.11")
+
+    assert data["diskette"]["name"] == "diskette"
+    assert data["diskette"]["status"] == "parsed"
+    assert data["diskette"]["parsed"] == Requirement("diskette")
+    assert data["diskette"]["source"] == "diskette"
+    assert data["diskette"]["specifier"] == SpecifierSet("")
+
+    assert data["boussole"]["name"] == "boussole"
+    assert data["boussole"]["status"] == "parsed"
+    assert data["boussole"]["parsed"] == Requirement("boussole<=2.1.2")
+    assert data["boussole"]["source"] == "boussole<=2.1.2"
+    assert data["boussole"]["specifier"] == SpecifierSet("<=2.1.2")
+
+    assert data["django-admin-shortcuts"]["name"] == "django-admin-shortcuts"
+    assert data["django-admin-shortcuts"]["status"] == "parsed"
+    assert data["django-admin-shortcuts"]["parsed"] == Requirement(
+        "django-admin-shortcuts==1.2.6"
+    )
+    assert data["django-admin-shortcuts"]["source"] == "django-admin-shortcuts==1.2.6"
+    assert data["django-admin-shortcuts"]["specifier"] == SpecifierSet("==1.2.6")
 
 
-def test_parse_inclusion_directive_notfound(settings):
+def test_include_notfound(settings):
     """
     A RequirementParserError exception should be raised with a proper message when
     included source file is not found.

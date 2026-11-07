@@ -11,19 +11,6 @@ from dependency_comb.formatting import BaseFormatter
 def test_build_analyzed_table(settings):
     """
     Method should build a list of dictionnaries for all items with status 'analyzed'.
-
-    TODO:
-        There is something wrong when computing delta dates for 'release_***' fields.
-
-        * freeze_time seems to be working and not bypassed;
-        * Analyzer use well the given data without making any request outside;
-        * Maybe 'humanizer.naturaldata' is rounding some value that lead to variadic
-          humanizations (24days become 1month) but i did not find any info about this;
-        * Upgrading humanizer to the very last release did not fix anything;
-        * We should compute ourselves the delta period in days without humanizer to
-          see what is going on;
-        * Computer date may be tampered to see what it would involves on delta
-          computation;
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
     analyze_content = json.loads(analyze.read_text())

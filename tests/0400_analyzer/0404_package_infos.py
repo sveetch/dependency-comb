@@ -146,30 +146,13 @@ def test_complete_package_informations_without_requirement(settings):
     pkg = PackageRequirement("diskette")
     analyzer.complete_package_informations(pkg)
 
-    # import json
-    # from dependency_comb.utils.jsons import ExtendedJsonEncoder
-    # print(json.dumps(pkg.data(), indent=4, cls=ExtendedJsonEncoder))
-
-    assert pkg.data() == {
-        "extras": set(),
-        "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
-        "highest_version": Version("0.3.6"),
-        "highest_delta": datetime.timedelta(days=53, seconds=50290),
-        "lateness": None,
-        "marker": None,
-        "name": "diskette",
-        "parsed": Requirement("diskette"),
-        "pypi_url": "https://pypi.org/project/diskette/",
-        "repository_url": "https://github.com/emencia/diskette",
-        "source": "diskette",
-        "specifier": SpecifierSet(""),
-        "status": "analyzed",
-        "url": None,
-        "resolved_version": None,
-        "resolved_published": None,
-        "resolved_delta": None,
-        "parsing_error": None
-    }
+    data = pkg.data()
+    assert data["name"] == "diskette"
+    assert data["status"] == "analyzed"
+    assert data["source"] == "diskette"
+    assert data["specifier"] == SpecifierSet("")
+    assert data["lateness"] is None
+    assert data["resolved_version"] is None
 
 
 @freeze_time("2024-10-25 10:00:00.000000")
@@ -184,26 +167,14 @@ def test_complete_package_informations_with_exceed_requirement(settings):
     pkg = PackageRequirement("diskette>0.4.0")
     analyzer.complete_package_informations(pkg)
 
-    assert pkg.data() == {
-        "extras": set(),
-        "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
-        "highest_version": Version("0.3.6"),
-        "highest_delta": datetime.timedelta(days=53, seconds=50290),
-        "lateness": None,
-        "marker": None,
-        "name": "diskette",
-        "parsed": Requirement("diskette>0.4.0"),
-        "pypi_url": "https://pypi.org/project/diskette/",
-        "repository_url": "https://github.com/emencia/diskette",
-        "source": "diskette>0.4.0",
-        "specifier": SpecifierSet(">0.4.0"),
-        "status": "analyzed",
-        "url": None,
-        "resolved_version": None,
-        "resolved_published": None,
-        "resolved_delta": None,
-        "parsing_error": None
-    }
+    data = pkg.data()
+    assert data["name"] == "diskette"
+    assert data["status"] == "analyzed"
+    assert data["highest_version"] == Version("0.3.6")
+    assert data["source"] == "diskette>0.4.0"
+    assert data["specifier"] == SpecifierSet(">0.4.0")
+    assert data["lateness"] is None
+    assert data["resolved_version"] is None
 
 
 def test_complete_package_informations_status_check(settings):

@@ -86,7 +86,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
 ])
 def test_inspect(settings, source, strict, environment, expected):
     """
-    Analyzer should return an iterator of PackageRequirement object with proper status
+    Analyzer should return an iterator of PackageRequirement objects with proper status
     from given requirements and possible strict option and possible environment.
     """
     cachedir = settings.fixtures_path / "api_cache"

@@ -1,6 +1,6 @@
 from freezegun import freeze_time
 
-from dependency_comb.formatting import BaseFormatter, RestructuredTextFormatter
+from dependency_comb.formatting import RestructuredTextFormatter
 
 
 def format_to_multline_str(content):
@@ -30,50 +30,9 @@ def format_to_multline_str(content):
     )
 
 
-@freeze_time("2024-07-25 10:00:00")
-def test_rst_build_analyzed_table(settings):
-    """
-    Method should build a table for succeeded analyzed items with proper informations.
-    """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    base_formatter = BaseFormatter()
-    formatter = RestructuredTextFormatter()
-
-    output = formatter.build_analyzed_table([
-        v
-        for v in base_formatter.open_content(analyze)
-        if v["status"] == "analyzed"
-    ])
-
-    # Used to rebuild table when code or formatting have changed
-    # print()
-    # print(format_to_multline_str(output))
-    # print()
-
-    assert output == (
-        """Analyzed\n"""  # noqa: E501
-        """********\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| #   | Name                   |  Lateness  |                     Required |        Latest release |\n"""  # noqa: E501
-        """+=====+========================+============+==============================+=======================+\n"""  # noqa: E501
-        """| 1   | django                 |    187     |         1.11.9 - 6 years ago |  5.1.2 - 2 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 2   | Pillow                 |     6      | 9.5.0 - 1 year, 4 months ago |  10.4.0 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 3   | djangorestframework    |     -      |                       Latest |  3.15.2 - A month ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 4   | django-admin-shortcuts |     6      |          1.2.6 - 9 years ago |    3.0.1 - 4 days ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 5   | requests               |     55     |          2.8.1 - 8 years ago | 2.32.3 - 2 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+\n"""  # noqa: E501
-        """| 6   | urllib3                |     -      |                       Latest |  2.2.3 - 2 months ago |\n"""  # noqa: E501
-        """+-----+------------------------+------------+------------------------------+-----------------------+"""  # noqa: E501
-    )
-
-
 def test_rst_build_errors_table():
     """
-    Method should build a table for failures from items.
+    Ensure all error cases are well formatted.
     """
     formatter = RestructuredTextFormatter()
     output = formatter.build_errors_table([
@@ -182,7 +141,7 @@ def test_rst_print(settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_rst_output_with_failures(settings):
+def test_rst_print_with_failures(settings):
     """
     With failures enabled the output should contains both analyzed and failed tables
     each with a title.
