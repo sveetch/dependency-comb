@@ -182,7 +182,7 @@ def test_open_content_from_filepath(settings):
     assert len(content) == 8
     assert [v["source"] for v in content] == [
         "django>=1.11,<1.12",
-        "Pillow>=3.1.1",
+        "Pillow>=3.1.1 # With useless comment",
         "djangorestframework",
         "django-admin-shortcuts==1.2.6",
         "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
@@ -208,7 +208,7 @@ def test_open_content_from_string(settings):
     assert len(content) == 8
     assert [v["source"] for v in content] == [
         "django>=1.11,<1.12",
-        "Pillow>=3.1.1",
+        "Pillow>=3.1.1 # With useless comment",
         "djangorestframework",
         "django-admin-shortcuts==1.2.6",
         "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",

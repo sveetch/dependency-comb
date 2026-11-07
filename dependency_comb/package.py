@@ -9,14 +9,23 @@ class PackageRequirement:
     A package object information is fullfilled in two cycles, firstly the requirement
     parser that is done in PackageRequirement itself then with the data collection and
     computation from the Analyzer. When parsing has failed, all attributes depending
-    from collection and computation will be None.
+    from collection and computation will be null.
+
+    The requirement parser only set value on the following attributes:
+
+    * ``name``;
+    * ``url``;
+    * ``extras``;
+    * ``specifier``;
+    * ``marker``;
 
     Arguments:
         source (string): A requirement line to parse.
 
     Keyword Arguments:
         environment (dict): Optionnal dictionnary of environment variables to use
-            with possible specifier marker resolution.
+            for specifier marker resolution. If requirements involve markers and this
+            attribute is empty, requirements with markers will fail on parsing.
 
     Attributes:
         source (string): Given requirement source. The source string is expected to be
@@ -55,6 +64,8 @@ class PackageRequirement:
             available on Pypi.
         highest_version (packaging.version.Version): Collected highest release version
             available on Pypi.
+        highest_delta (datetime.timedelta): Time period between current date and
+            ``highest_published``.
         lateness (list): List of tuples of version string and datetime for each
             released version that are higher than the resolved version. This means all
             available package versions that could be upgraded to.
@@ -64,6 +75,8 @@ class PackageRequirement:
             Internally a null value is assumed the requirement can use the latest
             version and so there is no lateness to compute.
         resolved_published (datetime.datetime): Date of the resolved release.
+        resolved_delta (datetime.timedelta): Time period between current date and
+            ``resolved_published``.
         specifier (packaging.requirements.SpecifierSet): Possible version specifiers
             parsed from source.
         url (string): Possible mirror URL parsed from source.
@@ -83,10 +96,24 @@ class PackageRequirement:
     }
     VALID_STATUSES = ("parsed", "analyzed")
     PUBLISHED_ATTRIBUTES = [
-        "extras", "highest_published", "highest_version", "lateness",
-        "marker", "name", "parsed", "pypi_url", "repository_url",
-        "source", "specifier", "status", "url", "resolved_version",
-        "resolved_published", "parsing_error",
+        "extras",
+        "highest_published",
+        "highest_version",
+        "highest_delta",
+        "lateness",
+        "marker",
+        "name",
+        "parsed",
+        "pypi_url",
+        "repository_url",
+        "source",
+        "specifier",
+        "status",
+        "url",
+        "resolved_version",
+        "resolved_published",
+        "resolved_delta",
+        "parsing_error",
     ]
 
     def __init__(self, source, environment=None):
@@ -97,6 +124,7 @@ class PackageRequirement:
         self.extras = None
         self.highest_published = None
         self.highest_version = None
+        self.highest_delta = None
         self.lateness = None
         self.marker = None
         self.name = None
@@ -108,6 +136,7 @@ class PackageRequirement:
         self.url = None
         self.resolved_version = None
         self.resolved_published = None
+        self.resolved_delta = None
         self.parsing_error = None
 
         # Check if source syntax is supported

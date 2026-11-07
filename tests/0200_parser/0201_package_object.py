@@ -16,6 +16,7 @@ def test_basic():
         "extras": set(),
         "highest_published": None,
         "highest_version": None,
+        "highest_delta": None,
         "lateness": None,
         "marker": None,
         "name": "diskette",
@@ -28,6 +29,7 @@ def test_basic():
         "url": None,
         "resolved_version": None,
         "resolved_published": None,
+        "resolved_delta": None,
         "parsing_error": None
     }
 

@@ -1,16 +1,16 @@
 import datetime
 
 
-def safe_isoformat_parse(content):
+def parse_pypi_date(content):
     """
     Parse a string that is expected to be a datetime in ISO format.
 
-    There is currently known two format from Pypi for dates:
+    There is currently two known formats from Pypi for dates:
 
-    * 2022-10-29T14:15:57.755859Z
-    * 2022-10-29T14:15:57Z
+    * ``2022-10-29T14:15:57.755859Z``
+    * ``2022-10-29T14:15:57Z``
 
-    Any other format would probably raise an error from datetime parsing.
+    Any other format would probably raise an error from datetime parser.
 
     Arguments:
         content (string): Expected datetime in ISO format.
@@ -18,11 +18,11 @@ def safe_isoformat_parse(content):
     Returns:
         datetime: Parsed datetime
     """
-    # Remove microsecond with timezone Z
+    # Remove microseconds with timezone marker 'Z'
     if "." in content:
         content = content.split(".")[0]
 
-    # Remove remaining timezone Z
+    # Remove simple timezone marker 'Z'
     if content.endswith("Z"):
         content = content[:-1]
 

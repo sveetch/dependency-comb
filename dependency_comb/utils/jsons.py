@@ -26,9 +26,12 @@ class ExtendedJsonEncoder(json.JSONEncoder):
         # Support for set to a list
         if isinstance(obj, set):
             return list(obj)
-        # Support for datetime objects
+        # Support for date and time objects
         if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
             return obj.isoformat()
+        # Support for timedelta objects
+        if isinstance(obj, (datetime.timedelta)):
+            return obj.total_seconds()
         # Support for packaging objects
         if isinstance(obj, (Marker, Requirement, SpecifierSet, Version)):
             return str(obj)

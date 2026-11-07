@@ -1,3 +1,4 @@
+import datetime
 import json
 import time
 
@@ -10,7 +11,7 @@ from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
 from .utils.lists import split_to_chunks
 from .utils.logger import NoOperationLogger
-from .utils.dates import safe_isoformat_parse
+from .utils.dates import parse_pypi_date
 from . import __pkgname__, __version__
 
 
@@ -25,6 +26,8 @@ class DependenciesAnalyzer(RequirementParser):
     Legacy API (also known as the "Simple API") return either a HTML or JSON response,
     depending value of request header "Accept:".
 
+    TODO: remove 'logger' since we can get the logger directly without passing it
+
     Keyword Arguments:
         cachedir (Path): Directory path where to search and create cache files for
             requested packages on API. Given path must already exists.
@@ -33,6 +36,11 @@ class DependenciesAnalyzer(RequirementParser):
             response takes more time, it will raise a timeout error.
         api_chunk (integer): How many packages each chunk can process. Concretely the
             full package list to request will be cutted in chunks using this value.
+        now_date (datetime): A datetime to set instead of default ``datetime.now()``.
+            This datetime is used to compute the delta time between release and current
+            date. When analyzer is used in conjunction of a formatter, the corresponding
+            analyzer attribute should be passed to formatter to ensure they are working
+            with the exact same date.
         logger (logging.Logger): Logger object to use.
         ignores (boolean): Unused yet, it should be a list of patterns to ignore when
             collecting packages from requirements.
@@ -47,22 +55,20 @@ class DependenciesAnalyzer(RequirementParser):
     PACKAGE_RELEASES_ENDPOINT = "https://pypi.org/simple/{name}/"
 
     def __init__(self, cachedir=None, api_pause=1, api_timeout=None, api_chunk=None,
-                 logger=None, ignores=None):
+                 logger=None, now_date=None, ignores=None):
         self.cachedir = cachedir
         self.logger = logger or NoOperationLogger()
-        # Amount of requirements to analyze by chunk
         self.api_chunk = api_chunk or 10
-        # Time in seconds to pause before an API request
-        # Pause time between chunks
         self.api_pause = api_pause
-        # Time in seconds for timeout limit on API request
         self.api_timeout = api_timeout
+        self.now_date = now_date or datetime.datetime.now()
         # TODO: Currently not implemented, it should be a list of package names to
-        # ignore from analyze, dont know the state it will end in. It could be helpful
-        # for bypassing some erroneous requirements without breaking the whole analyze.
-        self.ignores = ignores or []
+        # ignore from analyze, dont know the state it will end in yet. It could be
+        # helpful for bypassing some erroneous requirements without breaking the whole
+        # analyze.
+        # self.ignores = ignores or []
 
-    def request_headers(self):
+    def get_request_headers(self):
         """
         Define the custom headers to use in requests to the API.
 
@@ -74,7 +80,7 @@ class DependenciesAnalyzer(RequirementParser):
                 name=__pkgname__,
                 version=__version__,
             ),
-            # This specific 'accept' header (application/json won't work) is only
+            # This specific 'accept' header ('application/json' won't work) is only
             # required from Legacy API but JSON API ignores it, so let it be a global
             # header
             "Accept": "application/vnd.pypi.simple.v1+json",
@@ -93,7 +99,7 @@ class DependenciesAnalyzer(RequirementParser):
         endpoint_url = self.PACKAGE_DETAIL_ENDPOINT.format(name=name)
         response = requests.get(
             endpoint_url,
-            headers=self.request_headers(),
+            headers=self.get_request_headers(),
             timeout=self.api_timeout,
         )
 
@@ -124,7 +130,7 @@ class DependenciesAnalyzer(RequirementParser):
         endpoint_url = self.PACKAGE_RELEASES_ENDPOINT.format(name=name)
         response = requests.get(
             endpoint_url,
-            headers=self.request_headers(),
+            headers=self.get_request_headers(),
             timeout=self.api_timeout,
         )
 
@@ -196,7 +202,7 @@ class DependenciesAnalyzer(RequirementParser):
 
     def format_releases_payload(self, payload):
         """
-        Format package release payload to an useful one.
+        Format package release response payload to an useful one.
 
         This means we just need each version with its uploading date, everything else
         is useless from this application view.
@@ -208,8 +214,7 @@ class DependenciesAnalyzer(RequirementParser):
 
         Arguments:
             payload (dict): The package releases payload as returned from Legacy API
-                endpoint. For true we just need about the ``files`` item from this
-                dict.
+                endpoint. We just need about the ``files`` item from this dict.
 
         Returns:
             list: List of dictionnaries for all version, each one contain the ``number``
@@ -268,7 +273,7 @@ class DependenciesAnalyzer(RequirementParser):
 
         return output
 
-    def compute_package_releases(self, name, data):
+    def get_package_releases(self, name, data):
         """
         Build a list of released versions from API patched with some values in useful
         types.
@@ -278,14 +283,15 @@ class DependenciesAnalyzer(RequirementParser):
             data (dict): Dictionnary of package data as retrieved from API.
 
         Returns:
-            list: List of dictionnary for computed releases.
+            list: List of dictionnary for computed releases sorted ascendant on release
+            number.
         """
         versions = []
 
         # Rebuild the version list to patch some values in useful types
         for item in data["versions"]:
             # Enforce real datetime
-            item["published_at"] = safe_isoformat_parse(item["published_at"])
+            item["published_at"] = parse_pypi_date(item["published_at"])
 
             # Coerce original number to a Version object if possible
             try:
@@ -312,7 +318,7 @@ class DependenciesAnalyzer(RequirementParser):
             specifiers (packaging.SpecifierSet): Version specifiers to match against
                 releases.
             releases (list): List of dict for releases as built from
-                ``DependenciesAnalyzer.compute_package_releases()``.
+                ``DependenciesAnalyzer.get_package_releases()``.
 
         Returns:
             dict: Dictionnary of release data taken from given releases if it matched
@@ -338,15 +344,15 @@ class DependenciesAnalyzer(RequirementParser):
         """
         Compute version lateness for a given version target.
 
-        Lateness is only about version higher than targeted version and that are not
-        build releases or pre releases
+        Lateness is only about the versions higher than targeted version and that are
+        not build releases or pre releases.
 
         Arguments:
             target (string or packaging.version.Version): The targeted version
                 to check against package released versions. If a string it will be
                 coerced to a ``Version`` object.
             versions (list): List of dictionnaries (as computed from
-                ``build_package_informations()``) for all existing release versions.
+                ``complete_package_informations()``) for all existing release versions.
 
         Returns:
             list: A list of tuples for all existing version higher
@@ -358,7 +364,12 @@ class DependenciesAnalyzer(RequirementParser):
             target = Version(target)
 
         return [
-            (str(item["number"]), item["published_at"])
+            (
+                str(item["number"]),
+                item["published_at"],
+                # TODO this should be done sooner
+                self.now_date - item["published_at"],
+            )
             for item in versions
             if (
                 item["number"] > target and
@@ -398,9 +409,14 @@ class DependenciesAnalyzer(RequirementParser):
             "repository": repository_url,
         }
 
-    def build_package_informations(self, requirement):
+    def complete_package_informations(self, requirement):
         """
         Compute and set informations on a ``PackageRequirement`` object.
+
+        Commonly, PackageRequirement object given to this method comes from
+        ``RequirementParser.parse_requirements()`` which only care about parsing
+        requirement line (to get name, specifier, url, etc..). And this method exists
+        to complete PackageRequirement object with informations from API.
 
         Arguments:
             requirement (PackageRequirement): The package object where to complete
@@ -420,7 +436,7 @@ class DependenciesAnalyzer(RequirementParser):
 
             # Once numbers have been coerced they can be used to reorder versions
             # properly on number
-            versions = self.compute_package_releases(requirement.name, data)
+            versions = self.get_package_releases(requirement.name, data)
 
             if requirement.specifier:
                 # Match the highest elligible release
@@ -431,9 +447,15 @@ class DependenciesAnalyzer(RequirementParser):
                 if resolved:
                     requirement.resolved_version = resolved["number"]
                     requirement.resolved_published = resolved["published_at"]
+                    requirement.resolved_delta = (
+                        self.now_date - resolved["published_at"]
+                    )
 
             # Highest released version
             requirement.highest_published = versions[-1]["published_at"]
+            requirement.highest_delta = (
+                self.now_date - versions[-1]["published_at"]
+            )
 
             # Compute version lateness if a version has been given
             if requirement.resolved_version:
@@ -447,7 +469,7 @@ class DependenciesAnalyzer(RequirementParser):
     def inspect(self, requirements, path=None, environment=None, strict=False,
                 basepath=None):
         """
-        Inspect given requirement to get their informations.
+        Inspect given requirements to collect their informations.
 
         Arguments:
             requirements (string or Path): Either a Path object for a file to open or
@@ -483,7 +505,7 @@ class DependenciesAnalyzer(RequirementParser):
 
         for i, chunk in enumerate(chunks, start=1):
             for item in chunk:
-                pkginfos = self.build_package_informations(item)
+                pkginfos = self.complete_package_informations(item)
                 if not strict or (strict and pkginfos.is_valid):
                     yield pkginfos
 

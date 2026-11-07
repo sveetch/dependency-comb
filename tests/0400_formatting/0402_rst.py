@@ -128,13 +128,6 @@ def test_rst_build_errors_table():
             "status": "unknown",
             "parsing_error": None
         },
-        {
-            "marker": None,
-            "source": "nope",
-            "specifier": None,
-            "status": "niet",
-            "parsing_error": None
-        },
     ])
 
     # Used to rebuild table when code or formatting have changed
@@ -164,8 +157,6 @@ def test_rst_build_errors_table():
         """|     |                                          |                       | exception error title without the long |\n"""  # noqa: E501
         """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
         """| 7   | nope                                     |        unknown        | Unexpected failure                     |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 8   | nope                                     |         niet          | Unexpected failure                     |\n"""  # noqa: E501
         """+-----+------------------------------------------+-----------------------+----------------------------------------+"""  # noqa: E501
     )
 

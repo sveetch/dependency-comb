@@ -3,6 +3,7 @@
         "extras": [],
         "highest_published": "2024-10-08T14:53:12",
         "highest_version": "5.1.2",
+        "highest_delta": null,
         "lateness": [
             [
                 "1.11.10",
@@ -764,12 +765,14 @@
         "url": null,
         "resolved_version": "1.11.9",
         "resolved_published": "2018-01-02T01:02:08",
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": null,
@@ -782,6 +785,7 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     }
 ]

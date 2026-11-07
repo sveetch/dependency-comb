@@ -3,6 +3,7 @@
         "extras": null,
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": null,
@@ -15,6 +16,7 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     }
 ]

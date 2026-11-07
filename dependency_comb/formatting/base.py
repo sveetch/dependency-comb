@@ -9,7 +9,6 @@ import humanize
 
 from ..exceptions import FormatterEmptyContentError
 from ..package import PackageRequirement
-from ..utils.dates import safe_isoformat_parse
 
 
 class BaseFormatter:
@@ -110,7 +109,7 @@ class BaseFormatter:
 
     def get_required_release(self, item):
         """
-        Return a release labels for a requirement.
+        Return the release label for a requirement.
 
         Arguments:
             item (dict): The requirement dictionnary.
@@ -131,11 +130,9 @@ class BaseFormatter:
         # print("  🥚 resolved_published:", item["resolved_published"])
         # print(
         #     "  🙈 timedelta:",
-        #     self.now_date - safe_isoformat_parse(item["resolved_published"])
+        #     self.now_date - parse_pypi_date(item["resolved_published"])
         # )
-        resolved_age = humanize.naturaldelta(
-            self.now_date - safe_isoformat_parse(item["resolved_published"])
-        )
+        resolved_age = humanize.naturaldelta(item["resolved_delta"])
         return item["resolved_version"], resolved_age.capitalize()
 
     def build_analyzed_table(self, items):
@@ -165,9 +162,7 @@ class BaseFormatter:
 
             # Compute latest release label including humanized delta from current to
             # latest date
-            latest_activity = humanize.naturaldelta(
-                self.now_date - safe_isoformat_parse(item["highest_published"])
-            )
+            latest_activity = humanize.naturaldelta(item["highest_delta"])
             latest_release = "{} - {} ago".format(
                 item["highest_version"],
                 latest_activity.capitalize(),

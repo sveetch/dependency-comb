@@ -3,6 +3,7 @@
         "extras": [],
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": "django",
@@ -15,12 +16,14 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": "Pillow",
@@ -33,12 +36,14 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": "djangorestframework",
@@ -51,12 +56,14 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": "django-admin-shortcuts",
@@ -69,6 +76,7 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
@@ -77,6 +85,7 @@
         ],
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": "python_version < \"2.7\"",
         "name": "requests",
@@ -89,12 +98,14 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": [],
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": "urllib3",
@@ -107,12 +118,14 @@
         "url": "https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": null,
@@ -125,12 +138,14 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     },
     {
         "extras": null,
         "highest_published": null,
         "highest_version": null,
+        "highest_delta": null,
         "lateness": null,
         "marker": null,
         "name": null,
@@ -143,6 +158,7 @@
         "url": null,
         "resolved_version": null,
         "resolved_published": null,
+        "resolved_delta": null,
         "parsing_error": null
     }
 ]

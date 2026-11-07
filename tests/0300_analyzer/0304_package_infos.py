@@ -2,6 +2,8 @@ import datetime
 
 import pytest
 
+from freezegun import freeze_time
+
 from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
 
@@ -38,7 +40,7 @@ def test_get_latest_specified_release(settings, source, expected):
 
     pkg = PackageRequirement(source)
     data = analyzer.get_package_data(pkg.name)
-    versions = analyzer.compute_package_releases(pkg.name, data)
+    versions = analyzer.get_package_releases(pkg.name, data)
 
     assert analyzer.get_latest_specified_release(pkg.specifier, versions) == expected
 
@@ -81,33 +83,38 @@ def test_get_package_urls(settings):
     }
 
 
-def test_build_package_informations_with_requirement(settings):
+@freeze_time("2024-10-25 10:00:00.000000")
+def test_complete_package_informations_with_requirement(settings):
     """
-    Method should return computed informations for given package name and version
+    Method should set computed informations on given package name and version
     requirement specifiers that lead to a proper lateness computation.
     """
     cachedir = settings.fixtures_path / "api_cache"
     analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
-    analyzer.build_package_informations(pkg)
+    analyzer.complete_package_informations(pkg)
 
     assert pkg.data() == {
         "extras": set(),
         "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
         "highest_version": Version("0.3.6"),
+        "highest_delta": datetime.timedelta(days=53, seconds=50290),
         "lateness": [
             (
                 "0.3.4",
                 datetime.datetime(2024, 3, 30, 12, 38, 29),
+                datetime.timedelta(days=208, seconds=76891),
             ),
             (
                 "0.3.5",
                 datetime.datetime(2024, 3, 31, 2, 27, 8),
+                datetime.timedelta(days=208, seconds=27172),
             ),
             (
                 "0.3.6",
                 datetime.datetime(2024, 9, 1, 20, 1, 50),
+                datetime.timedelta(days=53, seconds=50290),
             ),
         ],
         "marker": None,
@@ -121,11 +128,13 @@ def test_build_package_informations_with_requirement(settings):
         "url": None,
         "resolved_version": Version("0.3.3"),
         "resolved_published": datetime.datetime(2024, 3, 28, 15, 46, 54),
+        "resolved_delta": datetime.timedelta(days=210, seconds=65586),
         "parsing_error": None
     }
 
 
-def test_build_package_informations_without_requirement(settings):
+@freeze_time("2024-10-25 10:00:00.000000")
+def test_complete_package_informations_without_requirement(settings):
     """
     Method should return computed informations for given package name without any
     requirement specifier that lead to no lateness (since without requirement the
@@ -135,7 +144,7 @@ def test_build_package_informations_without_requirement(settings):
     analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette")
-    analyzer.build_package_informations(pkg)
+    analyzer.complete_package_informations(pkg)
 
     # import json
     # from dependency_comb.utils.jsons import ExtendedJsonEncoder
@@ -145,6 +154,7 @@ def test_build_package_informations_without_requirement(settings):
         "extras": set(),
         "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
         "highest_version": Version("0.3.6"),
+        "highest_delta": datetime.timedelta(days=53, seconds=50290),
         "lateness": None,
         "marker": None,
         "name": "diskette",
@@ -157,11 +167,13 @@ def test_build_package_informations_without_requirement(settings):
         "url": None,
         "resolved_version": None,
         "resolved_published": None,
+        "resolved_delta": None,
         "parsing_error": None
     }
 
 
-def test_build_package_informations_with_exceed_requirement(settings):
+@freeze_time("2024-10-25 10:00:00.000000")
+def test_complete_package_informations_with_exceed_requirement(settings):
     """
     If specifiers resolve to version higher than releases available on Pypi, no
     latest version can be found and lateness will be empty.
@@ -170,12 +182,13 @@ def test_build_package_informations_with_exceed_requirement(settings):
     analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>0.4.0")
-    analyzer.build_package_informations(pkg)
+    analyzer.complete_package_informations(pkg)
 
     assert pkg.data() == {
         "extras": set(),
         "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
         "highest_version": Version("0.3.6"),
+        "highest_delta": datetime.timedelta(days=53, seconds=50290),
         "lateness": None,
         "marker": None,
         "name": "diskette",
@@ -188,11 +201,12 @@ def test_build_package_informations_with_exceed_requirement(settings):
         "url": None,
         "resolved_version": None,
         "resolved_published": None,
+        "resolved_delta": None,
         "parsing_error": None
     }
 
 
-def test_build_package_informations_status_check(settings):
+def test_complete_package_informations_status_check(settings):
     """
     Given PackageRequirement object must have a valid status to be processed. Also
     package object express validity through a property "is_valid"
@@ -201,13 +215,13 @@ def test_build_package_informations_status_check(settings):
     analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     pkg = PackageRequirement("diskette>0.4.0")
-    analyzer.build_package_informations(pkg)
+    analyzer.complete_package_informations(pkg)
     assert pkg.name == "diskette"
     assert pkg.status == "analyzed"
     assert pkg.is_valid is True
 
     pkg = PackageRequirement("-r dev.txt")
-    analyzer.build_package_informations(pkg)
+    analyzer.complete_package_informations(pkg)
     assert pkg.name is None
     assert pkg.status == "unsupported-argument"
     assert pkg.is_valid is False

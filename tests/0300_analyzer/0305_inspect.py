@@ -1,5 +1,7 @@
 import pytest
 
+from freezegun import freeze_time
+
 from dependency_comb.analyzer import DependenciesAnalyzer
 
 
@@ -91,10 +93,6 @@ def test_inspect(settings, source, strict, environment, expected):
     """
     cachedir = settings.fixtures_path / "api_cache"
     analyzer = DependenciesAnalyzer(cachedir=cachedir)
-    # analyzer = DependenciesAnalyzer(
-    #     cachedir=cachedir,
-    #     api_pause=None
-    # )
 
     packages = analyzer.inspect(source, environment=environment, strict=strict)
 
@@ -102,6 +100,7 @@ def test_inspect(settings, source, strict, environment, expected):
 
 
 @pytest.mark.skip("Just for test development")
+@freeze_time("2024-07-25 10:00:00.000000")
 def test_build_inspection(settings):
     """
     A non test routine to rebuild 'analyzes/basic.json' fixture file content.
