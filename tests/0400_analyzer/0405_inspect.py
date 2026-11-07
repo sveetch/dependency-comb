@@ -1,7 +1,5 @@
 import pytest
 
-from freezegun import freeze_time
-
 from dependency_comb.analyzer import DependenciesAnalyzer
 
 
@@ -97,30 +95,3 @@ def test_inspect(settings, source, strict, environment, expected):
     packages = analyzer.inspect(source, environment=environment, strict=strict)
 
     assert [(item.source, item.name, item.status) for item in packages] == expected
-
-
-@pytest.mark.skip("Just for test development")
-@freeze_time("2024-07-25 10:00:00.000000")
-def test_build_inspection(settings):
-    """
-    A non test routine to rebuild 'analyzes/basic.json' fixture file content.
-    """
-    import json
-    from dependency_comb.utils.jsons import ExtendedJsonEncoder
-
-    cachedir = settings.fixtures_path / "api_cache"
-    sample_source = settings.fixtures_path / "requirements_basic.txt"
-    sample_analyzed = settings.fixtures_path / "analyzes/basic.json"
-
-    analyzer = DependenciesAnalyzer(cachedir=cachedir)
-
-    packages = analyzer.inspect(sample_source)
-    sample_analyzed.write_text(json.dumps(
-        [item.data() for item in packages],
-        indent=4,
-        cls=ExtendedJsonEncoder),
-    )
-
-    print("Fixture wrote to:", sample_analyzed)
-
-    assert 1 == 42
