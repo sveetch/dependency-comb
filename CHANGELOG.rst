@@ -8,6 +8,8 @@ Development
 
 * Time delta period between a date and current date is no longer computed from
   formatter. Analyzer is doing it and set value into new attributes 'xxx_delta';
+* Now the method 'DependenciesAnalyzer.inspect()' compute some statistics about package
+  and project;
 
 
 Version 0.5.1 - 2026/11/06

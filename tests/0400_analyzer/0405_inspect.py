@@ -1,4 +1,8 @@
+import datetime
+
 import pytest
+
+from freezegun import freeze_time
 
 from dependency_comb.analyzer import DependenciesAnalyzer
 
@@ -95,3 +99,54 @@ def test_inspect(settings, source, strict, environment, expected):
     packages = analyzer.inspect(source, environment=environment, strict=strict)
 
     assert [(item.source, item.name, item.status) for item in packages] == expected
+
+
+@freeze_time("2024-07-25 10:00:00.000000")
+def test_statistics(settings):
+    """
+    Once all packages have been enumerated from inspect, statistics should have been
+    correctly computed.
+    """
+    source = (
+        "diskette\n"
+        "-r dev.txt\n"
+        "project-composer==0.7.0\n"
+        "django>3.1,<=3.2\n"
+        "foo>1,foo<=2\n"
+        "boussole ; python_version < \"2.7\"\n"
+    )
+
+    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
+
+    # With environment, some marker may be rejected and so some package maybe assumed
+    # invalid
+    list(analyzer.inspect(source, environment={"python_version": "3.4"}))
+    assert analyzer.statistics == {
+        "creation_date": datetime.datetime(2024, 7, 25, 10),
+        "packages": {
+            "analyzed": 3,
+            "invalid": 3,
+            "lates": 2,
+            "total": 6,
+        },
+        "project": {
+            "status": "late",
+            "python_version": "3.4",
+        }
+    }
+
+    # Without environment, marker are ignored and all valid packages are counted
+    list(analyzer.inspect(source))
+    assert analyzer.statistics == {
+        "creation_date": datetime.datetime(2024, 7, 25, 10),
+        "packages": {
+            "analyzed": 4,
+            "invalid": 2,
+            "lates": 2,
+            "total": 6,
+        },
+        "project": {
+            "status": "late",
+            "python_version": None,
+        }
+    }

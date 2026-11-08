@@ -6,6 +6,8 @@
 Overview
 ========
 
+.. _overview_how:
+
 How it works
 ************
 
@@ -27,6 +29,8 @@ Concretely, a requirement file from Pip will just work except for some
     There is no need for analyzed project or packages to be installed because the
     analyze only needs informations from `Pypi API`_.
 
+.. _overview_api:
+
 API
 ***
 
@@ -46,14 +50,50 @@ made for a reasonable usage. You may configure it differently for faster executi
 please be nice with the `Pypi API`_
 
 
-Recursive included requirements
-*******************************
+.. _overview_includes:
+
+Requirements include
+********************
 
 A requirement file can include other requirement files using the Pip option ``-r ...``,
 this is supported from analyzer. However remember that relative requirement file paths
 are resolved from the main requirement file path or from your current position path if
 you given requirements from standard input.
 
+
+.. _overview_marker:
+
+Marker expression
+*****************
+
+`Marker <https://packaging.pypa.io/en/stable/markers.html>`_ expression is supported
+in package requirement definition but is only evaluated if environment is given. If
+environment is not given all markers are just ignored and the requirement is considered
+valid.
+
+Commands :ref:`cli_cmd_analyze` and :ref:`cli_cmd_report` allow to give an
+environment.
+
+Here is a JSON sample of an advanced environment: ::
+
+    {
+        "implementation_name": "cpython",
+        "implementation_version": "3.13.3",
+        "os_name": "posix",
+        "platform_machine": "x86_64",
+        "platform_release": "6.14.0-37-generic",
+        "platform_system": "Linux",
+        "platform_version": "#37-Ubuntu SMP PREEMPT_DYNAMIC Fri Nov 14 22:10:32 UTC 2025",
+        "python_full_version": "3.13.3",
+        "platform_python_implementation": "CPython",
+        "python_version": "3.13",
+        "sys_platform": "linux"
+    }
+
+Not all these variables are needed but it finally depends from your requirements.
+
+
+.. _overview_unsupported:
 
 Unsupported requirement specifiers
 **********************************
@@ -88,6 +128,8 @@ Invalid syntax
     Requirement that is not valid with Pip requirement definition format. Requirement
     will be assumed as a failure.
 
+
+.. _overview_demo:
 
 Demonstration
 *************

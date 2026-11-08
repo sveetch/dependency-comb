@@ -156,7 +156,7 @@ def test_complete_package_informations_without_requirement(settings):
 
 
 @freeze_time("2024-10-25 10:00:00.000000")
-def test_complete_package_informations_with_exceed_requirement(settings):
+def test_complete_package_informations_with_younger_requirement(settings):
     """
     If specifiers resolve to version higher than releases available on Pypi, no
     latest version can be found and lateness will be empty.

@@ -1,4 +1,3 @@
-import datetime
 import json
 
 from pathlib import Path
@@ -21,16 +20,12 @@ class BaseFormatter:
     Concrete formatters would commonly prefer to inherit from ``BaseStringFormatter``.
 
     Arguments:
-        now_date (datetime): A datetime to set instead of default ``datetime.now()``.
-            This datetime is used to compute the delta time between release and current
-            date.
         printer (callable): Function to use to print content. The function accept a
             an argument for the content and commonly return a string just like
             ``print()``. On default this will use ``click.echo()``.
         printer_kwargs (dict): Possible kwargs to pass to the printer function.
     """
-    def __init__(self, now_date=None, printer=None, printer_kwargs=None):
-        self.now_date = now_date or datetime.datetime.now()
+    def __init__(self, printer=None, printer_kwargs=None):
         self.printer = printer
         self.printer_kwargs = printer_kwargs
 
@@ -124,14 +119,10 @@ class BaseFormatter:
             return "Latest", None
 
         # NOTE: Temporary prints until 'delta date' #12 issue is resolved
-        # print("🥚 self.now_date:", self.now_date)
         # print("💚 get_required_release for:", item["name"])
         # print("  🥚 resolved_version:", item["resolved_version"])
         # print("  🥚 resolved_published:", item["resolved_published"])
-        # print(
-        #     "  🙈 timedelta:",
-        #     self.now_date - parse_pypi_date(item["resolved_published"])
-        # )
+
         resolved_age = humanize.naturaldelta(item["resolved_delta"])
         return item["resolved_version"], resolved_age.capitalize()
 

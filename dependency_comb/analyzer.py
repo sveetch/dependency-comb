@@ -26,8 +26,6 @@ class DependenciesAnalyzer(RequirementParser):
     Legacy API (also known as the "Simple API") return either a HTML or JSON response,
     depending value of request header "Accept:".
 
-    TODO: remove 'logger' since we can get the logger directly without passing it
-
     Keyword Arguments:
         cachedir (Path): Directory path where to search and create cache files for
             requested packages on API. Given path must already exists.
@@ -50,6 +48,7 @@ class DependenciesAnalyzer(RequirementParser):
             JSON API to get package details.
         PACKAGE_RELEASES_ENDPOINT (string): Template string to build URL to the Pypi
             Legacy API to get package releases.
+        statistics (dict): A dict of computed statistics values.
     """
     PACKAGE_DETAIL_ENDPOINT = "https://pypi.org/pypi/{name}/json"
     PACKAGE_RELEASES_ENDPOINT = "https://pypi.org/simple/{name}/"
@@ -61,6 +60,7 @@ class DependenciesAnalyzer(RequirementParser):
         self.api_chunk = api_chunk or 10
         self.api_pause = api_pause
         self.api_timeout = api_timeout
+        self.statistics = None
         self.now_date = now_date or datetime.datetime.now()
         # TODO: Currently not implemented, it should be a list of package names to
         # ignore from analyze, dont know the state it will end in yet. It could be
@@ -381,9 +381,9 @@ class DependenciesAnalyzer(RequirementParser):
 
     def get_package_urls(self, data):
         """
-        Try to get the relevant URLs from package metadatas.
+        Get the relevant URLs from package metadatas.
 
-        However the ``project_urls`` item from package metadatas is not normalized
+        The ``project_urls`` item from package metadatas is not normalized
         enough to quickly get relevant infos so here we try to do so.
 
         Arguments:
@@ -425,6 +425,7 @@ class DependenciesAnalyzer(RequirementParser):
         Returns:
             PackageRequirement: The package object.
         """
+        # Proceed only for correctly parsed requirement
         if requirement.status == "parsed":
             data = self.get_package_data(requirement.name)
             urls = self.get_package_urls(data)
@@ -479,7 +480,9 @@ class DependenciesAnalyzer(RequirementParser):
             path (Path): Path of requirement file if available. This is used to avoid
                 circular references and must be an absolute path.
             environment (dict): Optionnal dictionnary of environment variables to use
-            with possible specifier marker resolution.
+                for marker resolution. If environment include ``python_version`` item,
+                it will be assumed to be the project Python version and will be added
+                to the project statistics.
             strict (boolean): If True only the valid requirements (see
                 ``dependency_comb.package.PackageRequirement.is_valid``) are returned.
                 Default is False, all requirements are returned and you need to check
@@ -490,6 +493,8 @@ class DependenciesAnalyzer(RequirementParser):
         Returns:
             iterator: Iterator of PackageRequirement objects for given requirements.
         """
+        environment = environment or {}
+
         parsed_requirements = self.parse_requirements(
             requirements,
             path=path,
@@ -497,18 +502,58 @@ class DependenciesAnalyzer(RequirementParser):
             basepath=basepath,
         )
 
-        #
+        self.statistics = {
+            "creation_date": self.now_date,
+            "packages": {
+                "analyzed": 0,
+                "invalid": 0,
+                "lates": 0,
+            },
+            "project": {
+                "status": "unknow",
+                "python_version": environment.get("python_version"),
+            }
+        }
+
+        # Use chunks if enabled else the whole list in a single batch
         if self.api_chunk:
             chunks = list(split_to_chunks(parsed_requirements, self.api_chunk))
         else:
             chunks = [parsed_requirements]
 
+        # Enumarate packages
         for i, chunk in enumerate(chunks, start=1):
             for item in chunk:
+                # Perform requests (or cache get) to complete package information from
+                # API
                 pkginfos = self.complete_package_informations(item)
+
+                # No matter the 'strict' option, we only append valid packages to
+                # statistics
+                if pkginfos.is_valid:
+                    self.statistics["packages"]["analyzed"] += 1
+
+                    if pkginfos.lateness:
+                        self.statistics["packages"]["lates"] += 1
+                else:
+                    self.statistics["packages"]["invalid"] += 1
+
+                # Yield the package if valid or strict is disabled
                 if not strict or (strict and pkginfos.is_valid):
                     yield pkginfos
 
+            # Apply possible pause time before processing a new chunk
             if self.api_pause and i < len(chunks):
                 self.logger.debug("Making pause of {} second(s)".format(self.api_pause))
                 time.sleep(self.api_pause)
+
+            # Compute package total
+            self.statistics["packages"]["total"] = (
+                self.statistics["packages"]["analyzed"]
+                + self.statistics["packages"]["invalid"]
+            )
+
+            # Set project status according to final stats
+            self.statistics["project"]["status"] = "healthy"
+            if self.statistics["packages"]["lates"]:
+                self.statistics["project"]["status"] = "late"

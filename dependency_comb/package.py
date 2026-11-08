@@ -25,7 +25,8 @@ class PackageRequirement:
     Keyword Arguments:
         environment (dict): Optionnal dictionnary of environment variables to use
             for specifier marker resolution. If requirements involve markers and this
-            attribute is empty, requirements with markers will fail on parsing.
+            attribute is empty, requirements with markers will fail on parsing. When
+            environment is empty, all markers are assumed to be valid.
 
     Attributes:
         source (string): Given requirement source. The source string is expected to be
@@ -45,7 +46,7 @@ class PackageRequirement:
             * ``unsupported-url``: unsupported package url, aborted parsing;
             * ``invalid``: invalid requirement syntax (as from PEP425 and PEP440),
               aborted computation from parsed source;
-            * ``marker-reject``: Requirement did have marker that does not match
+            * ``marker-reject``: Requirement have marker that does not match
               required environment variables when given, aborted computation from
               parsed source;
 
@@ -161,8 +162,8 @@ class PackageRequirement:
                 self.specifier = self.parsed.specifier
                 self.marker = self.parsed.marker
 
-                # If environment and marker are not empty, evaluate marker against
-                # given environment variables to possibly flag source as rejected
+                # If environment and marker are not empty, evaluate the marker with
+                # environment variables to possibly flag source as rejected
                 # from marker
                 if (
                     self.environment and
@@ -185,8 +186,8 @@ class PackageRequirement:
     @property
     def is_valid(self):
         """
-        Express if package has been properly parsed and result to a proper package and
-        not unsupported or invalid parsed rule.
+        Express if package has been properly parsed and result to a proper package.
+        Unsupported syntax or invalid parsing are never considered as valid.
         """
         return self.status in self.VALID_STATUSES
 

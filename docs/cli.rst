@@ -30,16 +30,20 @@ errors and 5 is to output everything.
     be recognized.
 
 
+.. _cli_cmd_help:
+
 Help
 ****
 
-There is a base tool help for global options: ::
+There is a base tool help for global options and available commands: ::
 
     dependency-comb -h
 
 And if you use ``-h`` after a command name you will get its specific help: ::
 
-    dependency-comb analyze -h
+    dependency-comb [COMMAND] -h
+
+.. _cli_cmd_analyze:
 
 Analyze
 *******
@@ -61,6 +65,8 @@ Usage:
     :code: text
 
 
+.. _cli_cmd_format:
+
 Format
 ******
 
@@ -78,6 +84,8 @@ Usage:
 .. include:: ./_static/command_helps/format.txt
     :code: text
 
+
+.. _cli_cmd_report:
 
 Report
 ******

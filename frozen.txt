@@ -1,4 +1,4 @@
-# Frozen requirement versions for 'dependency-comb==0.6.0rc3' installation
+# Frozen requirement versions for 'dependency-comb==0.6.0rc4' installation
 click==8.5.0
 colorlog==6.12.0
 requests==2.34.2
