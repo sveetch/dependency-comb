@@ -179,7 +179,7 @@ def report_command(*args, **parameters):
             strict=False,
             basepath=basepath,
         )
-        payload = [pkg.data() for pkg in packages]
+        payload = [pkg.serialize() for pkg in packages]
     except DependencyCombError as e:
         logger.critical(e)
         raise click.Abort()

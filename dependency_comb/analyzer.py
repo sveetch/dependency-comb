@@ -220,17 +220,17 @@ class DependenciesAnalyzer(RequirementParser):
             list: List of dictionnaries for all version, each one contain the ``number``
             and ``published_at`` items.
         """
+        def number_format(filename):
+            return filename.replace("-reupload", "").split(
+                "-"
+            )[-1].replace(
+                ".tar.gz",
+                ""
+            )
+
         return [
             {
-                "number": item["filename"].replace(
-                    "-reupload",
-                    ""
-                ).split(
-                    "-"
-                )[-1].replace(
-                    ".tar.gz",
-                    ""
-                ),
+                "number": number_format(item["filename"]),
                 "published_at": item["upload-time"],
             }
             for item in payload["files"]
@@ -275,7 +275,7 @@ class DependenciesAnalyzer(RequirementParser):
 
     def get_package_releases(self, name, data):
         """
-        Build a list of released versions from API patched with some values in useful
+        Build a list of released versions from API, patched with some values in useful
         types.
 
         Arguments:
@@ -324,10 +324,9 @@ class DependenciesAnalyzer(RequirementParser):
             dict: Dictionnary of release data taken from given releases if it matched
             specifier. Else returns a null value.
         """
-        indexed = {
-            str(item["number"]): item
-            for item in releases
-        }
+        release_index = {str(item["number"]): item for item in releases}
+
+        # Get a list of releases matching specifier in ascendant order
         matched = sorted(
             specifiers.filter(
                 [str(item["number"]) for item in releases],
@@ -338,9 +337,10 @@ class DependenciesAnalyzer(RequirementParser):
         if not matched:
             return None
 
-        return indexed[matched[-1]]
+        # Last release is the highest
+        return release_index[matched[-1]]
 
-    def compute_lateness(self, target, versions):
+    def get_version_lateness(self, target, versions):
         """
         Compute version lateness for a given version target.
 
@@ -357,8 +357,9 @@ class DependenciesAnalyzer(RequirementParser):
         Returns:
             list: A list of tuples for all existing version higher
                 than given target release version. Tuple first item is the version
-                number (as a ``Version`` object and second item is its
-                release publishing datetime.
+                number (as a ``Version`` object), second item is its release publishing
+                datetime and third item is the timedelta from current version to the
+                latest one.
         """
         if not isinstance(target, Version):
             target = Version(target)
@@ -367,7 +368,6 @@ class DependenciesAnalyzer(RequirementParser):
             (
                 str(item["number"]),
                 item["published_at"],
-                # TODO this should be done sooner
                 self.now_date - item["published_at"],
             )
             for item in versions
@@ -440,11 +440,12 @@ class DependenciesAnalyzer(RequirementParser):
             versions = self.get_package_releases(requirement.name, data)
 
             if requirement.specifier:
-                # Match the highest elligible release
+                # Find the highest available release for requirement specifier
                 resolved = self.get_latest_specified_release(
                     requirement.specifier,
                     versions
                 )
+
                 if resolved:
                     requirement.resolved_version = resolved["number"]
                     requirement.resolved_published = resolved["published_at"]
@@ -460,7 +461,7 @@ class DependenciesAnalyzer(RequirementParser):
 
             # Compute version lateness if a version has been given
             if requirement.resolved_version:
-                requirement.lateness = self.compute_lateness(
+                requirement.lateness = self.get_version_lateness(
                     requirement.resolved_version,
                     versions
                 )
@@ -484,9 +485,9 @@ class DependenciesAnalyzer(RequirementParser):
                 it will be assumed to be the project Python version and will be added
                 to the project statistics.
             strict (boolean): If True only the valid requirements (see
-                ``dependency_comb.package.PackageRequirement.is_valid``) are returned.
-                Default is False, all requirements are returned and you need to check
-                their status yourself if needed.
+                ``dependency_comb.models.package.PackageRequirement.is_valid``) are
+                returned. Default is False, all requirements are returned and you need
+                to check their status yourself if needed.
             basepath (Path): A directory path where to search for requirement
                 inclusions (directive ``-r foo.txt``) from requirements file.
 

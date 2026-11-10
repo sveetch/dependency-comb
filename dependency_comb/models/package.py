@@ -1,7 +1,30 @@
-from packaging.requirements import InvalidRequirement, Requirement
+import datetime
+from dataclasses import dataclass, field as dataclasses_field
+from typing import Any, ClassVar
+
+from packaging.markers import Marker
+from packaging.requirements import InvalidRequirement, SpecifierSet, Requirement
+from packaging.version import Version
+
+from .mixins.export import ExportMixin
 
 
-class PackageRequirement:
+STATUS_LABELS = {
+    "parsed": "Parsed requirement syntax",
+    "analyzed": "Analyzed package informations",
+    "unsupported-argument": "Unsupported Pip argument",
+    "unsupported-localpath": "Local package is not supported",
+    "unsupported-url": "Direct package URL is not supported",
+    "invalid": "Invalid syntax",
+    "marker-reject": "Rejected by marker evaluation against given environment",
+    "unknown": "Unexpected failure",
+}
+
+VALID_STATUSES = ("parsed", "analyzed")
+
+
+@dataclass
+class PackageRequirement(ExportMixin):
     """
     Package requirement object parse given requirement item to get relevant
     informations.
@@ -11,13 +34,15 @@ class PackageRequirement:
     computation from the Analyzer. When parsing has failed, all attributes depending
     from collection and computation will be null.
 
-    The requirement parser only set value on the following attributes:
+    The requirement parser will only set value on the following attributes:
 
     * ``name``;
     * ``url``;
     * ``extras``;
     * ``specifier``;
     * ``marker``;
+
+    All other attributes are in charge of analyzer.
 
     Arguments:
         source (string): A requirement line to parse.
@@ -85,72 +110,42 @@ class PackageRequirement:
         parsing_error (object): The exception object raise from
             ``packaging.Requirement`` when there was a parsing error.
     """
-    STATUS_LABELS = {
-        "parsed": "Parsed requirement syntax",
-        "analyzed": "Analyzed package informations",
-        "unsupported-argument": "Unsupported Pip argument",
-        "unsupported-localpath": "Local package is not supported",
-        "unsupported-url": "Direct package URL is not supported",
-        "invalid": "Invalid syntax",
-        "marker-reject": "Rejected by marker evaluation against given environment",
-        "unknown": "Unexpected failure",
-    }
-    VALID_STATUSES = ("parsed", "analyzed")
-    PUBLISHED_ATTRIBUTES = [
-        "extras",
-        "highest_published",
-        "highest_version",
-        "highest_delta",
-        "lateness",
-        "marker",
-        "name",
-        "parsed",
-        "pypi_url",
-        "repository_url",
-        "source",
-        "specifier",
-        "status",
-        "url",
-        "resolved_version",
-        "resolved_published",
-        "resolved_delta",
-        "parsing_error",
-    ]
+    EXPORT_PRIVATES: ClassVar[tuple[str]] = ("environment",)
+    EXPORT_PROPERTIES: ClassVar[tuple[str]] = ()
 
-    def __init__(self, source, environment=None):
-        self.source = source
-        self.environment = environment
+    source: str
+    environment: dict = dataclasses_field(repr=False, default=None)
+    extras: set = dataclasses_field(repr=False, default=None)
+    highest_published: datetime.datetime = None
+    highest_version: Version = None
+    highest_delta: datetime.timedelta = None
+    lateness: list = dataclasses_field(repr=False, default=None)
+    marker: Marker = None
+    name: str = None
+    parsed: Requirement = None
+    pypi_url: str = None
+    repository_url: str = None
+    specifier: SpecifierSet = None
+    status: str = None
+    url: str = None
+    resolved_version: Version = None
+    resolved_published: datetime.datetime = None
+    resolved_delta: datetime.timedelta = None
+    parsing_error: Any = None
 
-        # All details set to null on default
-        self.extras = None
-        self.highest_published = None
-        self.highest_version = None
-        self.highest_delta = None
-        self.lateness = None
-        self.marker = None
-        self.name = None
-        self.parsed = None
-        self.pypi_url = None
-        self.repository_url = None
-        self.specifier = None
-        self.status = None
-        self.url = None
-        self.resolved_version = None
-        self.resolved_published = None
-        self.resolved_delta = None
-        self.parsing_error = None
-
-        # Check if source syntax is supported
+    def __post_init__(self):
+        # Check source syntax validity
         if self.source.startswith("-"):
             self.status = "unsupported-argument"
         elif self.source.startswith((".", "/")):
             self.status = "unsupported-localpath"
         elif self.source.startswith(("http://", "https://")):
             self.status = "unsupported-url"
+        # Assume we can parse the source
         else:
             try:
                 # Parse source with possible comment part removed
-                self.parsed = Requirement(source.split(" #")[0].strip())
+                self.parsed = Requirement(self.source.split(" #")[0].strip())
             except InvalidRequirement as e:
                 self.status = "invalid"
                 self.parsing_error = e
@@ -163,7 +158,7 @@ class PackageRequirement:
                 self.marker = self.parsed.marker
 
                 # If environment and marker are not empty, evaluate the marker with
-                # environment variables to possibly flag source as rejected
+                # environment variables to possibly set source as rejected
                 # from marker
                 if (
                     self.environment and
@@ -171,17 +166,9 @@ class PackageRequirement:
                     self.marker.evaluate(self.environment) is False
                 ):
                     self.status = "marker-reject"
+                # Finally the requirement has been correctly parsed
                 else:
                     self.status = "parsed"
-
-    def __str__(self):
-        return "[{status}] {source}".format(status=self.status, source=self.source)
-
-    def __repr__(self):
-        return "<PackageRequirement:{status}> {source}".format(
-            status=self.status,
-            source=self.source
-        )
 
     @property
     def is_valid(self):
@@ -189,13 +176,4 @@ class PackageRequirement:
         Express if package has been properly parsed and result to a proper package.
         Unsupported syntax or invalid parsing are never considered as valid.
         """
-        return self.status in self.VALID_STATUSES
-
-    def data(self):
-        """
-        Return public attributes into a dictionnary.
-
-        Returns:
-            dict: The public attributes to publish.
-        """
-        return {k: getattr(self, k) for k in self.PUBLISHED_ATTRIBUTES}
+        return self.status in VALID_STATUSES

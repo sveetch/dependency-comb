@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .exceptions import RequirementParserError
-from .package import PackageRequirement
+from .models import PackageRequirement
 
 
 class RequirementParser:
@@ -112,9 +112,6 @@ class RequirementParser:
         """
         Load content as requirements.
 
-        TODO: Analyzer.inspect() is using original method, it must be ported for the
-        'path' kwarg.
-
         Arguments:
             content (string or Path): Content to load. Either a string for a content
                 to parse or a Path object to open and read as a content to parse. If
@@ -139,11 +136,9 @@ class RequirementParser:
             path = content
             content = path.read_text()
 
-        results = self.parse_recursive_lines(
+        return self.parse_recursive_lines(
             content,
             breadcrumbs=[path] if path else [],
             environment=environment,
             basepath=basepath
         )
-
-        return results

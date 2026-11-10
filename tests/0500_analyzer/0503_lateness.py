@@ -8,7 +8,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
 
 
 @freeze_time("2024-10-25 10:00:00.000000")
-def test_compute_lateness(settings):
+def test_get_version_lateness(settings):
     """
     Computed lateness should return a list of release versions with a higher version
     number than the target one.
@@ -25,7 +25,7 @@ def test_compute_lateness(settings):
         {"number": Version("0.3.4"), "published_at": datetime.datetime(2020, 2, 11)},
     ]
 
-    informations = analyzer.compute_lateness(target="0.3.4", versions=versions)
+    informations = analyzer.get_version_lateness(target="0.3.4", versions=versions)
 
     assert informations == [
         (

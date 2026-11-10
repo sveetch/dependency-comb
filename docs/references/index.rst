@@ -14,5 +14,5 @@ from code docstrings by Sphinx extension ``autodoc``.
    exceptions.rst
    formatting.rst
    logger.rst
-   package.rst
+   models.rst
    parser.rst

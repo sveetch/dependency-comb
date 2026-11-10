@@ -57,7 +57,7 @@ def test_markers(settings):
     })
 
     data = {
-        pkg.data()["name"]: pkg.data()
+        pkg.serialize()["name"]: pkg.serialize()
         for pkg in results
     }
 
@@ -96,7 +96,7 @@ def test_includes(settings):
     )
 
     data = {
-        pkg.data()["name"]: pkg.data()
+        pkg.serialize()["name"]: pkg.serialize()
         for pkg in results
     }
 

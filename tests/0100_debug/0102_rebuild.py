@@ -25,7 +25,7 @@ def test_build_inspection(settings):
 
     packages = analyzer.inspect(sample_source)
     sample_analyzed.write_text(json.dumps(
-        [item.data() for item in packages],
+        [item.serialize() for item in packages],
         indent=4,
         cls=ExtendedJsonEncoder),
     )

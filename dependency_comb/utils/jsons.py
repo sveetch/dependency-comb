@@ -7,8 +7,6 @@ from packaging.requirements import InvalidRequirement, Requirement, SpecifierSet
 from packaging.version import Version
 from packaging.markers import Marker
 
-from ..package import PackageRequirement
-
 
 class ExtendedJsonEncoder(json.JSONEncoder):
     """
@@ -36,11 +34,13 @@ class ExtendedJsonEncoder(json.JSONEncoder):
         if isinstance(obj, (Marker, Requirement, SpecifierSet, Version)):
             return str(obj)
         # Support for dependency-comb objects
-        if isinstance(obj, PackageRequirement):
-            return obj.data()
-        # Support for dependency-comb objects
         if isinstance(obj, InvalidRequirement):
             return str(obj)
+
+        # Support for models without to import them (from their specific class name)
+        # NOTE: This is to be as a last resort
+        if hasattr(obj, "serialize"):
+            return obj.serialize()
 
         # Let the base class default method raise the TypeError
         return json.JSONEncoder.default(self, obj)

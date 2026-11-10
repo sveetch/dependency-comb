@@ -98,24 +98,17 @@ Not all these variables are needed but it finally depends from your requirements
 Unsupported requirement specifiers
 **********************************
 
-.. Hint::
-    You can see every failures and warning with the ``report`` command with options
-    for maximum verbosity level and enable failures inclusion.
-
-    The command ``analyze`` can do it also but not when used to output JSON to the
-    standard input.
+Here we describe unsupported specified with a reason. An unsupported specifier will just
+make a requirement assumed as invalid.
 
 Direct requirement URL
-    Because we cannot determine the package name to get its info from pypi. Requirement
-    will be assumed as a failure.
+    Because we cannot determine the package name to get its info from pypi.
 
 Local package path
-    As the same reason than direct requirement URL. Requirement will be
-    assumed as a failure.
+    As the same reason than direct requirement URL.
 
 Pip requirement option
-    No requirement option are supported except ``-r``. Requirement will be
-    assumed as a failure.
+    No requirement option are supported except ``-r``.
 
 Invalid version
     A version specifier must be valid with
@@ -125,8 +118,14 @@ Invalid version
     failure.
 
 Invalid syntax
-    Requirement that is not valid with Pip requirement definition format. Requirement
-    will be assumed as a failure.
+    Requirement that is not valid with Pip requirement definition format.
+
+.. Hint::
+    You can see every failures and warning with the ``report`` command with options
+    for maximum verbosity level and enable failures inclusion.
+
+    The command ``analyze`` can do it also but not when used to output JSON to the
+    standard input.
 
 
 .. _overview_demo:

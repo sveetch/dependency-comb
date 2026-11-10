@@ -7,7 +7,7 @@ import click
 import humanize
 
 from ..exceptions import FormatterEmptyContentError
-from ..package import PackageRequirement
+from ..models.package import STATUS_LABELS
 
 
 class BaseFormatter:
@@ -194,12 +194,12 @@ class BaseFormatter:
 
         rows = []
         wrapper = TextWrapper(width=40, max_lines=2, placeholder="")
-        default_label = PackageRequirement.STATUS_LABELS["unknown"]
+        default_label = STATUS_LABELS["unknown"]
 
         for i, item in enumerate(ignored_items, start=1):
             status = item["status"]
 
-            resume = PackageRequirement.STATUS_LABELS.get(status, default_label)
+            resume = STATUS_LABELS.get(status, default_label)
             if status == "invalid":
                 resume += ": {}".format(item["parsing_error"])
 

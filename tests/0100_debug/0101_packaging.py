@@ -1,6 +1,7 @@
 import pytest
 
 from packaging.requirements import Requirement
+from packaging.specifiers import SpecifierSet
 
 
 @pytest.mark.skip("Just R&D demonstration")
@@ -29,7 +30,7 @@ def test_packaging_splitter():
 
 
 @pytest.mark.skip("Just R&D demonstration")
-def test_packaging_match():
+def test_packaging_specifier_match():
     """
     Check 'SpecifierSet.contains()' rightness with matching versions.
     """
@@ -60,5 +61,62 @@ def test_packaging_match():
         print("└── matching:", list(requirement.specifier.filter(
             releases, prereleases=False
         )))
+
+    assert 1 == 42
+
+
+@pytest.mark.skip("Just R&D demonstration")
+def test_packaging_specifier_comparaison():
+    """
+    SpecifierSet can be combined with another one and then be check if it can
+    be satisfied, meaning there is no conflict.
+    """
+    empty = SpecifierSet("")
+
+    """
+    Django
+    Django
+    """
+    sample_1 = empty & empty
+    print()
+    print("🍱 both no constraint:")
+    print("   - combined:", sample_1)
+    print("   - conflict:", sample_1.is_unsatisfiable())
+
+    """
+    Django
+    Django==5.2
+    """
+    exact_52 = SpecifierSet("==5.2")
+    sample_2 = empty & exact_52
+    print()
+    print("🍱 empty and exact constraint:")
+    print("   - combined:", sample_2)
+    print("   - conflict:", sample_2.is_unsatisfiable())
+
+    """
+    Django<5
+    Django>5.2
+    """
+    less_5 = SpecifierSet("<5")
+    more_52 = SpecifierSet(">5.2")
+    sample_3 = less_5 & more_52
+    print()
+    print("🍱 contradictory less than and more than:")
+    print("   - combined:", sample_3)
+    print("   - conflict:", sample_3.is_unsatisfiable())
+
+    """
+    Django
+    Django>=5.2
+    Django==6.0
+    """
+    more_or_better_52 = SpecifierSet(">=5.2")
+    exact_6 = SpecifierSet("==6.0")
+    sample_6 = empty & more_or_better_52 & exact_6
+    print()
+    print("🍱 no constraint and 'more or better' and exact higher:")
+    print("   - combined:", sample_6)
+    print("   - conflict:", sample_6.is_unsatisfiable())
 
     assert 1 == 42

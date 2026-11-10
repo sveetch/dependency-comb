@@ -8,7 +8,7 @@ from packaging.requirements import Requirement, SpecifierSet
 from packaging.version import Version
 
 from dependency_comb.analyzer import DependenciesAnalyzer
-from dependency_comb.package import PackageRequirement
+from dependency_comb.models.package import PackageRequirement
 
 
 @pytest.mark.parametrize("source, expected", [
@@ -95,7 +95,7 @@ def test_complete_package_informations_with_requirement(settings):
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
     analyzer.complete_package_informations(pkg)
 
-    assert pkg.data() == {
+    assert pkg.serialize() == {
         "extras": set(),
         "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
         "highest_version": Version("0.3.6"),
@@ -146,7 +146,7 @@ def test_complete_package_informations_without_requirement(settings):
     pkg = PackageRequirement("diskette")
     analyzer.complete_package_informations(pkg)
 
-    data = pkg.data()
+    data = pkg.serialize()
     assert data["name"] == "diskette"
     assert data["status"] == "analyzed"
     assert data["source"] == "diskette"
@@ -167,7 +167,7 @@ def test_complete_package_informations_with_younger_requirement(settings):
     pkg = PackageRequirement("diskette>0.4.0")
     analyzer.complete_package_informations(pkg)
 
-    data = pkg.data()
+    data = pkg.serialize()
     assert data["name"] == "diskette"
     assert data["status"] == "analyzed"
     assert data["highest_version"] == Version("0.3.6")

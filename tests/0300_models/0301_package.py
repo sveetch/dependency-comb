@@ -1,18 +1,20 @@
+import json
+
 import pytest
 
 from packaging.requirements import Requirement, SpecifierSet
 
-from dependency_comb.package import PackageRequirement
+from dependency_comb.models.package import PackageRequirement
 
 
 def test_basic():
     """
-    Before post processing from analyzer, the package object only has basic informations
-    from 'packaging.PackageRequirement' parser.
+    Before post processing from analyzer, the package object has only basic informations
+    from parser 'packaging.requirements.Requirement'.
     """
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
 
-    assert pkg.data() == {
+    assert pkg.serialize() == {
         "extras": set(),
         "highest_published": None,
         "highest_version": None,
@@ -25,6 +27,34 @@ def test_basic():
         "repository_url": None,
         "source": "diskette>=0.1.0,<0.3.4",
         "specifier": SpecifierSet("<0.3.4,>=0.1.0"),
+        "status": "parsed",
+        "url": None,
+        "resolved_version": None,
+        "resolved_published": None,
+        "resolved_delta": None,
+        "parsing_error": None
+    }
+
+
+def test_as_json():
+    """
+    Model object can be serialized to JSON
+    """
+    pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
+
+    assert json.loads(pkg.as_json()) == {
+        "extras": [],
+        "highest_published": None,
+        "highest_version": None,
+        "highest_delta": None,
+        "lateness": None,
+        "marker": None,
+        "name": "diskette",
+        "parsed": "diskette<0.3.4,>=0.1.0",
+        "pypi_url": None,
+        "repository_url": None,
+        "source": "diskette>=0.1.0,<0.3.4",
+        "specifier": "<0.3.4,>=0.1.0",
         "status": "parsed",
         "url": None,
         "resolved_version": None,
@@ -68,10 +98,11 @@ def test_parser_valid(source, parsed_name, parsed_url):
     """
     All expected valid requirement line formats should be successfuly parsed.
     """
-    pkg = PackageRequirement(source).data()
-    assert pkg["status"] == "parsed"
-    assert pkg["name"] == parsed_name
-    assert pkg["url"] == parsed_url
+    pkg = PackageRequirement(source)
+    assert pkg.status == "parsed"
+    assert pkg.name == parsed_name
+    assert pkg.url == parsed_url
+    assert pkg.is_valid is True
 
 
 @pytest.mark.parametrize("source, parsed_name", [
@@ -83,11 +114,13 @@ def test_parser_valid(source, parsed_name, parsed_url):
         ),
         "unsupported-url"
     ),
+    ("-z foobar", "unsupported-argument"),
 ])
 def test_parser_invalid(source, parsed_name):
     """
     All expected invalid requirement line formats should return invalid package object.
     """
-    pkg = PackageRequirement(source).data()
-    assert pkg["status"] == parsed_name
-    assert pkg["name"] is None
+    pkg = PackageRequirement(source)
+    assert pkg.status == parsed_name
+    assert pkg.name is None
+    assert pkg.is_valid is False
