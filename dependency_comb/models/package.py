@@ -1,4 +1,5 @@
 import datetime
+from pathlib import Path
 from dataclasses import dataclass, field as dataclasses_field
 from typing import Any, ClassVar
 
@@ -57,6 +58,10 @@ class PackageRequirement(ExportMixin):
         source (string): Given requirement source. The source string is expected to be
             stripped from leading whitespaces else it could causes unexpected parsing
             false positive.
+        origin (pathlib.Path): If source comes from a requirement file this will be
+            its Path object. Else it will be null.
+        lineno (integer): Line number of source from requirement file, if source does
+            not come from a requirement file it will be a zero value.
         environment (dict): Given environment dictionnary
         status (string): Computed requirement status from parsing process. Status can
             be:
@@ -114,6 +119,8 @@ class PackageRequirement(ExportMixin):
     EXPORT_PROPERTIES: ClassVar[tuple[str]] = ()
 
     source: str
+    origin: Path = None
+    lineno: int = 0
     environment: dict = dataclasses_field(repr=False, default=None)
     extras: set = dataclasses_field(repr=False, default=None)
     highest_published: datetime.datetime = None

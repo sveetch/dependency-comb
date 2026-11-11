@@ -52,13 +52,17 @@ class RequirementParser:
                 requirement files.
 
         Keyword Arguments:
+            breadcrumbs (list): A list of Path objects for parent files when content is
+                coming from a requirement file. This is used to avoid circular reference
+                with included requirement files.
             environment (dict): Environment variables as defined from
                 `PEP 508 <https://peps.python.org/pep-0508/>` to use for marker
                 evaluations on parsed requirement items.
             basepath (Path): A directory path where to search for requirement
                 inclusions (directive ``-r foo.txt``) from requirements file. If not
-                given inclusions will be ignored and PackageRequirement will assume it
-                as an unsupported argument.
+                given inclusions will be ignored and PackageRequirement will assume
+                them as an unsupported argument. This should always be given for
+                content file.
 
         Returns:
             list: List of PackageRequirement objects for all involved requirements.
@@ -68,7 +72,7 @@ class RequirementParser:
         current_crumb = breadcrumbs[-1] if breadcrumbs else None
 
         resolved = []
-        for line in content.splitlines():
+        for lineno, line in enumerate(content.splitlines(), start=1):
             # Ignore empty lines and comment lines
             if not line.strip() or line.strip().startswith("#"):
                 continue
@@ -98,11 +102,24 @@ class RequirementParser:
                         basepath=basepath
                     ))
 
-            # Finally for everything else (that can be valid, invalid, unsupported,
-            # etc.. requirement), package parser will take it in charge
+            # Everything else (valid, invalid, unsupported, etc..), package parser
+            # will process it
             else:
+                # Build origin according to crumb and basepath
+                origin = None
+                if current_crumb and basepath:
+                    origin = current_crumb.relative_to(basepath)
+                elif current_crumb and not basepath:
+                    origin = current_crumb
+
+                # Store parsed requirement line
                 resolved.append(
-                    PackageRequirement(line.strip(), environment=environment)
+                    PackageRequirement(
+                        line.strip(),
+                        origin=origin,
+                        lineno=lineno,
+                        environment=environment,
+                    )
                 )
 
         return resolved

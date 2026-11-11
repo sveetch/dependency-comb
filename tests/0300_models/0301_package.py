@@ -15,6 +15,9 @@ def test_basic():
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
 
     assert pkg.serialize() == {
+        "source": "diskette>=0.1.0,<0.3.4",
+        "origin": None,
+        "lineno": 0,
         "extras": set(),
         "highest_published": None,
         "highest_version": None,
@@ -25,7 +28,6 @@ def test_basic():
         "parsed": Requirement("diskette<0.3.4,>=0.1.0"),
         "pypi_url": None,
         "repository_url": None,
-        "source": "diskette>=0.1.0,<0.3.4",
         "specifier": SpecifierSet("<0.3.4,>=0.1.0"),
         "status": "parsed",
         "url": None,
@@ -43,6 +45,9 @@ def test_as_json():
     pkg = PackageRequirement("diskette>=0.1.0,<0.3.4")
 
     assert json.loads(pkg.as_json()) == {
+        "source": "diskette>=0.1.0,<0.3.4",
+        "origin": None,
+        "lineno": 0,
         "extras": [],
         "highest_published": None,
         "highest_version": None,
@@ -53,7 +58,6 @@ def test_as_json():
         "parsed": "diskette<0.3.4,>=0.1.0",
         "pypi_url": None,
         "repository_url": None,
-        "source": "diskette>=0.1.0,<0.3.4",
         "specifier": "<0.3.4,>=0.1.0",
         "status": "parsed",
         "url": None,

@@ -9,16 +9,65 @@ from dependency_comb.parser import RequirementParser
 from dependency_comb.utils.jsons import ExtendedJsonEncoder
 
 
-def test_basic(settings):
+def test_from_file(settings):
+    """
+    Parser should be able to parse requirements with valid Pip syntax from a file then
+    return requirements objects.
+    """
+    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    expected = settings.fixtures_path / "parsed_requirements_basic.json"
+    parser = RequirementParser()
+
+    results = parser.parse_requirements(sample_source, basepath=settings.fixtures_path)
+
+    # Turn data to JSON to stringify some objects and then load it as Python object to
+    # make assert
+    serialized = json.loads(
+        json.dumps(results, indent=4, cls=ExtendedJsonEncoder)
+    )
+    assert serialized == json.loads(expected.read_text())
+
+
+def test_from_file_without_basepath(settings):
+    """
+    Parser should be able to parse requirements with valid Pip syntax from a file
+    without basepath then return requirements objects.
+    """
+    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    expected = settings.fixtures_path / "parsed_requirements_basic.json"
+    parser = RequirementParser()
+
+    # NOTE: Patch 'origin' field as an absolute path
+    expected_absolute = []
+    for item in json.loads(expected.read_text()):
+        item["origin"] = str(settings.fixtures_path / item["origin"])
+        expected_absolute.append(item)
+
+    results = parser.parse_requirements(sample_source, basepath=None)
+
+    # Turn data to JSON to stringify some objects and then load it as Python object to
+    # make assert
+    serialized = json.loads(
+        json.dumps(results, indent=4, cls=ExtendedJsonEncoder)
+    )
+    assert serialized == expected_absolute
+
+
+def test_from_string(settings):
     """
     Parser should be able to parse requirements with valid Pip syntax from a string
     then return requirements objects.
     """
     sample_source = settings.fixtures_path / "requirements_basic.txt"
-    sample_parsed = settings.fixtures_path / "parsed_requirements_basic.json"
+    expected = settings.fixtures_path / "parsed_requirements_basic.json"
     parser = RequirementParser()
 
-    # As a string
+    # NOTE: Neutralize 'origin' field from expected data
+    expected_no_basepath = []
+    for item in json.loads(expected.read_text()):
+        item["origin"] = None
+        expected_no_basepath.append(item)
+
     results = parser.parse_requirements(sample_source.read_text())
 
     # Turn data to JSON to stringify some objects and then load it as Python object to
@@ -26,16 +75,7 @@ def test_basic(settings):
     serialized = json.loads(
         json.dumps(results, indent=4, cls=ExtendedJsonEncoder)
     )
-    assert serialized == json.loads(sample_parsed.read_text())
-
-    # As a file with a Path object
-    results = parser.parse_requirements(sample_source)
-    # Turn data to JSON to stringify some objects and then load it as Python object to
-    # make assert
-    serialized = json.loads(
-        json.dumps(results, indent=4, cls=ExtendedJsonEncoder)
-    )
-    assert serialized == json.loads(sample_parsed.read_text())
+    assert serialized == expected_no_basepath
 
 
 def test_markers(settings):

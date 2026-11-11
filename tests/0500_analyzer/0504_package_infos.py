@@ -96,6 +96,9 @@ def test_complete_package_informations_with_requirement(settings):
     analyzer.complete_package_informations(pkg)
 
     assert pkg.serialize() == {
+        "source": "diskette>=0.1.0,<0.3.4",
+        "origin": None,
+        "lineno": 0,
         "extras": set(),
         "highest_published": datetime.datetime(2024, 9, 1, 20, 1, 50),
         "highest_version": Version("0.3.6"),
@@ -122,7 +125,6 @@ def test_complete_package_informations_with_requirement(settings):
         "parsed": Requirement("diskette<0.3.4,>=0.1.0"),
         "pypi_url": "https://pypi.org/project/diskette/",
         "repository_url": "https://github.com/emencia/diskette",
-        "source": "diskette>=0.1.0,<0.3.4",
         "specifier": SpecifierSet("<0.3.4,>=0.1.0"),
         "status": "analyzed",
         "url": None,

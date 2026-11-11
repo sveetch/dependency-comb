@@ -10,6 +10,10 @@ Development
   formatter. Analyzer is doing it and set value into new attributes 'xxx_delta';
 * Now the method 'DependenciesAnalyzer.inspect()' compute some statistics about package
   and project;
+* RequirementPackage class is now a dataclass and considered as a model object;
+* Now the RequirementPackage contains the line number where it have been found from
+  requirements parsing. And if requirements comes from a file it is stored as the
+  'origin', finally the requirements parsed from a string will have a null origin;
 
 
 Version 0.5.1 - 2026/11/06
