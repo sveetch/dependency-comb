@@ -19,7 +19,7 @@ This tool will read given project Python requirements and check packages informa
 to build a report about project lateness and related packages activities.
 
 Analyze is performed using informations from `Pypi API`_ and can be formatted to various
-formats (ReStructuredText, JSON, CSV, Rich).
+formats (JSON, ReStructuredText, Rich).
 
 This is commonly used when auditing an existing project to know about its dependencies
 states.

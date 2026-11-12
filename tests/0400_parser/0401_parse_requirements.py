@@ -205,3 +205,81 @@ def test_circular(settings):
         "File 'circular_leaf.txt' try to include the parent file 'circular_parent.txt' "
         "that would lead to a circular reference."
     )
+
+
+def test_parse_duplicates(settings):
+    """
+    Method should not return duplicated requirements and only keep the last
+    combined specifier.
+    """
+    parser = RequirementParser()
+
+    # Duplicates without any specifier
+    lines = [
+        "Django",
+        "emencia-django-staticpages",
+        "Django",
+    ]
+    requirements = parser.parse_requirements("\n".join(lines))
+    assert [(v.name, str(v.specifier)) for v in requirements] == [
+        ("Django", ""),
+        ("emencia-django-staticpages", ""),
+    ]
+
+    # Duplicates with a specific specifier
+    lines = [
+        "Django",
+        "emencia-django-staticpages",
+        "Django==5.2",
+    ]
+    requirements = parser.parse_requirements("\n".join(lines))
+    assert [(v.name, str(v.specifier)) for v in requirements] == [
+        ("Django", "==5.2"),
+        ("emencia-django-staticpages", ""),
+    ]
+
+    # With a 'at least or better' specifier and higher specific specifier
+    lines = [
+        "Django",
+        "emencia-django-staticpages",
+        "Django>=5.2",
+        "Django==6.0",
+    ]
+    requirements = parser.parse_requirements("\n".join(lines))
+    assert [(v.name, str(v.specifier)) for v in requirements] == [
+        ("Django", "==6.0,>=5.2"),
+        ("emencia-django-staticpages", ""),
+    ]
+
+    # With many specifiers leveling up the constraint
+    lines = [
+        "Django",
+        "Django>=3.2",
+        "Django>=4.2",
+        "Django>=5.2",
+        "Django<6.1",
+    ]
+    requirements = parser.parse_requirements("\n".join(lines))
+    assert [(v.name, str(v.specifier)) for v in requirements] == [
+        ("Django", "<6.1,>=3.2,>=4.2,>=5.2"),
+    ]
+
+
+def test_parse_duplicates_error(settings):
+    """
+    Parser should raise an error in cases of duplicate requirements with a
+    specifier conflict.
+    """
+    parser = RequirementParser()
+
+    lines = [
+        "Django<5",
+        "emencia-django-staticpages",
+        "Django>5.2",
+    ]
+    with pytest.raises(RequirementParserError) as excinfo:
+        parser.parse_requirements("\n".join(lines))
+
+    assert str(excinfo.value) == (
+        "Requirement specifier conflict"
+    )

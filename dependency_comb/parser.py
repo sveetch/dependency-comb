@@ -1,7 +1,13 @@
+import logging
+
 from pathlib import Path
 
 from .exceptions import RequirementParserError
 from .models import PackageRequirement
+from . import __pkgname__
+
+
+logger = logging.getLogger(__pkgname__)
 
 
 class RequirementParser:
@@ -38,6 +44,114 @@ class RequirementParser:
 
         return requirement_path.resolve()
 
+    def manage_include(self, store, line, basepath, crumb, breadcrumbs=None,
+                       environment=None):
+        """
+        Parse include directive to process its lines.
+
+        Arguments:
+            store (list): List where to store included requirements.
+            line (string): Content line of the inclusion directive.
+            basepath (Path): A directory path where to search for requirement
+                inclusions (directive ``-r foo.txt``) from requirements file.
+            crumb (Path): Path of the file where the content line comes from.
+
+        Keyword Arguments:
+            breadcrumbs (list): A list of Path objects for parent files when content is
+                coming from a requirement file. This is used to avoid circular reference
+                with included requirement files.
+            environment (dict): Environment variables as defined from
+                `PEP 508 <https://peps.python.org/pep-0508/>` to use for marker
+                evaluations on parsed requirement items.
+        """
+        inclusion_path = self.get_inclusion_path(line, basepath)
+
+        if inclusion_path:
+            if inclusion_path in breadcrumbs:
+                msg = (
+                    "File '{current}' try to include the parent file "
+                    "'{include}' that would lead to a circular reference."
+                )
+                raise RequirementParserError(
+                    msg.format(
+                        current=crumb.relative_to(basepath),
+                        include=inclusion_path.relative_to(basepath),
+                    )
+                )
+
+            # Append resolved included requirement files
+            store.extend(
+                self.parse_recursive_lines(
+                    inclusion_path.read_text(),
+                    breadcrumbs=breadcrumbs.copy() + [inclusion_path],
+                    environment=environment,
+                    basepath=basepath
+                )
+            )
+
+    def manage_duplicate(self, package):
+        """
+        Find if given package has already been registered and update it if needed.
+
+        Arguments:
+            package (PackageRequirement):
+
+        Raises:
+            RequirementParserError: In case of conflict with specifier.
+
+        Returns:
+            boolean: Returns True if package is a duplicate of a previously parsed one
+            else False. A duplicate package is ignored from collection but may alter
+            the initial package specifier.
+        """
+        if package.name not in self.package_registry:
+            self.package_registry[package.name] = package
+            return False
+        else:
+            # TODO: We also have to store every duplicate coords to make
+            # table in analyze then it can be included in report
+            # Or we keep storing requiremnt with a status "duplicate" ?
+            if package.origin:
+                msg = (
+                    "Duplicate requirement for '{name}' found at line "
+                    "{lineno} from '{origin}'."
+                )
+            else:
+                msg = (
+                    "Duplicate requirement for '{name}' found at line "
+                    "{lineno}."
+                )
+
+            logger.warning(
+                msg.format(
+                    origin=package.origin,
+                    lineno=package.lineno,
+                    name=package.name
+                )
+            )
+
+            # Check current specifier against registered one
+            combined_specifier = (
+                self.package_registry[package.name].specifier & package.specifier
+            )
+            print(
+                "💚 Combined specifier:",
+                self.package_registry[package.name].specifier,
+                "&",
+                package.specifier,
+                "=",
+                combined_specifier,
+                combined_specifier.is_unsatisfiable()
+            )
+
+            if combined_specifier.is_unsatisfiable():
+                msg = "Requirement specifier conflict"
+                raise RequirementParserError(msg)
+            else:
+                self.package_registry[package.name].specifier = combined_specifier
+
+            return True
+
     def parse_recursive_lines(self, content, breadcrumbs=None, environment=None,
                               basepath=None):
         """
@@ -69,58 +183,49 @@ class RequirementParser:
         """
         breadcrumbs = [] if breadcrumbs is None else breadcrumbs
         # The path of requirements source we are currently parsing
-        current_crumb = breadcrumbs[-1] if breadcrumbs else None
+        crumb = breadcrumbs[-1] if breadcrumbs else None
 
         resolved = []
         for lineno, line in enumerate(content.splitlines(), start=1):
+            # Build origin according to crumb and basepath
+            origin = crumb if crumb else None
+            if origin and basepath:
+                origin = origin.relative_to(basepath)
+
             # Ignore empty lines and comment lines
             if not line.strip() or line.strip().startswith("#"):
                 continue
 
             # Inclusion directive to resolve
             elif basepath and line.strip().startswith("-r "):
-                inclusion_path = self.get_inclusion_path(line, basepath)
-
-                if inclusion_path:
-                    if inclusion_path in breadcrumbs:
-                        msg = (
-                            "File '{current}' try to include the parent file "
-                            "'{include}' that would lead to a circular reference."
-                        )
-                        raise RequirementParserError(
-                            msg.format(
-                                current=current_crumb.relative_to(basepath),
-                                include=inclusion_path.relative_to(basepath),
-                            )
-                        )
-
-                    # Append resolved included requirement files
-                    resolved.extend(self.parse_recursive_lines(
-                        inclusion_path.read_text(),
-                        breadcrumbs=breadcrumbs.copy() + [inclusion_path],
-                        environment=environment,
-                        basepath=basepath
-                    ))
+                self.manage_include(
+                    resolved,
+                    line,
+                    basepath,
+                    crumb,
+                    breadcrumbs=breadcrumbs,
+                    environment=environment,
+                )
 
             # Everything else (valid, invalid, unsupported, etc..), package parser
             # will process it
             else:
-                # Build origin according to crumb and basepath
-                origin = None
-                if current_crumb and basepath:
-                    origin = current_crumb.relative_to(basepath)
-                elif current_crumb and not basepath:
-                    origin = current_crumb
-
-                # Store parsed requirement line
-                resolved.append(
-                    PackageRequirement(
-                        line.strip(),
-                        origin=origin,
-                        lineno=lineno,
-                        environment=environment,
-                    )
+                # Create package requirement object from parsed line
+                package = PackageRequirement(
+                    line.strip(),
+                    origin=origin,
+                    lineno=lineno,
+                    environment=environment,
                 )
+
+                # Evaluate possible duplicate requirement
+                is_duplicate = False
+                if package.status == "parsed":
+                    is_duplicate = self.manage_duplicate(package)
+
+                # Store package
+                if not is_duplicate:
+                    resolved.append(package)
 
         return resolved
 
@@ -152,6 +257,11 @@ class RequirementParser:
         if isinstance(content, Path):
             path = content
             content = path.read_text()
+
+        # Open a new registry where to store accepted packages with their specifier
+        # that is used to avoid duplicate and conflicts
+        #TODO: Calling 'parse_recursive_lines' directly will cause AttributeError
+        self.package_registry = {}
 
         return self.parse_recursive_lines(
             content,

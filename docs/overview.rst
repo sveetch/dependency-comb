@@ -29,6 +29,28 @@ Concretely, a requirement file from Pip will just work except for some
     There is no need for analyzed project or packages to be installed because the
     analyze only needs informations from `Pypi API`_.
 
+
+.. _overview_resolution:
+
+Requirements resolution
+***********************
+
+Once parsed, a requirement version will be resolved following its specifier and
+available package version.
+
+Comb does not dig into requirement dependencies to resolve package version
+against dependency constraints.
+
+If a requirement ``A`` is defined and a requirement ``B`` define
+``A`` as a dependency with a specific version, Comb won't know it and ``A`` will be
+resolved without the constraints from ``B``.
+
+.. Hint::
+    Although Comb analyze works well with unresolved requirements files,
+    it works better with trusted requirements like frozen requirements from an
+    installed project.
+
+
 .. _overview_api:
 
 API
