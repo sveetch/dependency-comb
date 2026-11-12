@@ -18,6 +18,7 @@ STATUS_LABELS = {
     "unsupported-url": "Direct package URL is not supported",
     "invalid": "Invalid syntax",
     "marker-reject": "Rejected by marker evaluation against given environment",
+    "duplicate": "Duplicate package requirement",
     "unknown": "Unexpected failure",
 }
 
@@ -63,13 +64,9 @@ class PackageRequirement(ExportMixin):
         lineno (integer): Line number of source from requirement file, if source does
             not come from a requirement file it will be a zero value.
         environment (dict): Given environment dictionnary
-        status (string): Computed requirement status from parsing process. Status can
+        status (string): Computed requirement status from parsing processes. Status can
             be:
 
-            * ``parsed``: requirement has been properly parsed as supported syntax. This
-              is a temporary status that analyzer will overwrite to another one;
-            * ``analyzed``: requirement has been parsed and has been processed by
-              the Analyzer;
             * ``unsupported-argument``: unsupported Pip argument, aborted parsing;
             * ``unsupported-localpath``: unsupported local path to package, aborted
               parsing;
@@ -79,9 +76,19 @@ class PackageRequirement(ExportMixin):
             * ``marker-reject``: Requirement have marker that does not match
               required environment variables when given, aborted computation from
               parsed source;
+            * ``parsed``: requirement has been properly parsed as supported syntax. This
+              is a temporary status that analyzer will overwrite to another one;
+            * ``duplicate``: When the package requirement has already been parsed
+              previously from another line. The requirement won't be analyzed but its
+              specifier may update the specifier of the initial requirement occurence;
+            * ``analyzed``: requirement has been parsed and has been processed by
+              the Analyzer;
 
             Commonly to get all valid requirements that have been properly analyzed,
             you will just seek for items with status ``analyzed``.
+
+            The status ``duplicate`` and ``analyzed`` are only applied from the
+            analyzer.
 
         marker (packaging.markers.Marker): Marker object parsed from source.
         name (string): Package name parsed from source.

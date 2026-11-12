@@ -207,62 +207,71 @@ def test_circular(settings):
     )
 
 
-def test_parse_duplicates(settings):
+@pytest.mark.parametrize("lines, expected", [
+    (
+        [
+            "Django",
+            "emencia-django-staticpages",
+            "Django",
+        ],
+        [
+            ("Django", "", "parsed"),
+            ("emencia-django-staticpages", "", "parsed"),
+            ("Django", "", "duplicate"),
+        ],
+    ),
+    (
+        [
+            "Django",
+            "emencia-django-staticpages",
+            "Django==5.2",
+        ],
+        [
+            ("Django", "==5.2", "parsed"),
+            ("emencia-django-staticpages", "", "parsed"),
+            ("Django", "==5.2", "duplicate"),
+        ],
+    ),
+    (
+        [
+            "Django",
+            "emencia-django-staticpages",
+            "Django>=5.2",
+            "Django==6.0",
+        ],
+        [
+            ("Django", "==6.0,>=5.2", "parsed"),
+            ("emencia-django-staticpages", "", "parsed"),
+            ("Django", ">=5.2", "duplicate"),
+            ("Django", "==6.0", "duplicate"),
+        ],
+    ),
+    (
+        [
+            "Django",
+            "Django>=3.2",
+            "Django>=4.2",
+            "Django>=5.2",
+            "Django<6.1",
+        ],
+        [
+            ("Django", "<6.1,>=3.2,>=4.2,>=5.2", "parsed"),
+            ("Django", ">=3.2", "duplicate"),
+            ("Django", ">=4.2", "duplicate"),
+            ("Django", ">=5.2", "duplicate"),
+            ("Django", "<6.1", "duplicate"),
+        ],
+    ),
+])
+def test_parse_duplicates(settings, lines, expected):
     """
-    Method should not return duplicated requirements and only keep the last
-    combined specifier.
+    Method should detect duplicate, mark them in status and initial requirement
+    occurence may be updated from duplicates specifiers.
     """
     parser = RequirementParser()
-
-    # Duplicates without any specifier
-    lines = [
-        "Django",
-        "emencia-django-staticpages",
-        "Django",
-    ]
     requirements = parser.parse_requirements("\n".join(lines))
-    assert [(v.name, str(v.specifier)) for v in requirements] == [
-        ("Django", ""),
-        ("emencia-django-staticpages", ""),
-    ]
-
-    # Duplicates with a specific specifier
-    lines = [
-        "Django",
-        "emencia-django-staticpages",
-        "Django==5.2",
-    ]
-    requirements = parser.parse_requirements("\n".join(lines))
-    assert [(v.name, str(v.specifier)) for v in requirements] == [
-        ("Django", "==5.2"),
-        ("emencia-django-staticpages", ""),
-    ]
-
-    # With a 'at least or better' specifier and higher specific specifier
-    lines = [
-        "Django",
-        "emencia-django-staticpages",
-        "Django>=5.2",
-        "Django==6.0",
-    ]
-    requirements = parser.parse_requirements("\n".join(lines))
-    assert [(v.name, str(v.specifier)) for v in requirements] == [
-        ("Django", "==6.0,>=5.2"),
-        ("emencia-django-staticpages", ""),
-    ]
-
-    # With many specifiers leveling up the constraint
-    lines = [
-        "Django",
-        "Django>=3.2",
-        "Django>=4.2",
-        "Django>=5.2",
-        "Django<6.1",
-    ]
-    requirements = parser.parse_requirements("\n".join(lines))
-    assert [(v.name, str(v.specifier)) for v in requirements] == [
-        ("Django", "<6.1,>=3.2,>=4.2,>=5.2"),
-    ]
+    results = [(v.name, str(v.specifier), v.status) for v in requirements]
+    assert results == expected
 
 
 def test_parse_duplicates_error(settings):
@@ -281,5 +290,6 @@ def test_parse_duplicates_error(settings):
         parser.parse_requirements("\n".join(lines))
 
     assert str(excinfo.value) == (
-        "Requirement specifier conflict"
+        "A duplicate requirement for 'Django' at line 3 requires a version '>5.2' in "
+        "conflict with initial requirement version '<5'."
     )

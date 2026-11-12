@@ -30,8 +30,8 @@ class RequirementParser:
         """
         parts = line.split()
 
-        # When there is the inclusion argument without a following requirement file
-        # path, we just ignore the inclusion line
+        # If there is an inclusion argument without a following file path, we just
+        # ignore the inclusion line
         if len(parts) < 2:
             return None
 
@@ -108,46 +108,40 @@ class RequirementParser:
             self.package_registry[package.name] = package
             return False
         else:
-            # TODO: We also have to store every duplicate coords to make
-            # table in analyze then it can be included in report
-            # Or we keep storing requiremnt with a status "duplicate" ?
+            origin_prefix = ""
             if package.origin:
-                msg = (
-                    "Duplicate requirement for '{name}' found at line "
-                    "{lineno} from '{origin}'."
-                )
-            else:
-                msg = (
-                    "Duplicate requirement for '{name}' found at line "
-                    "{lineno}."
-                )
+                origin_prefix = "From '{}': ".format(package.origin)
 
-            logger.warning(
-                msg.format(
-                    origin=package.origin,
-                    lineno=package.lineno,
-                    name=package.name
-                )
+            # Log duplicate occurence
+            msg = origin_prefix + (
+                "Duplicate requirement for '{name}' found at line {lineno}."
             )
+            logger.debug(msg.format(lineno=package.lineno, name=package.name))
 
-            # Check current specifier against registered one
+            # Combine initial occurence with current requirement specifier
             combined_specifier = (
                 self.package_registry[package.name].specifier & package.specifier
             )
-            print(
-                "💚 Combined specifier:",
-                self.package_registry[package.name].specifier,
-                "&",
-                package.specifier,
-                "=",
-                combined_specifier,
-                combined_specifier.is_unsatisfiable()
-            )
 
             if combined_specifier.is_unsatisfiable():
-                msg = "Requirement specifier conflict"
-                raise RequirementParserError(msg)
+                # If unsatisfiable it is a conflict error
+                msg = origin_prefix + (
+                    "A duplicate requirement for '{name}' at line {lineno} requires a "
+                    "version '{current}' in conflict with initial requirement "
+                    "version '{initial}'."
+                )
+                raise RequirementParserError(
+                    msg.format(
+                        lineno=package.lineno,
+                        name=package.name,
+                        current=package.specifier,
+                        initial=self.package_registry[package.name].specifier,
+                    )
+                )
             else:
+                # If satisfiable, set duplicate status and update initial occurence
+                # specifier
+                package.status = "duplicate"
                 self.package_registry[package.name].specifier = combined_specifier
 
             return True
@@ -219,13 +213,11 @@ class RequirementParser:
                 )
 
                 # Evaluate possible duplicate requirement
-                is_duplicate = False
                 if package.status == "parsed":
-                    is_duplicate = self.manage_duplicate(package)
+                    self.manage_duplicate(package)
 
                 # Store package
-                if not is_duplicate:
-                    resolved.append(package)
+                resolved.append(package)
 
         return resolved
 
@@ -260,7 +252,7 @@ class RequirementParser:
 
         # Open a new registry where to store accepted packages with their specifier
         # that is used to avoid duplicate and conflicts
-        #TODO: Calling 'parse_recursive_lines' directly will cause AttributeError
+        # TODO: Calling 'parse_recursive_lines' directly will cause AttributeError
         self.package_registry = {}
 
         return self.parse_recursive_lines(

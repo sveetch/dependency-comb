@@ -12,6 +12,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
         (
             "diskette\n"
             "-r dev.txt\n"
+            "project-composer\n"
             "# Niet\n"
             "project-composer==0.7.0\n"
             "django>3.1,<=3.2\n"
@@ -23,7 +24,8 @@ from dependency_comb.analyzer import DependenciesAnalyzer
         [
             ("diskette", "diskette", "analyzed"),
             ("-r dev.txt", None, "unsupported-argument"),
-            ("project-composer==0.7.0", "project-composer", "analyzed"),
+            ("project-composer", "project-composer", "analyzed"),
+            ("project-composer==0.7.0", "project-composer", "duplicate"),
             ("django>3.1,<=3.2", "django", "analyzed"),
             ("foo>1,foo<=2", None, "invalid"),
             ("boussole ; python_version < \"2.7\"", "boussole", "analyzed"),
@@ -110,6 +112,7 @@ def test_statistics(settings):
     source = (
         "diskette\n"
         "-r dev.txt\n"
+        "project-composer\n"
         "project-composer==0.7.0\n"
         "django>3.1,<=3.2\n"
         "foo>1,foo<=2\n"
@@ -125,9 +128,10 @@ def test_statistics(settings):
         "creation_date": datetime.datetime(2024, 7, 25, 10),
         "packages": {
             "analyzed": 3,
+            "duplicate": 1,
             "invalid": 3,
             "lates": 2,
-            "total": 6,
+            "total": 7,
         },
         "project": {
             "status": "late",
@@ -141,9 +145,10 @@ def test_statistics(settings):
         "creation_date": datetime.datetime(2024, 7, 25, 10),
         "packages": {
             "analyzed": 4,
+            "duplicate": 1,
             "invalid": 2,
             "lates": 2,
-            "total": 6,
+            "total": 7,
         },
         "project": {
             "status": "late",
