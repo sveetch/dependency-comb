@@ -13,7 +13,7 @@ class JSONFormatter(BaseFormatter):
         JSON object even if they are empty.
     """
 
-    def build(self, content, with_failures=True):
+    def build(self, content, with_failures=True, with_duplicates=True):
         """
         Build dictionnary of analyzed and possibles failures
 
@@ -25,14 +25,16 @@ class JSONFormatter(BaseFormatter):
             with_failures (boolean): To disable display of failures.
 
         """
-        succeeds, failures = super().build(content, with_failures=with_failures)
+        results = super().build(content, with_failures=with_failures, with_duplicates=with_duplicates)
 
         return {
-            "analyzed": succeeds,
-            "failures": failures,
+            "analyzed": results.analyzed,
+            #TODO
+            #"duplicated": results.duplicated,
+            "failures": results.failed,
         }
 
-    def print(self, content, with_failures=True):
+    def print(self, content, with_failures=True, with_duplicates=True):
         """
         Print out the analyzed and possibly failures
 
@@ -44,10 +46,10 @@ class JSONFormatter(BaseFormatter):
             with_failures (boolean): To disable display of failures.
         """
         self.printer_call(
-            json.dumps(self.build(content, with_failures=with_failures), indent=4)
+            json.dumps(self.build(content, with_failures=with_failures, with_duplicates=with_duplicates), indent=4)
         )
 
-    def write(self, content, destination, with_failures=True):
+    def write(self, content, destination, with_failures=True, with_duplicates=True):
         """
         Write the analyzed and possibly failures into destination file.
 
@@ -62,7 +64,7 @@ class JSONFormatter(BaseFormatter):
             Path: Path of created file.
         """
         destination.write_text(
-            json.dumps(self.build(content, with_failures=with_failures))
+            json.dumps(self.build(content, with_failures=with_failures, with_duplicates=with_duplicates))
         )
 
         return destination

@@ -44,24 +44,6 @@ Example
     :code: text
 
 
-CSV
-***
-
-It will output analyze and possibles failures in a CSV structure.
-
-When including failures table, this format is not ready to use since analyze and
-failures does not have the same columns.
-
-Output will so includes two differents CSV tables that you will need to distinct
-yourself.
-
-Example
--------
-
-.. include:: ../tests/data_fixtures/formatted/with_failures.csv
-    :code: text
-
-
 JSON
 ****
 

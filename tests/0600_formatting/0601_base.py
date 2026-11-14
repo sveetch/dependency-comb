@@ -7,6 +7,57 @@ from dependency_comb.exceptions import FormatterEmptyContentError
 from dependency_comb.formatting import BaseFormatter
 
 
+def test_open_content_from_filepath(settings):
+    """
+    Base formatter is able to open analyze from a file path but just returns
+    deserialized JSON to Python data.
+    """
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+    formatter = BaseFormatter()
+
+    content = formatter.open_content(analyze)
+    assert len(content) == 8
+    assert [v["source"] for v in content] == [
+        "django>=1.11,<1.12",
+        "Pillow>=3.1.1 # With useless comment",
+        "djangorestframework",
+        "django-admin-shortcuts==1.2.6",
+        "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
+        "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
+        "./downloads/numpy-1.9.2-cp34-none-win32.whl",
+        (
+            "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3."
+            "dev1820+49a8884-cp34-none-win_amd64.whl"
+        ),
+    ]
+
+
+def test_open_content_from_string(settings):
+    """
+    Base formatter is able to open analyze from a string but just returns deserialized
+    JSON to Python data.
+    """
+    analyze = settings.fixtures_path / "analyzes/basic.json"
+
+    formatter = BaseFormatter()
+    content = formatter.open_content(analyze.read_text())
+
+    assert len(content) == 8
+    assert [v["source"] for v in content] == [
+        "django>=1.11,<1.12",
+        "Pillow>=3.1.1 # With useless comment",
+        "djangorestframework",
+        "django-admin-shortcuts==1.2.6",
+        "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
+        "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
+        "./downloads/numpy-1.9.2-cp34-none-win32.whl",
+        (
+            "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3."
+            "dev1820+49a8884-cp34-none-win_amd64.whl"
+        ),
+    ]
+
+
 @freeze_time("2024-07-25 10:00:00")
 def test_build_analyzed_table(settings):
     """
@@ -108,57 +159,6 @@ def test_build_errors_table(settings):
     ]
 
 
-def test_open_content_from_filepath(settings):
-    """
-    Base formatter is able to open analyze from a file path but just returns
-    deserialized JSON to Python data.
-    """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    formatter = BaseFormatter()
-
-    content = formatter.open_content(analyze)
-    assert len(content) == 8
-    assert [v["source"] for v in content] == [
-        "django>=1.11,<1.12",
-        "Pillow>=3.1.1 # With useless comment",
-        "djangorestframework",
-        "django-admin-shortcuts==1.2.6",
-        "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
-        "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
-        "./downloads/numpy-1.9.2-cp34-none-win32.whl",
-        (
-            "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3."
-            "dev1820+49a8884-cp34-none-win_amd64.whl"
-        ),
-    ]
-
-
-def test_open_content_from_string(settings):
-    """
-    Base formatter is able to open analyze from a string but just returns deserialized
-    JSON to Python data.
-    """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-
-    formatter = BaseFormatter()
-    content = formatter.open_content(analyze.read_text())
-
-    assert len(content) == 8
-    assert [v["source"] for v in content] == [
-        "django>=1.11,<1.12",
-        "Pillow>=3.1.1 # With useless comment",
-        "djangorestframework",
-        "django-admin-shortcuts==1.2.6",
-        "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
-        "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
-        "./downloads/numpy-1.9.2-cp34-none-win32.whl",
-        (
-            "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3."
-            "dev1820+49a8884-cp34-none-win_amd64.whl"
-        ),
-    ]
-
-
 @pytest.mark.parametrize("source, success, failed, with_failures", [
     (
         "minimal_success_and_failure.json",
@@ -200,9 +200,9 @@ def test_build(settings, source, success, failed, with_failures):
 
     formatter = BaseFormatter()
 
-    succeeds, failures = formatter.build(analyzes / source, with_failures=with_failures)
-    assert [v["name"] for v in succeeds] == success
-    assert [v["source"] for v in failures] == failed
+    results = formatter.build(analyzes / source, with_failures=with_failures)
+    assert [v["name"] for v in results.analyzed] == success
+    assert [v["source"] for v in results.failed] == failed
 
 
 def test_build_empty(settings):

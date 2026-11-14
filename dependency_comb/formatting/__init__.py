@@ -1,5 +1,4 @@
 from .base import BaseFormatter
-from .csv import CSVFormatter
 from .json_format import JSONFormatter
 from .rst import RestructuredTextFormatter
 
@@ -15,7 +14,6 @@ else:
 
 __all__ = [
     "BaseFormatter",
-    "CSVFormatter",
     "JSONFormatter",
     "RestructuredTextFormatter",
     "RichFormatter",
@@ -26,7 +24,6 @@ __all__ = [
 DEFAULT_FORMAT = "rst"
 
 AVAILABLE_FORMATS = {
-    "csv": CSVFormatter,
     "json": JSONFormatter,
     "rst": RestructuredTextFormatter,
 }

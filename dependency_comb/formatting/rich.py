@@ -84,7 +84,8 @@ class RichFormatter(BaseStringFormatter):
 
         return table
 
-    def print(self, content, destination=None, with_failures=True):
+    def print(self, content, destination=None, with_failures=True,
+              with_duplicates=True):
         """
         Print out the analyzed and possible failures
 
@@ -97,29 +98,35 @@ class RichFormatter(BaseStringFormatter):
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
         """
-        succeeds, failures = self.build(content, with_failures=with_failures)
+        results = self.build(content, with_failures=with_failures, with_duplicates=with_duplicates)
 
         console = Console(width=300, file=destination)
         group_items = []
 
-        if succeeds:
+        if results.analyzed:
             group_items.append(Padding("", (1, 2), expand=False))
             group_items.append(
-                Panel(succeeds, title="[green]Analyzed[/green]", expand=False)
+                Panel(results.analyzed, title="[green]Analyzed[/green]", expand=False)
             )
 
-        if failures:
+        if results.failed:
             group_items.append(Padding("", (1, 2), expand=False))
             group_items.append(
-                Panel(failures, title="[red]Failures[/red]", expand=False)
+                Panel(results.failed, title="[red]Failures[/red]", expand=False)
             )
+
+        #if results.duplicated:
+            #group_items.append(Padding("", (1, 2), expand=False))
+            #group_items.append(
+                #Panel(results.duplicated, title="[orange]Failures[/orange]", expand=False)
+            #)
 
         panel_group = Group(*group_items)
         console.print(panel_group)
 
         return console
 
-    def write(self, content, destination, with_failures=True):
+    def write(self, content, destination, with_failures=True, with_duplicates=True):
         """
         Write the analyzed and possibly failures into destination file.
 
@@ -136,7 +143,8 @@ class RichFormatter(BaseStringFormatter):
         self.print(
             content,
             destination=destination.open("w"),
-            with_failures=with_failures
+            with_failures=with_failures,
+            with_duplicates=with_duplicates
         )
 
         return destination

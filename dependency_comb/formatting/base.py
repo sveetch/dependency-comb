@@ -1,4 +1,5 @@
 import json
+from collections import namedtuple
 
 from pathlib import Path
 from textwrap import TextWrapper
@@ -8,6 +9,12 @@ import humanize
 
 from ..exceptions import FormatterEmptyContentError
 from ..models.package import STATUS_LABELS
+
+
+BuiltResults = namedtuple(
+    "BuiltResults",
+    ["analyzed", "duplicated", "failed"]
+)
 
 
 class BaseFormatter:
@@ -173,6 +180,14 @@ class BaseFormatter:
 
         return rows
 
+    def build_duplicates_table(self, items):
+        """
+        TODO: Build a table of duplicated items
+        """
+        rows = []
+
+        return rows
+
     def build_errors_table(self, items):
         """
         Build the information table for failed requirements analyze.
@@ -180,6 +195,8 @@ class BaseFormatter:
         Because failures can be some long local paths, source name is wrapped on
         two lines if it is over 40 characters, it means a source of +80 characters will
         be cut to 80.
+
+        TODO: Add line number and possible origin in item data.
 
         Arguments:
             items (list): List of requirement dict as returned from Analyzer. All items
@@ -190,6 +207,8 @@ class BaseFormatter:
             ``source`` and ``resume`` will be wrapped to fit on line of 40 characters
             max and only for two lines (all other lines are replaced with an elipsis).
         """
+        # TODO: Filtering upstream from build() would be more efficient (same with
+        # analyzed, duplicated, etc..)
         ignored_items = [v for v in items if v["status"] != "analyzed"]
 
         rows = []
@@ -212,7 +231,7 @@ class BaseFormatter:
 
         return rows
 
-    def build(self, content, with_failures=True):
+    def build(self, content, with_failures=True, with_duplicates=True):
         """
         Build 'succeeds' and 'failures' payloads of analyze for concrete formatter
         method.
@@ -222,23 +241,34 @@ class BaseFormatter:
                 ``BaseFormatter.open_content()`` doc for more details.
 
         Keyword Arguments:
-            with_failures (boolean): To disable display of failures.
+            with_failures (boolean): To enable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
 
         Return:
-            tuple: Success and failures parts from analyze.
+            namedtuple: With items analyzed, duplicated and failed. Alls are lists.
         """
         data = self.open_content(content)
 
-        succeeds = self.build_analyzed_table(data)
+        results = BuiltResults(
+            analyzed=self.build_analyzed_table(data),
+            duplicated=(
+                []
+                if with_duplicates is False
+                else self.build_duplicates_table(data)
+            ),
+            failed=(
+                []
+                if with_failures is False
+                else self.build_errors_table(data)
+            )
+        )
 
-        failures = [] if with_failures is False else self.build_errors_table(data)
-
-        if not succeeds and not failures:
+        if not results.analyzed and not results.failed:
             raise FormatterEmptyContentError("There was no data to format.")
 
-        return succeeds, failures
+        return results
 
-    def print(self, content, with_failures=True):
+    def print(self, content, with_failures=True, with_duplicates=True):
         """
         Print out the analyzed and possibly failures
 
@@ -249,15 +279,19 @@ class BaseFormatter:
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
         """
-        succeeds, failures = self.build(content, with_failures=with_failures)
+        results = self.build(content, with_failures=with_failures, with_duplicates=with_duplicates)
 
-        if succeeds:
-            self.printer_call(succeeds)
+        if results.analyzed:
+            self.printer_call(results.analyzed)
 
-        if failures:
-            self.printer_call(failures)
+        if results.failed:
+            self.printer_call(results.failed)
 
-    def write(self, content, destination, with_failures=True):
+        #TODO
+        #if results.duplicated:
+            #self.printer_call(results.duplicated)
+
+    def write(self, content, destination, with_failures=True, with_duplicates=True):
         """
         Write the analyzed and possibly failures into destination file.
 
@@ -271,19 +305,23 @@ class BaseFormatter:
         Return:
             Path: Path of created file.
         """
-        succeeds, failures = self.build(content, with_failures=with_failures)
+        results = self.build(content, with_failures=with_failures, with_duplicates=with_duplicates)
 
         # Base output type fit to 'succeeds' type because different formatter
-        if isinstance(succeeds, str):
+        if isinstance(results.analyzed, str):
             output = ""
         else:
             output = []
 
-        if succeeds:
-            output += succeeds
+        if results.analyzed:
+            output += results.analyzed
 
-        if failures:
-            output += failures
+        if results.failed:
+            output += results.failed
+
+        #TODO
+        #if results.duplicated:
+            #output += results.duplicated
 
         # Write merged built lists as JSON
         destination.write_text(self.serialize_output(output))
