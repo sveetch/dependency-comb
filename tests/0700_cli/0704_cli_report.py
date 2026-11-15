@@ -1,9 +1,12 @@
+import pytest
 from freezegun import freeze_time
 
 from click.testing import CliRunner
 
 from dependency_comb import __pkgname__
 from dependency_comb.cli.entrypoint import cli_frontend
+from dependency_comb.formatting import AVAILABLE_FORMATS
+from dependency_comb.compat.click_support import ABORT_ENDING
 
 
 def test_report_default(caplog):
@@ -47,7 +50,7 @@ def test_report_with_failures_from_stdin(caplog, settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_report_from_stdin(caplog, settings):
+def test_report_no_failures_from_stdin(caplog, settings):
     """
     Command should succeed to analyze from standard input and return a
     RST format without failures included and titles. Logs are muted.
@@ -115,5 +118,32 @@ def test_report_to_file(caplog, tmp_path, settings):
         (__pkgname__, 20, "Processing package: django-admin-shortcuts"),
         (__pkgname__, 20, "Processing package: requests"),
         (__pkgname__, 20, "Processing package: urllib3"),
-        (__pkgname__, 20, "Analyze report written to: {}".format(destination)),
+        (__pkgname__, 20, "Report written to: {}".format(destination)),
     ]
+
+
+@pytest.mark.parametrize("format_name", AVAILABLE_FORMATS)
+def test_empty(caplog, settings, format_name):
+    """
+    Ensure empty analyze is properly managed.
+    """
+    analyze = settings.fixtures_path / "analyzes/failure_only.json"
+
+    runner = CliRunner()
+
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "report",
+            "-",
+            "--no-failures",
+            "--format", format_name,
+        ],
+        input=analyze.read_text()
+    )
+    # print(result.output)
+    assert result.exit_code == 1
+    assert result.output == (
+        "There was no data to format.\nAborted{}\n".format(ABORT_ENDING)
+    )
+    assert caplog.record_tuples == []

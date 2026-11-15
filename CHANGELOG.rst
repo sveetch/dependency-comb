@@ -14,6 +14,9 @@ Development
 * Now the RequirementPackage contains the line number where it have been found from
   requirements parsing. And if requirements comes from a file it is stored as the
   'origin', finally the requirements parsed from a string will have a null origin;
+* Removed CSV format since this format is not suitable for multiple tables;
+* Removed commands ``analyze`` and ``format`` because they do not bring any added value
+  compared to ``report`` and so complicated development for nothing;
 
 
 Version 0.5.1 - 2026/11/06

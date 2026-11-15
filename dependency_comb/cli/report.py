@@ -193,8 +193,8 @@ def report_command(*args, **parameters):
             with_failures=with_failures
         )
     except FormatterEmptyContentError as e:
-        logger.critical(e)
+        click.echo(str(e))
         raise click.Abort()
 
     if destination:
-        logger.info("Analyze report written to: {}".format(destination))
+        logger.info("Report written to: {}".format(destination))

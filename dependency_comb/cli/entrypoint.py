@@ -6,8 +6,6 @@ from ..compat.click_support import RICH_CLICK_ENABLED, click
 from ..utils.logger import init_logger
 
 from .version import version_command
-from .analyze import analyze_command
-from .formatter import format_command
 from .report import report_command
 
 
@@ -65,6 +63,4 @@ def cli_frontend(ctx, verbose):
 
 # Attach commands methods to the main grouper
 cli_frontend.add_command(version_command, name="version")
-cli_frontend.add_command(analyze_command, name="analyze")
-cli_frontend.add_command(format_command, name="format")
 cli_frontend.add_command(report_command, name="report")
