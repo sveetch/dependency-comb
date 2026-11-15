@@ -31,7 +31,7 @@ def test_report_with_failures_from_stdin(caplog, settings):
     """
     cachedir = settings.fixtures_path / "api_cache"
     formatted = settings.fixtures_path / "formatted/with_failures.rst"
-    requirements_file = settings.fixtures_path / "requirements_basic.txt"
+    requirements_file = settings.fixtures_path / "requirements/basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -54,7 +54,7 @@ def test_report_from_stdin(caplog, settings):
     """
     cachedir = settings.fixtures_path / "api_cache"
     formatted = settings.fixtures_path / "formatted/no_failures.rst"
-    requirements_file = settings.fixtures_path / "requirements_basic.txt"
+    requirements_file = settings.fixtures_path / "requirements/basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -79,7 +79,7 @@ def test_report_to_file(caplog, tmp_path, settings):
     cachedir = settings.fixtures_path / "api_cache"
     destination = tmp_path / "format.rst"
     expected = settings.fixtures_path / "formatted/no_failures.rst"
-    requirements_file = settings.fixtures_path / "requirements_basic.txt"
+    requirements_file = settings.fixtures_path / "requirements/basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(

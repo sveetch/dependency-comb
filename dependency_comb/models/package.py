@@ -18,7 +18,7 @@ STATUS_LABELS = {
     "unsupported-url": "Direct package URL is not supported",
     "invalid": "Invalid syntax",
     "marker-reject": "Rejected by marker evaluation against given environment",
-    "duplicate": "Duplicate package requirement",
+    "duplicated": "Duplicate package requirement",
     "unknown": "Unexpected failure",
 }
 
@@ -78,7 +78,7 @@ class PackageRequirement(ExportMixin):
               parsed source;
             * ``parsed``: requirement has been properly parsed as supported syntax. This
               is a temporary status that analyzer will overwrite to another one;
-            * ``duplicate``: When the package requirement has already been parsed
+            * ``duplicated``: When the package requirement has already been parsed
               previously from another line. The requirement won't be analyzed but its
               specifier may update the specifier of the initial requirement occurence;
             * ``analyzed``: requirement has been parsed and has been processed by
@@ -87,7 +87,7 @@ class PackageRequirement(ExportMixin):
             Commonly to get all valid requirements that have been properly analyzed,
             you will just seek for items with status ``analyzed``.
 
-            The status ``duplicate`` and ``analyzed`` are only applied from the
+            The status ``duplicated`` and ``analyzed`` are only applied from the
             analyzer.
 
         marker (packaging.markers.Marker): Marker object parsed from source.

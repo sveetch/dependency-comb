@@ -1,5 +1,8 @@
 [
     {
+        "source": "django>=1.11,<1.12",
+        "origin": "requirements/basic.txt",
+        "lineno": 2,
         "extras": [],
         "highest_published": "2024-10-08T14:53:12",
         "highest_version": "5.1.2",
@@ -946,7 +949,6 @@
         "parsed": "django<1.12,>=1.11",
         "pypi_url": "https://pypi.org/project/Django/",
         "repository_url": "https://github.com/django/django",
-        "source": "django>=1.11,<1.12",
         "specifier": "<1.12,>=1.11",
         "status": "analyzed",
         "url": null,
@@ -956,6 +958,9 @@
         "parsing_error": null
     },
     {
+        "source": "Pillow>=3.1.1 # With useless comment",
+        "origin": "requirements/basic.txt",
+        "lineno": 3,
         "extras": [],
         "highest_published": "2024-07-01T09:48:43",
         "highest_version": "10.4.0",
@@ -997,7 +1002,6 @@
         "parsed": "Pillow>=3.1.1",
         "pypi_url": "https://pypi.org/project/pillow/",
         "repository_url": "https://github.com/python-pillow/Pillow",
-        "source": "Pillow>=3.1.1 # With useless comment",
         "specifier": ">=3.1.1",
         "status": "analyzed",
         "url": null,
@@ -1007,6 +1011,9 @@
         "parsing_error": null
     },
     {
+        "source": "djangorestframework",
+        "origin": "requirements/basic.txt",
+        "lineno": 4,
         "extras": [],
         "highest_published": "2024-06-19T07:59:32",
         "highest_version": "3.15.2",
@@ -1017,7 +1024,6 @@
         "parsed": "djangorestframework",
         "pypi_url": "https://pypi.org/project/djangorestframework/",
         "repository_url": "https://github.com/encode/django-rest-framework",
-        "source": "djangorestframework",
         "specifier": "",
         "status": "analyzed",
         "url": null,
@@ -1027,6 +1033,9 @@
         "parsing_error": null
     },
     {
+        "source": "django-admin-shortcuts==1.2.6",
+        "origin": "requirements/basic.txt",
+        "lineno": 6,
         "extras": [],
         "highest_published": "2024-07-30T07:34:36",
         "highest_version": "3.0.1",
@@ -1068,7 +1077,6 @@
         "parsed": "django-admin-shortcuts==1.2.6",
         "pypi_url": "https://pypi.org/project/django-admin-shortcuts/",
         "repository_url": null,
-        "source": "django-admin-shortcuts==1.2.6",
         "specifier": "==1.2.6",
         "status": "analyzed",
         "url": null,
@@ -1078,6 +1086,9 @@
         "parsing_error": null
     },
     {
+        "source": "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
+        "origin": "requirements/basic.txt",
+        "lineno": 8,
         "extras": [
             "security"
         ],
@@ -1366,7 +1377,6 @@
         "parsed": "requests[security]==2.8.*,>=2.8.1; python_version < \"2.7\"",
         "pypi_url": "https://pypi.org/project/requests/",
         "repository_url": "https://github.com/psf/requests",
-        "source": "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
         "specifier": "==2.8.*,>=2.8.1",
         "status": "analyzed",
         "url": null,
@@ -1376,6 +1386,9 @@
         "parsing_error": null
     },
     {
+        "source": "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
+        "origin": "requirements/basic.txt",
+        "lineno": 9,
         "extras": [],
         "highest_published": "2024-09-12T10:52:18",
         "highest_version": "2.2.3",
@@ -1386,7 +1399,6 @@
         "parsed": "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
         "pypi_url": "https://pypi.org/project/urllib3/",
         "repository_url": null,
-        "source": "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
         "specifier": "",
         "status": "analyzed",
         "url": "https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
@@ -1396,6 +1408,9 @@
         "parsing_error": null
     },
     {
+        "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
+        "origin": "requirements/basic.txt",
+        "lineno": 12,
         "extras": null,
         "highest_published": null,
         "highest_version": null,
@@ -1406,7 +1421,6 @@
         "parsed": null,
         "pypi_url": null,
         "repository_url": null,
-        "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
         "specifier": null,
         "status": "unsupported-localpath",
         "url": null,
@@ -1416,6 +1430,9 @@
         "parsing_error": null
     },
     {
+        "source": "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3.dev1820+49a8884-cp34-none-win_amd64.whl",
+        "origin": "requirements/basic.txt",
+        "lineno": 15,
         "extras": null,
         "highest_published": null,
         "highest_version": null,
@@ -1426,7 +1443,6 @@
         "parsed": null,
         "pypi_url": null,
         "repository_url": null,
-        "source": "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3.dev1820+49a8884-cp34-none-win_amd64.whl",
         "specifier": null,
         "status": "unsupported-url",
         "url": null,

@@ -23,18 +23,22 @@ class JSONFormatter(BaseFormatter):
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
 
         """
-        results = super().build(content, with_failures=with_failures, with_duplicates=with_duplicates)
+        results = super().build(
+            content,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates
+        )
 
         return {
             "analyzed": results.analyzed,
-            #TODO
-            #"duplicated": results.duplicated,
+            "duplicated": results.duplicated,
             "failures": results.failed,
         }
 
-    def print(self, content, with_failures=True, with_duplicates=True):
+    def print(self, content, with_failures=True, with_duplicates=True, indent=4):
         """
         Print out the analyzed and possibly failures
 
@@ -44,12 +48,21 @@ class JSONFormatter(BaseFormatter):
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
         """
         self.printer_call(
-            json.dumps(self.build(content, with_failures=with_failures, with_duplicates=with_duplicates), indent=4)
+            json.dumps(
+                self.build(
+                    content,
+                    with_failures=with_failures,
+                    with_duplicates=with_duplicates
+                ),
+                indent=indent
+            )
         )
 
-    def write(self, content, destination, with_failures=True, with_duplicates=True):
+    def write(self, content, destination, with_failures=True, with_duplicates=True,
+              indent=None):
         """
         Write the analyzed and possibly failures into destination file.
 
@@ -59,12 +72,20 @@ class JSONFormatter(BaseFormatter):
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
 
         Return:
             Path: Path of created file.
         """
         destination.write_text(
-            json.dumps(self.build(content, with_failures=with_failures, with_duplicates=with_duplicates))
+            json.dumps(
+                self.build(
+                    content,
+                    with_failures=with_failures,
+                    with_duplicates=with_duplicates
+                ),
+                indent=indent
+            )
         )
 
         return destination

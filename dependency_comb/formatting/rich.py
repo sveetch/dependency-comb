@@ -97,8 +97,13 @@ class RichFormatter(BaseStringFormatter):
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
         """
-        results = self.build(content, with_failures=with_failures, with_duplicates=with_duplicates)
+        results = self.build(
+            content,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates
+        )
 
         console = Console(width=300, file=destination)
         group_items = []
@@ -115,11 +120,15 @@ class RichFormatter(BaseStringFormatter):
                 Panel(results.failed, title="[red]Failures[/red]", expand=False)
             )
 
-        #if results.duplicated:
-            #group_items.append(Padding("", (1, 2), expand=False))
-            #group_items.append(
-                #Panel(results.duplicated, title="[orange]Failures[/orange]", expand=False)
-            #)
+        if results.duplicated:
+            group_items.append(Padding("", (1, 2), expand=False))
+            group_items.append(
+                Panel(
+                    results.duplicated,
+                    title="[orange]Failures[/orange]",
+                    expand=False
+                )
+            )
 
         panel_group = Group(*group_items)
         console.print(panel_group)
@@ -136,6 +145,7 @@ class RichFormatter(BaseStringFormatter):
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
 
         Return:
             Path: Path of created file.

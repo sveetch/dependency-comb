@@ -25,7 +25,7 @@ from dependency_comb.analyzer import DependenciesAnalyzer
             ("diskette", "diskette", "analyzed"),
             ("-r dev.txt", None, "unsupported-argument"),
             ("project-composer", "project-composer", "analyzed"),
-            ("project-composer==0.7.0", "project-composer", "duplicate"),
+            ("project-composer==0.7.0", "project-composer", "duplicated"),
             ("django>3.1,<=3.2", "django", "analyzed"),
             ("foo>1,foo<=2", None, "invalid"),
             ("boussole ; python_version < \"2.7\"", "boussole", "analyzed"),
@@ -128,7 +128,7 @@ def test_statistics(settings):
         "creation_date": datetime.datetime(2024, 7, 25, 10),
         "packages": {
             "analyzed": 3,
-            "duplicate": 1,
+            "duplicated": 1,
             "invalid": 3,
             "lates": 2,
             "total": 7,
@@ -145,7 +145,7 @@ def test_statistics(settings):
         "creation_date": datetime.datetime(2024, 7, 25, 10),
         "packages": {
             "analyzed": 4,
-            "duplicate": 1,
+            "duplicated": 1,
             "invalid": 2,
             "lates": 2,
             "total": 7,

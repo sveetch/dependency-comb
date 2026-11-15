@@ -14,7 +14,7 @@ def test_from_file(settings):
     Parser should be able to parse requirements with valid Pip syntax from a file then
     return requirements objects.
     """
-    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    sample_source = settings.fixtures_path / "requirements/basic.txt"
     expected = settings.fixtures_path / "parsed_requirements_basic.json"
     parser = RequirementParser()
 
@@ -33,7 +33,7 @@ def test_from_file_without_basepath(settings):
     Parser should be able to parse requirements with valid Pip syntax from a file
     without basepath then return requirements objects.
     """
-    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    sample_source = settings.fixtures_path / "requirements/basic.txt"
     expected = settings.fixtures_path / "parsed_requirements_basic.json"
     parser = RequirementParser()
 
@@ -58,7 +58,7 @@ def test_from_string(settings):
     Parser should be able to parse requirements with valid Pip syntax from a string
     then return requirements objects.
     """
-    sample_source = settings.fixtures_path / "requirements_basic.txt"
+    sample_source = settings.fixtures_path / "requirements/basic.txt"
     expected = settings.fixtures_path / "parsed_requirements_basic.json"
     parser = RequirementParser()
 
@@ -217,7 +217,7 @@ def test_circular(settings):
         [
             ("Django", "", "parsed"),
             ("emencia-django-staticpages", "", "parsed"),
-            ("Django", "", "duplicate"),
+            ("Django", "", "duplicated"),
         ],
     ),
     (
@@ -229,7 +229,7 @@ def test_circular(settings):
         [
             ("Django", "==5.2", "parsed"),
             ("emencia-django-staticpages", "", "parsed"),
-            ("Django", "==5.2", "duplicate"),
+            ("Django", "==5.2", "duplicated"),
         ],
     ),
     (
@@ -242,8 +242,8 @@ def test_circular(settings):
         [
             ("Django", "==6.0,>=5.2", "parsed"),
             ("emencia-django-staticpages", "", "parsed"),
-            ("Django", ">=5.2", "duplicate"),
-            ("Django", "==6.0", "duplicate"),
+            ("Django", ">=5.2", "duplicated"),
+            ("Django", "==6.0", "duplicated"),
         ],
     ),
     (
@@ -256,10 +256,10 @@ def test_circular(settings):
         ],
         [
             ("Django", "<6.1,>=3.2,>=4.2,>=5.2", "parsed"),
-            ("Django", ">=3.2", "duplicate"),
-            ("Django", ">=4.2", "duplicate"),
-            ("Django", ">=5.2", "duplicate"),
-            ("Django", "<6.1", "duplicate"),
+            ("Django", ">=3.2", "duplicated"),
+            ("Django", ">=4.2", "duplicated"),
+            ("Django", ">=5.2", "duplicated"),
+            ("Django", "<6.1", "duplicated"),
         ],
     ),
 ])

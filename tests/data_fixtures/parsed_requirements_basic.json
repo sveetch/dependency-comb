@@ -1,7 +1,7 @@
 [
     {
         "source": "django>=1.11,<1.12",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 2,
         "extras": [],
         "highest_published": null,
@@ -23,7 +23,7 @@
     },
     {
         "source": "Pillow>=3.1.1 # With useless comment",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 3,
         "extras": [],
         "highest_published": null,
@@ -45,7 +45,7 @@
     },
     {
         "source": "djangorestframework",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 4,
         "extras": [],
         "highest_published": null,
@@ -67,7 +67,7 @@
     },
     {
         "source": "django-admin-shortcuts==1.2.6",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 6,
         "extras": [],
         "highest_published": null,
@@ -89,7 +89,7 @@
     },
     {
         "source": "requests [security] >= 2.8.1, == 2.8.* ; python_version < \"2.7\"",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 8,
         "extras": [
             "security"
@@ -113,7 +113,7 @@
     },
     {
         "source": "urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 9,
         "extras": [],
         "highest_published": null,
@@ -135,7 +135,7 @@
     },
     {
         "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 12,
         "extras": null,
         "highest_published": null,
@@ -157,7 +157,7 @@
     },
     {
         "source": "http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3.dev1820+49a8884-cp34-none-win_amd64.whl",
-        "origin": "requirements_basic.txt",
+        "origin": "requirements/basic.txt",
         "lineno": 15,
         "extras": null,
         "highest_published": null,

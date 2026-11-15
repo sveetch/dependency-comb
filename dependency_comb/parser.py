@@ -141,7 +141,7 @@ class RequirementParser:
             else:
                 # If satisfiable, set duplicate status and update initial occurence
                 # specifier
-                package.status = "duplicate"
+                package.status = "duplicated"
                 self.package_registry[package.name].specifier = combined_specifier
 
             return True

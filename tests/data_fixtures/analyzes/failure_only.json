@@ -1,5 +1,8 @@
 [
     {
+        "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
+        "origin": "requirements/failure_only.txt",
+        "lineno": 2,
         "extras": null,
         "highest_published": null,
         "highest_version": null,
@@ -10,7 +13,6 @@
         "parsed": null,
         "pypi_url": null,
         "repository_url": null,
-        "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
         "specifier": null,
         "status": "unsupported-localpath",
         "url": null,

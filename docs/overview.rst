@@ -157,7 +157,7 @@ Demonstration
 
 With the following requirements file ``requirements.txt``:
 
-.. include:: ../tests/data_fixtures/requirements_basic.txt
+.. include:: ../tests/data_fixtures/requirements/basic.txt
     :code: text
 
 We can build a report like this: ::

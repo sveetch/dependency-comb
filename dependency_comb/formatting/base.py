@@ -13,7 +13,8 @@ from ..models.package import STATUS_LABELS
 
 BuiltResults = namedtuple(
     "BuiltResults",
-    ["analyzed", "duplicated", "failed"]
+    ["analyzed", "duplicated", "failed"],
+    defaults=[[], [], []]
 )
 
 
@@ -145,11 +146,9 @@ class BaseFormatter:
         Returns:
             list: A list of dictionnaries for each processed items.
         """
-        analyzed_items = [v for v in items if v["status"] == "analyzed"]
-
         rows = []
 
-        for i, item in enumerate(analyzed_items, start=1):
+        for i, item in enumerate(items, start=1):
             lateness = len(item["lateness"]) if item["lateness"] else "-"
 
             label, age = self.get_required_release(item)
@@ -176,6 +175,8 @@ class BaseFormatter:
                 "latest_activity": latest_activity,
                 "release_label": label,
                 "release_age": age,
+                "lineno": item["lineno"],
+                "origin": item["origin"],
             })
 
         return rows
@@ -183,8 +184,22 @@ class BaseFormatter:
     def build_duplicates_table(self, items):
         """
         TODO: Build a table of duplicated items
+
+        TODO:
+            * Need dedicated test
         """
+        #TODO
         rows = []
+
+        for i, item in enumerate(items, start=1):
+            rows.append({
+                "key": i,
+                "name": item["name"],
+                "source": item["source"],
+                "specifier": item["specifier"],
+                "lineno": item["lineno"],
+                "origin": item["origin"],
+            })
 
         return rows
 
@@ -192,30 +207,24 @@ class BaseFormatter:
         """
         Build the information table for failed requirements analyze.
 
-        Because failures can be some long local paths, source name is wrapped on
-        two lines if it is over 40 characters, it means a source of +80 characters will
-        be cut to 80.
-
-        TODO: Add line number and possible origin in item data.
+        Because failures can have some long string (url, error reason, etc..), source
+        and resume are wrapped on two lines if they are over 40 characters, it means
+        a string of +80 characters will be cut to 80.
 
         Arguments:
-            items (list): List of requirement dict as returned from Analyzer. All items
-                are processed except the ones with status ``analyzed``.
+            items (list): List of requirement (dict) as returned from Analyzer and
+            already filtered to only include failures.
 
         Returns:
             list: A list of dictionnaries for each processed items. Dict items
             ``source`` and ``resume`` will be wrapped to fit on line of 40 characters
             max and only for two lines (all other lines are replaced with an elipsis).
         """
-        # TODO: Filtering upstream from build() would be more efficient (same with
-        # analyzed, duplicated, etc..)
-        ignored_items = [v for v in items if v["status"] != "analyzed"]
-
         rows = []
         wrapper = TextWrapper(width=40, max_lines=2, placeholder="")
         default_label = STATUS_LABELS["unknown"]
 
-        for i, item in enumerate(ignored_items, start=1):
+        for i, item in enumerate(items, start=1):
             status = item["status"]
 
             resume = STATUS_LABELS.get(status, default_label)
@@ -227,6 +236,8 @@ class BaseFormatter:
                 "source": wrapper.fill(item["source"]),
                 "status": status,
                 "resume": wrapper.fill(resume),
+                "lineno": item["lineno"],
+                "origin": item["origin"],
             })
 
         return rows
@@ -249,17 +260,25 @@ class BaseFormatter:
         """
         data = self.open_content(content)
 
+        # NOTE: This is not efficient as it could be since we iterate again the same
+        # list for each kind of table
         results = BuiltResults(
-            analyzed=self.build_analyzed_table(data),
+            analyzed=self.build_analyzed_table(
+                [v for v in data if v["status"] == "analyzed"]
+            ),
             duplicated=(
                 []
                 if with_duplicates is False
-                else self.build_duplicates_table(data)
+                else self.build_duplicates_table(
+                    [v for v in data if v["status"] == "duplicated"]
+                )
             ),
             failed=(
                 []
                 if with_failures is False
-                else self.build_errors_table(data)
+                else self.build_errors_table(
+                    [v for v in data if v["status"] not in ("analyzed", "duplicated")]
+                )
             )
         )
 
@@ -278,8 +297,13 @@ class BaseFormatter:
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
         """
-        results = self.build(content, with_failures=with_failures, with_duplicates=with_duplicates)
+        results = self.build(
+            content,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates
+        )
 
         if results.analyzed:
             self.printer_call(results.analyzed)
@@ -287,9 +311,8 @@ class BaseFormatter:
         if results.failed:
             self.printer_call(results.failed)
 
-        #TODO
-        #if results.duplicated:
-            #self.printer_call(results.duplicated)
+        if results.duplicated:
+            self.printer_call(results.duplicated)
 
     def write(self, content, destination, with_failures=True, with_duplicates=True):
         """
@@ -301,11 +324,16 @@ class BaseFormatter:
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
 
         Return:
             Path: Path of created file.
         """
-        results = self.build(content, with_failures=with_failures, with_duplicates=with_duplicates)
+        results = self.build(
+            content,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates
+        )
 
         # Base output type fit to 'succeeds' type because different formatter
         if isinstance(results.analyzed, str):
@@ -319,9 +347,8 @@ class BaseFormatter:
         if results.failed:
             output += results.failed
 
-        #TODO
-        #if results.duplicated:
-            #output += results.duplicated
+        if results.duplicated:
+            output += results.duplicated
 
         # Write merged built lists as JSON
         destination.write_text(self.serialize_output(output))
@@ -333,7 +360,7 @@ class BaseStringFormatter(BaseFormatter):
     """
     Alternative base formatter where content is assumed to be written as a string.
 
-    This is commonly the one to inherit from because BaseFormatter is intended for
+    This is commonly the one to inherit because BaseFormatter is intended for
     formatters that need to conserve Python objects.
     """
     def serialize_output(self, content):

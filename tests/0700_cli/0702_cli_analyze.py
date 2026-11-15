@@ -61,7 +61,7 @@ def test_analyze_from_file(caplog, settings):
     from file path. We use cache to speed up tests.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    requirements_file = settings.fixtures_path / "requirements_basic.txt"
+    requirements_file = settings.fixtures_path / "requirements/basic.txt"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -134,7 +134,7 @@ def test_analyze_with_env(caplog, settings):
     environment.
     """
     cachedir = settings.fixtures_path / "api_cache"
-    requirements_file = settings.fixtures_path / "requirements_basic.txt"
+    requirements_file = settings.fixtures_path / "requirements/basic.txt"
     environment_file = settings.fixtures_path / "env_requirements.json"
 
     runner = CliRunner()

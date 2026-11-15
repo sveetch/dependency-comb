@@ -63,8 +63,17 @@ def test_build_analyzed_table(settings):
     """
     Method should build a list of dictionnaries for all items with status 'analyzed'.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    analyze_content = json.loads(analyze.read_text())
+    analyze = settings.fixtures_path / "analyzes/success_only.json"
+    analyze_content = [
+        v
+        for v in json.loads(analyze.read_text())
+        if v["status"] == "analyzed"
+    ]
+    # Use formatted dump but only use the analyzed part
+    formatted_analyzed = json.loads(
+        (settings.fixtures_path / "formatted/with_failures.json").read_text()
+    )["analyzed"]
+
     formatter = BaseFormatter()
 
     output = formatter.build_analyzed_table(analyze_content)
@@ -77,69 +86,58 @@ def test_build_analyzed_table(settings):
             "latest_release": "5.1.2 - 2 months ago",
             "latest_activity": "2 months",
             "release_label": "1.11.9",
-            "release_age": "6 years"
+            "release_age": "6 years",
+            "lineno": 2,
+            "origin": "requirements/success_only.txt"
+        },
+    ]
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_build_duplicates_table(settings):
+    """
+    Method should build a list of dictionnaries for given items.
+    """
+    analyze = settings.fixtures_path / "analyzes/basic_with_duplicates.json"
+    analyze_content = [
+        v
+        for v in json.loads(analyze.read_text())
+        if v["status"] == "duplicated"
+    ]
+    formatter = BaseFormatter()
+
+    output = formatter.build_duplicates_table(analyze_content)
+    assert output == [
+        {
+            "key": 1,
+            "name": "django",
+            "source": "django<1.12",
+            "specifier": "<1.12",
+            "lineno": 17,
+            "origin": "requirements/basic_with_duplicates.txt",
         },
         {
             "key": 2,
-            "name": "Pillow",
-            "lateness": 6,
-            "resolved_version": "9.5.0 - 1 year, 4 months ago",
-            "latest_release": "10.4.0 - A month ago",
-            "latest_activity": "a month",
-            "release_label": "9.5.0",
-            "release_age": "1 year, 4 months"
-        },
-        {
-            "key": 3,
-            "name": "djangorestframework",
-            "lateness": "-",
-            "resolved_version": "Latest",
-            "latest_release": "3.15.2 - A month ago",
-            "latest_activity": "a month",
-            "release_label": "Latest",
-            "release_age": None
-        },
-        {
-            "key": 4,
             "name": "django-admin-shortcuts",
-            "lateness": 6,
-            "resolved_version": "1.2.6 - 9 years ago",
-            "latest_release": "3.0.1 - 4 days ago",
-            "latest_activity": "4 days",
-            "release_label": "1.2.6",
-            "release_age": "9 years"
+            "source": "django-admin-shortcuts",
+            "specifier": "",
+            "lineno": 18,
+            "origin": "requirements/basic_with_duplicates.txt",
         },
-        {
-            "key": 5,
-            "name": "requests",
-            "lateness": 55,
-            "resolved_version": "2.8.1 - 8 years ago",
-            "latest_release": "2.32.3 - 2 months ago",
-            "latest_activity": "2 months",
-            "release_label": "2.8.1",
-            "release_age": "8 years"
-        },
-        {
-            "key": 6,
-            "name": "urllib3",
-            "lateness": "-",
-            "resolved_version": "Latest",
-            "latest_release": "2.2.3 - 2 months ago",
-            "latest_activity": "2 months",
-            "release_label": "Latest",
-            "release_age": None
-        }
     ]
 
 
 @freeze_time("2024-07-25 10:00:00")
 def test_build_errors_table(settings):
     """
-    Method should build a list of dictionnaries for all items except the ones with
-    status 'analyzed'.
+    Method should build a list of dictionnaries for given items.
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
-    analyze_content = json.loads(analyze.read_text())
+    analyze_content = [
+        v
+        for v in json.loads(analyze.read_text())
+        if v["status"] not in ("analyzed", "duplicated")
+    ]
     formatter = BaseFormatter()
 
     output = formatter.build_errors_table(analyze_content)
@@ -148,13 +146,17 @@ def test_build_errors_table(settings):
             "key": 1,
             "source": "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
             "status": "unsupported-localpath",
-            "resume": "Local package is not supported"
+            "resume": "Local package is not supported",
+            "lineno": 12,
+            "origin": "requirements/basic.txt"
         },
         {
             "key": 2,
             "source": "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
             "status": "unsupported-url",
-            "resume": "Direct package URL is not supported"
+            "resume": "Direct package URL is not supported",
+            "lineno": 15,
+            "origin": "requirements/basic.txt"
         }
     ]
 
@@ -229,97 +231,39 @@ def test_print(settings):
     """
     Printer method should write its result outputs into given printer function.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
+    analyze = settings.fixtures_path / "analyzes/minimal_success_and_failure.json"
     analyze_content = json.loads(analyze.read_text())
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
 
     def receiver(content, *args, **kwargs):
-        output.append(content)
+        output.extend(content)
 
     formatter = BaseFormatter(printer=receiver)
     formatter.print(analyze_content, with_failures=True)
 
     assert output == [
-        [
-            {
-                "key": 1,
-                "name": "django",
-                "lateness": 187,
-                "resolved_version": "1.11.9 - 6 years ago",
-                "latest_release": "5.1.2 - 2 months ago",
-                "latest_activity": "2 months",
-                "release_label": "1.11.9",
-                "release_age": "6 years"
-            },
-            {
-                "key": 2,
-                "name": "Pillow",
-                "lateness": 6,
-                "resolved_version": "9.5.0 - 1 year, 4 months ago",
-                "latest_release": "10.4.0 - A month ago",
-                "latest_activity": "a month",
-                "release_label": "9.5.0",
-                "release_age": "1 year, 4 months"
-            },
-            {
-                "key": 3,
-                "name": "djangorestframework",
-                "lateness": "-",
-                "resolved_version": "Latest",
-                "latest_release": "3.15.2 - A month ago",
-                "latest_activity": "a month",
-                "release_label": "Latest",
-                "release_age": None
-            },
-            {
-                "key": 4,
-                "name": "django-admin-shortcuts",
-                "lateness": 6,
-                "resolved_version": "1.2.6 - 9 years ago",
-                "latest_release": "3.0.1 - 4 days ago",
-                "latest_activity": "4 days",
-                "release_label": "1.2.6",
-                "release_age": "9 years"
-            },
-            {
-                "key": 5,
-                "name": "requests",
-                "lateness": 55,
-                "resolved_version": "2.8.1 - 8 years ago",
-                "latest_release": "2.32.3 - 2 months ago",
-                "latest_activity": "2 months",
-                "release_label": "2.8.1",
-                "release_age": "8 years"
-            },
-            {
-                "key": 6,
-                "name": "urllib3",
-                "lateness": "-",
-                "resolved_version": "Latest",
-                "latest_release": "2.2.3 - 2 months ago",
-                "latest_activity": "2 months",
-                "release_label": "Latest",
-                "release_age": None
-            }
-        ],
-        [
-            {
-                "key": 1,
-                "source": "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
-                "status": "unsupported-localpath",
-                "resume": "Local package is not supported"
-            },
-            {
-                "key": 2,
-                "source": (
-                    "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-"
-                ),
-                "status": "unsupported-url",
-                "resume": "Direct package URL is not supported"
-            }
-        ]
+        {
+            "key": 1,
+            "name": "django",
+            "lateness": 187,
+            "resolved_version": "1.11.9 - 6 years ago",
+            "latest_release": "5.1.2 - 2 months ago",
+            "latest_activity": "2 months",
+            "release_label": "1.11.9",
+            "release_age": "6 years",
+            "lineno": 2,
+            "origin": "requirements/minimal_success_and_failure.txt"
+        },
+        {
+            "key": 1,
+            "source": "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
+            "status": "unsupported-localpath",
+            "resume": "Local package is not supported",
+            "lineno": 5,
+            "origin": "requirements/minimal_success_and_failure.txt"
+        },
     ]
 
 
@@ -329,7 +273,7 @@ def test_write(settings, tmp_path):
     Base writer method should write its result outputs as JSON into given file
     destination.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
+    analyze = settings.fixtures_path / "analyzes/minimal_success_and_failure.json"
     analyze_content = json.loads(analyze.read_text())
     destination = tmp_path / "output.json"
 
@@ -345,68 +289,16 @@ def test_write(settings, tmp_path):
             "latest_release": "5.1.2 - 2 months ago",
             "latest_activity": "2 months",
             "release_label": "1.11.9",
-            "release_age": "6 years"
-        },
-        {
-            "key": 2,
-            "name": "Pillow",
-            "lateness": 6,
-            "resolved_version": "9.5.0 - 1 year, 4 months ago",
-            "latest_release": "10.4.0 - A month ago",
-            "latest_activity": "a month",
-            "release_label": "9.5.0",
-            "release_age": "1 year, 4 months"
-        },
-        {
-            "key": 3,
-            "name": "djangorestframework",
-            "lateness": "-",
-            "resolved_version": "Latest",
-            "latest_release": "3.15.2 - A month ago",
-            "latest_activity": "a month",
-            "release_label": "Latest",
-            "release_age": None
-        },
-        {
-            "key": 4,
-            "name": "django-admin-shortcuts",
-            "lateness": 6,
-            "resolved_version": "1.2.6 - 9 years ago",
-            "latest_release": "3.0.1 - 4 days ago",
-            "latest_activity": "4 days",
-            "release_label": "1.2.6",
-            "release_age": "9 years"
-        },
-        {
-            "key": 5,
-            "name": "requests",
-            "lateness": 55,
-            "resolved_version": "2.8.1 - 8 years ago",
-            "latest_release": "2.32.3 - 2 months ago",
-            "latest_activity": "2 months",
-            "release_label": "2.8.1",
-            "release_age": "8 years"
-        },
-        {
-            "key": 6,
-            "name": "urllib3",
-            "lateness": "-",
-            "resolved_version": "Latest",
-            "latest_release": "2.2.3 - 2 months ago",
-            "latest_activity": "2 months",
-            "release_label": "Latest",
-            "release_age": None
+            "release_age": "6 years",
+            "lineno": 2,
+            "origin": "requirements/minimal_success_and_failure.txt"
         },
         {
             "key": 1,
             "source": "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
             "status": "unsupported-localpath",
-            "resume": "Local package is not supported"
+            "resume": "Local package is not supported",
+            "lineno": 5,
+            "origin": "requirements/minimal_success_and_failure.txt"
         },
-        {
-            "key": 2,
-            "source": "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
-            "status": "unsupported-url",
-            "resume": "Direct package URL is not supported"
-        }
     ]

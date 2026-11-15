@@ -507,7 +507,7 @@ class DependenciesAnalyzer(RequirementParser):
             "creation_date": self.now_date,
             "packages": {
                 "analyzed": 0,
-                "duplicate": 0,
+                "duplicated": 0,
                 "invalid": 0,
                 "lates": 0,
             },
@@ -537,12 +537,12 @@ class DependenciesAnalyzer(RequirementParser):
 
                     if pkginfos.lateness:
                         self.statistics["packages"]["lates"] += 1
-                elif pkginfos.status == "duplicate":
-                    self.statistics["packages"]["duplicate"] += 1
+                elif pkginfos.status == "duplicated":
+                    self.statistics["packages"]["duplicated"] += 1
                 else:
                     self.statistics["packages"]["invalid"] += 1
 
-                # Yield the package if valid or strict is disabled
+                # Yield the package if valid or if strict is disabled
                 if not strict or (strict and pkginfos.is_valid):
                     yield pkginfos
 
@@ -555,7 +555,7 @@ class DependenciesAnalyzer(RequirementParser):
             self.statistics["packages"]["total"] = (
                 self.statistics["packages"]["analyzed"]
                 + self.statistics["packages"]["invalid"]
-                + self.statistics["packages"]["duplicate"]
+                + self.statistics["packages"]["duplicated"]
             )
 
             # Set project status according to final stats

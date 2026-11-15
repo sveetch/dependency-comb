@@ -123,7 +123,63 @@ def test_parser_valid(source, parsed_name, parsed_url):
 def test_parser_invalid(source, parsed_name):
     """
     All expected invalid requirement line formats should return invalid package object.
+
+    TODO: Relevant invalid syntax pulled out of rst format tests: ::
+        [
+            {
+                "marker": None,
+                "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
+                "specifier": None,
+                "status": "unsupported-localpath",
+                "parsing_error": None
+            },
+            {
+                "marker": None,
+                "source": "http://wxpython.org/Phoenix/wxPython.whl",
+                "specifier": None,
+                "status": "unsupported-url",
+                "parsing_error": None
+            },
+            {
+                "marker": None,
+                "source": "requests[security]>=2.8.1; python_version < \"2.7\"",
+                "specifier": None,
+                "status": "marker-reject",
+                "parsing_error": None
+            },
+            {
+                "marker": None,
+                "source": "-c constraints.txt",
+                "specifier": None,
+                "status": "unsupported-argument",
+                "parsing_error": None
+            },
+            {
+                "marker": None,
+                "source": "-~@élé",
+                "specifier": None,
+                "status": "invalid",
+                "parsing_error": None
+            },
+            {
+                "marker": None,
+                "source": "-~@àlà",
+                "specifier": None,
+                "status": "invalid",
+                "parsing_error": (
+                    "This could be an exception error title without the long traceback"
+                ),
+            },
+            {
+                "marker": None,
+                "source": "nope",
+                "specifier": None,
+                "status": "unknown",
+                "parsing_error": None
+            },
+        ]
     """
+    #TODO
     pkg = PackageRequirement(source)
     assert pkg.status == parsed_name
     assert pkg.name is None

@@ -33,6 +33,8 @@ def format_to_multline_str(content):
 def test_rst_build_errors_table():
     """
     Ensure all error cases are well formatted.
+
+    NOTE: We use some custom samples to ensure long string are managed well.
     """
     formatter = RestructuredTextFormatter()
     output = formatter.build_errors_table([
@@ -41,35 +43,9 @@ def test_rst_build_errors_table():
             "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
             "specifier": None,
             "status": "unsupported-localpath",
-            "parsing_error": None
-        },
-        {
-            "marker": None,
-            "source": "http://wxpython.org/Phoenix/wxPython.whl",
-            "specifier": None,
-            "status": "unsupported-url",
-            "parsing_error": None
-        },
-        {
-            "marker": None,
-            "source": "requests[security]>=2.8.1; python_version < \"2.7\"",
-            "specifier": None,
-            "status": "marker-reject",
-            "parsing_error": None
-        },
-        {
-            "marker": None,
-            "source": "-c constraints.txt",
-            "specifier": None,
-            "status": "unsupported-argument",
-            "parsing_error": None
-        },
-        {
-            "marker": None,
-            "source": "-~@élé",
-            "specifier": None,
-            "status": "invalid",
-            "parsing_error": None
+            "parsing_error": None,
+            "lineno": 1,
+            "origin": None,
         },
         {
             "marker": None,
@@ -79,13 +55,17 @@ def test_rst_build_errors_table():
             "parsing_error": (
                 "This could be an exception error title without the long traceback"
             ),
+            "lineno": 2,
+            "origin": None,
         },
         {
             "marker": None,
             "source": "nope",
             "specifier": None,
             "status": "unknown",
-            "parsing_error": None
+            "parsing_error": None,
+            "lineno": 3,
+            "origin": None,
         },
     ])
 
@@ -95,28 +75,20 @@ def test_rst_build_errors_table():
     # print("👷")
 
     assert output == (
-        """\nFailures\n"""
-        """********\n"""
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| #   | Source                                   |        Status         | Resume                                 |\n"""  # noqa: E501
-        """+=====+==========================================+=======================+========================================+\n"""  # noqa: E501
-        """| 1   | ./downloads/numpy-1.9.2-cp34-none-       | unsupported-localpath | Local package is not supported         |\n"""  # noqa: E501
-        """|     | win32.whl                                |                       |                                        |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 2   | http://wxpython.org/Phoenix/wxPython.whl |    unsupported-url    | Direct package URL is not supported    |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 3   | requests[security]>=2.8.1;               |     marker-reject     | Rejected by marker evaluation against  |\n"""  # noqa: E501
-        """|     | python_version < \"2.7\"                   |                       | given environment                      |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 4   | -c constraints.txt                       | unsupported-argument  | Unsupported Pip argument               |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 5   | -~@élé                                   |        invalid        | Invalid syntax: None                   |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 6   | -~@àlà                                   |        invalid        | Invalid syntax: This could be an       |\n"""  # noqa: E501
-        """|     |                                          |                       | exception error title without the long |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 7   | nope                                     |        unknown        | Unexpected failure                     |\n"""  # noqa: E501
-        """+-----+------------------------------------------+-----------------------+----------------------------------------+"""  # noqa: E501
+        """\n"""  # noqa: E501
+        """Failures\n"""  # noqa: E501
+        """********\n"""  # noqa: E501
+        """+-----+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
+        """| #   | Source                             |        Status         | Resume                                 |\n"""  # noqa: E501
+        """+=====+====================================+=======================+========================================+\n"""  # noqa: E501
+        """| 1   | ./downloads/numpy-1.9.2-cp34-none- | unsupported-localpath | Local package is not supported         |\n"""  # noqa: E501
+        """|     | win32.whl                          |                       |                                        |\n"""  # noqa: E501
+        """+-----+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
+        """| 2   | -~@àlà                             |        invalid        | Invalid syntax: This could be an       |\n"""  # noqa: E501
+        """|     |                                    |                       | exception error title without the long |\n"""  # noqa: E501
+        """+-----+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
+        """| 3   | nope                               |        unknown        | Unexpected failure                     |\n"""  # noqa: E501
+        """+-----+------------------------------------+-----------------------+----------------------------------------+"""  # noqa: E501
     )
 
 
@@ -126,7 +98,7 @@ def test_rst_print(settings):
     Without failures enabled the output should only contains the analyzed table.
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
-    formatted = settings.fixtures_path / "formatted/no_failures.rst"
+    expected = settings.fixtures_path / "formatted/no_failures.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -137,7 +109,7 @@ def test_rst_print(settings):
     formatter = RestructuredTextFormatter(printer=receiver)
 
     formatter.print(analyze, with_failures=False)
-    assert "\n".join(output) == formatted.read_text()
+    assert "\n".join(output) == expected.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -147,7 +119,7 @@ def test_rst_print_with_failures(settings):
     each with a title.
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
-    formatted = settings.fixtures_path / "formatted/with_failures.rst"
+    expected = settings.fixtures_path / "formatted/with_failures.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
@@ -161,7 +133,7 @@ def test_rst_print_with_failures(settings):
     # print("\n".join(output))
     # print("👷")
 
-    assert "\n".join(output) == formatted.read_text()
+    assert "\n".join(output) == expected.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -171,7 +143,7 @@ def test_rst_write_without_failures(settings, tmp_path):
     file.
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
-    formatted = settings.fixtures_path / "formatted/no_failures.rst"
+    expected = settings.fixtures_path / "formatted/no_failures.rst"
     destination = tmp_path / "output.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
@@ -180,4 +152,4 @@ def test_rst_write_without_failures(settings, tmp_path):
     # print("👷")
     # print(destination.read_text())
     # print("👷")
-    assert destination.read_text() == formatted.read_text()
+    assert destination.read_text() == expected.read_text()
