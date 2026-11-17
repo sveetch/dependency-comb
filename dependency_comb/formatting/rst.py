@@ -74,7 +74,7 @@ class RestructuredTextFormatter(BaseStringFormatter):
                     else "{}:{}".format(item["origin"], item["lineno"])
                 ),
                 item["name"],
-                item["specifier"],
+                item["specifier"] or "-",
                 item["source"],
             ]
             for item in results

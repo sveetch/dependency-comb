@@ -49,6 +49,47 @@ class RichFormatter(BaseStringFormatter):
 
         return table
 
+    def build_duplicates_table(self, items):
+        """
+        Build the information table for duplicated requirements.
+
+        Arguments:
+            items (list): List of requirement dict as returned from Analyzer. Given
+                items could have any status despite not very useful for properly
+                analyzed items.
+
+        Returns:
+            rich.table.Table: A Rich table object with duplicated requirements.
+        """
+        results = super().build_duplicates_table(items)
+
+        if not results:
+            return None
+
+        table = Table(
+            "#",
+            "Origin",
+            "Name",
+            "Version",
+            "Source",
+            box=box.MINIMAL_HEAVY_HEAD,
+        )
+
+        for item in results:
+            table.add_row(
+                str(item["key"]),
+                (
+                    "<string>:{}".format(item["lineno"])
+                    if not item["origin"]
+                    else "{}:{}".format(item["origin"], item["lineno"])
+                ),
+                item["name"],
+                item["specifier"] or "-",
+                item["source"],
+            )
+
+        return table
+
     def build_errors_table(self, items):
         """
         Build the information table for failed requirements analyze.
@@ -89,8 +130,6 @@ class RichFormatter(BaseStringFormatter):
         """
         Print out the analyzed and possible failures
 
-        TODO: Console width should not be hardcoded
-
         Arguments:
             content (Path or string or list): JSON content as built from Analyzer. See
                 ``BaseFormatter.open_content()`` doc for more details.
@@ -105,7 +144,7 @@ class RichFormatter(BaseStringFormatter):
             with_duplicates=with_duplicates
         )
 
-        console = Console(width=300, file=destination)
+        console = Console(width=kwargs.get("width", 300), file=destination)
         group_items = []
 
         if results.analyzed:
@@ -125,7 +164,7 @@ class RichFormatter(BaseStringFormatter):
             group_items.append(
                 Panel(
                     results.duplicated,
-                    title="[orange]Failures[/orange]",
+                    title="[yellow]Duplicated[/yellow]",
                     expand=False
                 )
             )
@@ -155,7 +194,8 @@ class RichFormatter(BaseStringFormatter):
             content,
             destination=destination.open("w"),
             with_failures=with_failures,
-            with_duplicates=with_duplicates
+            with_duplicates=with_duplicates,
+            **kwargs
         )
 
         return destination
