@@ -119,7 +119,7 @@ class PackageRequirement(ExportMixin):
             parsed from source.
         url (string): Possible mirror URL parsed from source.
         extras (set): Possible parsed set of extras environ names from source.
-        parsing_error (object): The exception object raise from
+        parsing_error (object): The exception object raised from
             ``packaging.Requirement`` when there was a parsing error.
     """
     EXPORT_PRIVATES: ClassVar[tuple[str]] = ("environment",)

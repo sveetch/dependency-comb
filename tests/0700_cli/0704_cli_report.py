@@ -30,23 +30,36 @@ def test_report_default(caplog):
 def test_report_with_failures_from_stdin(caplog, settings):
     """
     Command should succeed to analyze from standard input and return a full
-    RST format with failures included.
+    JSON format with failures included.
+
+    NOTE: We use JSON format because it is easier to patch origin with stdin (no
+    origin) and expected dump (include an origin).
     """
     cachedir = settings.fixtures_path / "api_cache"
-    formatted = settings.fixtures_path / "formatted/with_failures.rst"
     requirements_file = settings.fixtures_path / "requirements/basic.txt"
+    formatted = settings.fixtures_path / "formatted/with_failures.json"
+    # Patch dump to nullify origin
+    expected = formatted.read_text().replace(
+        "\"origin\": \"requirements/basic.txt\"",
+        "\"origin\": null"
+    )
 
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["-v", "0", "report", "-", "--cachedir", str(cachedir)],
+        [
+            "-v", "0",
+            "report", "-",
+            "--format", "json",
+            "--cachedir", str(cachedir)
+        ],
         input=requirements_file.read_text()
     )
 
     assert result.exit_code == 0
     assert caplog.record_tuples == []
 
-    assert result.output == formatted.read_text() + "\n"
+    assert result.output == expected + "\n"
 
 
 @freeze_time("2024-07-25 10:00:00")
@@ -54,21 +67,35 @@ def test_report_no_failures_from_stdin(caplog, settings):
     """
     Command should succeed to analyze from standard input and return a
     RST format without failures included and titles. Logs are muted.
+
+    NOTE: We use JSON format because it is easier to patch origin with stdin (no
+    origin) and expected dump (include an origin).
     """
     cachedir = settings.fixtures_path / "api_cache"
-    formatted = settings.fixtures_path / "formatted/no_failures.rst"
     requirements_file = settings.fixtures_path / "requirements/basic.txt"
+    formatted = settings.fixtures_path / "formatted/no_failures.json"
+    # Patch dump to nullify origin
+    expected = formatted.read_text().replace(
+        "\"origin\": \"requirements/basic.txt\"",
+        "\"origin\": null"
+    )
 
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
-        ["-v", "0", "report", "-", "--no-failures", "--cachedir", str(cachedir)],
+        [
+            "-v", "0",
+            "report", "-",
+            "--no-failures",
+            "--format", "json",
+            "--cachedir", str(cachedir)
+        ],
         input=requirements_file.read_text()
     )
 
     assert result.exit_code == 0
 
-    assert result.output == formatted.read_text() + "\n"
+    assert result.output == expected + "\n"
 
     assert caplog.record_tuples == []
 
@@ -76,7 +103,7 @@ def test_report_no_failures_from_stdin(caplog, settings):
 @freeze_time("2024-07-25 10:00:00")
 def test_report_to_file(caplog, tmp_path, settings):
     """
-    Command should write JSON to a file instead of standard output and logging
+    Command should write RST to a file instead of standard output and logging
     some messages.
     """
     cachedir = settings.fixtures_path / "api_cache"

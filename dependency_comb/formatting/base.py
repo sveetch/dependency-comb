@@ -22,10 +22,10 @@ class BaseFormatter:
     """
     Base formatter abstract.
 
-    This is not a useful formatter since finally it will write computed data as
-    JSON with its ``write()`` method.
+    This formatter output Python objects and write them to JSON.
 
-    Concrete formatters would commonly prefer to inherit from ``BaseStringFormatter``.
+    Formatters intended to output string would rather prefer to inherit from
+    ``BaseStringFormatter``.
 
     Arguments:
         printer (callable): Function to use to print content. The function accept a
@@ -60,22 +60,6 @@ class BaseFormatter:
             klass(content, **opts)
         else:
             klass(content)
-
-    def serialize_output(self, content):
-        """
-        Serialize output to be written in a file.
-
-        Formatters should commonly override it because the default implementation here
-        serializes content with JSON because internally the content is just a list but
-        this is rarely the case with other formatters.
-
-        Arguments:
-            content (string or list): Content to serialize.
-
-        Returns:
-            string: JSON dump of given content.
-        """
-        return json.dumps(content)
 
     def open_content(self, content):
         """
@@ -183,12 +167,10 @@ class BaseFormatter:
 
     def build_duplicates_table(self, items):
         """
-        TODO: Build a table of duplicated items
+        Build a table of duplicated items
 
-        TODO:
-            * Need dedicated test
+        TODO: Item should be ordered. Ever on name then version, or origin then name.
         """
-        #TODO
         rows = []
 
         for i, item in enumerate(items, start=1):
@@ -287,9 +269,10 @@ class BaseFormatter:
 
         return results
 
-    def print(self, content, with_failures=True, with_duplicates=True):
+    def print(self, content, with_failures=True, with_duplicates=True,
+              **kwargs):
         """
-        Print out the analyzed and possibly failures
+        Print out the analyzed and possibly failures.
 
         Arguments:
             content (Path or string or list): JSON content as built from Analyzer. See
@@ -314,7 +297,8 @@ class BaseFormatter:
         if results.duplicated:
             self.printer_call(results.duplicated)
 
-    def write(self, content, destination, with_failures=True, with_duplicates=True):
+    def write(self, content, destination, with_failures=True, with_duplicates=True,
+              **kwargs):
         """
         Write the analyzed and possibly failures into destination file.
 
@@ -335,23 +319,20 @@ class BaseFormatter:
             with_duplicates=with_duplicates
         )
 
-        # Base output type fit to 'succeeds' type because different formatter
-        if isinstance(results.analyzed, str):
-            output = ""
-        else:
-            output = []
+        # Base output type adjust to 'content' type to fit different formatter
+        output = []
 
         if results.analyzed:
-            output += results.analyzed
+            output.extend(results.analyzed)
 
         if results.failed:
-            output += results.failed
+            output.extend(results.failed)
 
         if results.duplicated:
-            output += results.duplicated
+            output.extend(results.duplicated)
 
-        # Write merged built lists as JSON
-        destination.write_text(self.serialize_output(output))
+        # Write merged contents
+        destination.write_text(json.dumps(output))
 
         return destination
 
@@ -363,8 +344,41 @@ class BaseStringFormatter(BaseFormatter):
     This is commonly the one to inherit because BaseFormatter is intended for
     formatters that need to conserve Python objects.
     """
-    def serialize_output(self, content):
+    def write(self, content, destination, with_failures=True, with_duplicates=True,
+              **kwargs):
         """
-        No specific serialization since it should be already a string.
+        Write the analyzed and possibly failures into destination file.
+
+        Arguments:
+            content (Path or string or list): JSON content as built from Analyzer. See
+                ``BaseFormatter.open_content()`` doc for more details.
+
+        Keyword Arguments:
+            with_failures (boolean): To disable display of failures.
+            with_duplicates (boolean): To enable display of duplicates.
+
+        Return:
+            Path: Path of created file.
         """
-        return content
+        results = self.build(
+            content,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates
+        )
+
+        # Base output type adjust to 'content' type to fit different formatter
+        output = []
+
+        if results.analyzed:
+            output.append(results.analyzed)
+
+        if results.failed:
+            output.append(results.failed)
+
+        if results.duplicated:
+            output.append(results.duplicated)
+
+        # Write merged contents
+        destination.write_text("\n".join(output))
+
+        return destination

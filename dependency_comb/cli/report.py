@@ -114,9 +114,6 @@ def report_command(*args, **parameters):
     """
     Analyze and report informations about requirements.
 
-    Opposed to the 'analyze' command, the logs are not muted when there is no
-    destination file.
-
     Arguments:
 
     \b
@@ -179,6 +176,7 @@ def report_command(*args, **parameters):
             strict=False,
             basepath=basepath,
         )
+        # NOTE: We could just pass the package objects without serialize
         payload = [pkg.serialize() for pkg in packages]
     except DependencyCombError as e:
         logger.critical(e)

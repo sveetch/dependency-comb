@@ -59,7 +59,7 @@ def test_analyzer_build_inspection(settings, source, analyze):
 
 @pytest.mark.skip("Only to rebuild formatted analyzes")
 @freeze_time("2024-07-25 10:00:00.000000")
-@pytest.mark.parametrize("output_format", ["json"])  #, "rst", "rich"])
+@pytest.mark.parametrize("output_format", ["json", "rst"])  #, "rich"])
 def test_formatted_full(settings, output_format):
     """
     A non test routine to rebuild formatted fixture files for a format.
@@ -87,7 +87,7 @@ def test_formatted_full(settings, output_format):
 
     # Get formatter class related to format
     formatter_class = AVAILABLE_FORMATS[output_format]
-    formatter = formatter_class(printer=receiver)
+    formatter = formatter_class(printer=print)
 
     # Write all kind of output
     formatter.write(analyze, destination=formatted_full, with_failures=True, indent=4)
@@ -97,5 +97,7 @@ def test_formatted_full(settings, output_format):
 
     print("Fixture 'with_failures' wrote to:", formatted_full)
     print("Fixture 'no_failures' wrote to:", formatted_no_failures)
+
+    #formatter.print(analyze, with_failures=True)
 
     assert 1 == 42

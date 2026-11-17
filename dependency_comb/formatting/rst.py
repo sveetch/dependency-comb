@@ -13,8 +13,7 @@ class RestructuredTextFormatter(BaseStringFormatter):
 
         Arguments:
             items (list): List of requirement dict as returned from Analyzer. All
-                given items should have a status "analyzed" else it would lead to
-                unexpected results or even errors.
+                given items should have a status "analyzed".
 
         Returns:
             string: An ASCII table built from given items.
@@ -35,7 +34,7 @@ class RestructuredTextFormatter(BaseStringFormatter):
             for item in results
         ]
 
-        head = "Analyzed" + "\n" + ("*" * len("Analyzed")) + "\n"
+        head = "Analyzed" + "\n" + ("*" * len("Analyzed")) + "\n\n"
 
         return head + str(tabulate(
             rows,
@@ -50,14 +49,59 @@ class RestructuredTextFormatter(BaseStringFormatter):
             colalign=("left", "left", "center", "right", "right"),
         ))
 
+    def build_duplicates_table(self, items):
+        """
+        Build the information table for duplicated requirements.
+
+        Arguments:
+            items (list): List of requirement dict as returned from Analyzer. All
+                given items should have a status "duplicated".
+
+        Returns:
+            string: An ASCII table built from given items.
+        """
+        results = super().build_duplicates_table(items)
+
+        if not results:
+            return ""
+
+        rows = [
+            [
+                item["key"],
+                (
+                    "<string>:{}".format(item["lineno"])
+                    if not item["origin"]
+                    else "{}:{}".format(item["origin"], item["lineno"])
+                ),
+                item["name"],
+                item["specifier"],
+                item["source"],
+            ]
+            for item in results
+        ]
+
+        head = "\nDuplicated" + "\n" + ("*" * len("Duplicated")) + "\n\n"
+
+        return head + str(tabulate(
+            rows,
+            tablefmt="grid",
+            headers=[
+                "#",
+                "Origin",
+                "Name",
+                "Version",
+                "Source",
+            ],
+            colalign=("left", "left", "center", "left"),
+        ))
+
     def build_errors_table(self, items):
         """
         Build the information table for failed requirements analyze.
 
         Arguments:
             items (list): List of requirement dict as returned from Analyzer. Given
-                items could have any status despite not very useful for properly
-                analyzed items.
+                items could have various status except 'analyzed' and 'duplicated'.
 
         Returns:
             string: An ASCII table built from given items.
@@ -70,6 +114,11 @@ class RestructuredTextFormatter(BaseStringFormatter):
         rows = [
             [
                 item["key"],
+                (
+                    "<string>:{}".format(item["lineno"])
+                    if not item["origin"]
+                    else "{}:{}".format(item["origin"], item["lineno"])
+                ),
                 item["source"],
                 item["status"],
                 item["resume"],
@@ -77,16 +126,17 @@ class RestructuredTextFormatter(BaseStringFormatter):
             for item in results
         ]
 
-        head = "\nFailures" + "\n" + ("*" * len("Failures")) + "\n"
+        head = "\nFailures" + "\n" + ("*" * len("Failures")) + "\n\n"
 
         return head + str(tabulate(
             rows,
             tablefmt="grid",
             headers=[
                 "#",
+                "Origin",
                 "Source",
                 "Status",
                 "Resume",
             ],
-            colalign=("left", "left", "center", "left"),
+            colalign=("left", "left", "left", "left", "left"),
         ))

@@ -85,7 +85,7 @@ class RichFormatter(BaseStringFormatter):
         return table
 
     def print(self, content, destination=None, with_failures=True,
-              with_duplicates=True):
+              with_duplicates=True, **kwargs):
         """
         Print out the analyzed and possible failures
 
@@ -135,7 +135,8 @@ class RichFormatter(BaseStringFormatter):
 
         return console
 
-    def write(self, content, destination, with_failures=True, with_duplicates=True):
+    def write(self, content, destination, with_failures=True, with_duplicates=True,
+              **kwargs):
         """
         Write the analyzed and possibly failures into destination file.
 

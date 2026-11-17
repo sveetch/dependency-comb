@@ -44,7 +44,7 @@ def test_rst_build_errors_table():
             "specifier": None,
             "status": "unsupported-localpath",
             "parsing_error": None,
-            "lineno": 1,
+            "lineno": 4,
             "origin": None,
         },
         {
@@ -55,7 +55,7 @@ def test_rst_build_errors_table():
             "parsing_error": (
                 "This could be an exception error title without the long traceback"
             ),
-            "lineno": 2,
+            "lineno": 5,
             "origin": None,
         },
         {
@@ -64,7 +64,7 @@ def test_rst_build_errors_table():
             "specifier": None,
             "status": "unknown",
             "parsing_error": None,
-            "lineno": 3,
+            "lineno": 6,
             "origin": None,
         },
     ])
@@ -77,18 +77,18 @@ def test_rst_build_errors_table():
     assert output == (
         """\n"""  # noqa: E501
         """Failures\n"""  # noqa: E501
-        """********\n"""  # noqa: E501
-        """+-----+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| #   | Source                             |        Status         | Resume                                 |\n"""  # noqa: E501
-        """+=====+====================================+=======================+========================================+\n"""  # noqa: E501
-        """| 1   | ./downloads/numpy-1.9.2-cp34-none- | unsupported-localpath | Local package is not supported         |\n"""  # noqa: E501
-        """|     | win32.whl                          |                       |                                        |\n"""  # noqa: E501
-        """+-----+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 2   | -~@àlà                             |        invalid        | Invalid syntax: This could be an       |\n"""  # noqa: E501
-        """|     |                                    |                       | exception error title without the long |\n"""  # noqa: E501
-        """+-----+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
-        """| 3   | nope                               |        unknown        | Unexpected failure                     |\n"""  # noqa: E501
-        """+-----+------------------------------------+-----------------------+----------------------------------------+"""  # noqa: E501
+        """********\n\n"""  # noqa: E501
+        """+-----+------------+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
+        """| #   | Origin     | Source                             | Status                | Resume                                 |\n"""  # noqa: E501
+        """+=====+============+====================================+=======================+========================================+\n"""  # noqa: E501
+        """| 1   | <string>:4 | ./downloads/numpy-1.9.2-cp34-none- | unsupported-localpath | Local package is not supported         |\n"""  # noqa: E501
+        """|     |            | win32.whl                          |                       |                                        |\n"""  # noqa: E501
+        """+-----+------------+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
+        """| 2   | <string>:5 | -~@àlà                             | invalid               | Invalid syntax: This could be an       |\n"""  # noqa: E501
+        """|     |            |                                    |                       | exception error title without the long |\n"""  # noqa: E501
+        """+-----+------------+------------------------------------+-----------------------+----------------------------------------+\n"""  # noqa: E501
+        """| 3   | <string>:6 | nope                               | unknown               | Unexpected failure                     |\n"""  # noqa: E501
+        """+-----+------------+------------------------------------+-----------------------+----------------------------------------+"""  # noqa: E501
     )
 
 
@@ -129,6 +129,7 @@ def test_rst_print_with_failures(settings):
 
     formatter = RestructuredTextFormatter(printer=receiver)
     formatter.print(analyze, with_failures=True)
+
     # print("👷")
     # print("\n".join(output))
     # print("👷")
@@ -149,6 +150,7 @@ def test_rst_write_without_failures(settings, tmp_path):
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RestructuredTextFormatter()
     formatter.write(analyze, destination=destination, with_failures=False)
+
     # print("👷")
     # print(destination.read_text())
     # print("👷")

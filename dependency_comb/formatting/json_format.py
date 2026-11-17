@@ -38,7 +38,7 @@ class JSONFormatter(BaseFormatter):
             "failures": results.failed,
         }
 
-    def print(self, content, with_failures=True, with_duplicates=True, indent=4):
+    def print(self, content, with_failures=True, with_duplicates=True, **kwargs):
         """
         Print out the analyzed and possibly failures
 
@@ -57,12 +57,12 @@ class JSONFormatter(BaseFormatter):
                     with_failures=with_failures,
                     with_duplicates=with_duplicates
                 ),
-                indent=indent
+                indent=kwargs.get("indent", 4)
             )
         )
 
     def write(self, content, destination, with_failures=True, with_duplicates=True,
-              indent=None):
+              **kwargs):
         """
         Write the analyzed and possibly failures into destination file.
 
@@ -84,7 +84,7 @@ class JSONFormatter(BaseFormatter):
                     with_failures=with_failures,
                     with_duplicates=with_duplicates
                 ),
-                indent=indent
+                indent=kwargs.get("indent", None)
             )
         )
 
