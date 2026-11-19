@@ -3,14 +3,17 @@ import json
 import pytest
 from freezegun import freeze_time
 
+from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.exceptions import FormatterEmptyContentError
 from dependency_comb.formatting import BaseFormatter
 
 
 def test_open_content_from_filepath(settings):
     """
-    Base formatter is able to open analyze from a file path but just returns
-    deserialized JSON to Python data.
+    Base formatter is able to open analyze from a file path and returns deserialized
+    JSON to Python data.
+
+    NOTE: This is mostly to be deprecated in a further release.
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
     formatter = BaseFormatter()
@@ -34,8 +37,10 @@ def test_open_content_from_filepath(settings):
 
 def test_open_content_from_string(settings):
     """
-    Base formatter is able to open analyze from a string but just returns deserialized
-    JSON to Python data.
+    Base formatter is able to open analyze from a string and returns deserialized JSON
+    to Python data.
+
+    NOTE: This is mostly to be deprecated in a further release.
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
 
@@ -161,49 +166,68 @@ def test_build_errors_table(settings):
     ]
 
 
-@pytest.mark.parametrize("source, success, failed, with_failures", [
+@pytest.mark.parametrize("source, success, duplicated, failed, with_failures", [
     (
-        "minimal_success_and_failure.json",
+        "minimal_complete.txt",
+        ["django"],
         ["django"],
         ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
         True,
     ),
     (
-        "minimal_success_and_failure.json",
+        "minimal_success_and_failure.txt",
         ["django"],
+        [],
+        ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
+        True,
+    ),
+    (
+        "minimal_success_and_failure.txt",
+        ["django"],
+        [],
         [],
         False,
     ),
     (
-        "failure_only.json",
+        "failure_only.txt",
+        [],
         [],
         ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
         True,
     ),
     (
-        "success_only.json",
+        "success_only.txt",
         ["django"],
+        [],
         [],
         True,
     ),
     (
-        "success_only.json",
+        "success_only.txt",
         ["django"],
+        [],
         [],
         False,
     ),
 ])
-def test_build(settings, source, success, failed, with_failures):
+def test_build(settings, source, success, duplicated, failed, with_failures):
     """
-    Build method should return found success and possibly failures (according to
+    The build method should return found success and possibly failures (according to
     option).
     """
-    analyzes = settings.fixtures_path / "analyzes"
+    analyze = (settings.fixtures_path / "requirements" / source).read_text()
+
+    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
+    packages = analyzer.inspect(analyze)
 
     formatter = BaseFormatter()
 
-    results = formatter.build(analyzes / source, with_failures=with_failures)
+    results = formatter.build(
+        [pkg.serialize() for pkg in packages],
+        with_failures=with_failures
+    )
     assert [v["name"] for v in results.analyzed] == success
+    assert [v["name"] for v in results.duplicated] == duplicated
     assert [v["source"] for v in results.failed] == failed
 
 
@@ -217,11 +241,14 @@ def test_build_empty(settings):
     with pytest.raises(FormatterEmptyContentError):
         formatter.build([])
 
-    # If there is only failures but they are disabled from option, this lead to empty
-    # result
+    # If analyze only have failures but they are disabled from option, this lead to
+    # empty result
+    analyze = (settings.fixtures_path / "requirements" / "failure_only.txt").read_text()
+    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
+    packages = analyzer.inspect(analyze)
     with pytest.raises(FormatterEmptyContentError):
         formatter.build(
-            settings.fixtures_path / "analyzes/failure_only.json",
+            [pkg.serialize() for pkg in packages],
             with_failures=False
         )
 

@@ -64,6 +64,8 @@ def test_formatted_full(settings, output_format):
     """
     A non test routine to rebuild formatted fixture files for a format.
 
+    TODO: Use analyzer to build payload to pass to formatter instead of deprecated
+    JSON analyze dump.
     TODO: A output of table kind for duplicated will be needed
     """
     import json

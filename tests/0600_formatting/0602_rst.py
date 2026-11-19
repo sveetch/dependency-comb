@@ -1,5 +1,6 @@
 from freezegun import freeze_time
 
+from dependency_comb.analyzer import DependenciesAnalyzer
 from dependency_comb.formatting import RestructuredTextFormatter
 
 
@@ -97,7 +98,11 @@ def test_rst_print(settings):
     """
     Without failures enabled the output should only contains the analyzed table.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
+    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
+    packages = analyzer.inspect(
+        (settings.fixtures_path / "requirements" / "basic.txt").read_text()
+    )
+
     expected = settings.fixtures_path / "formatted/no_failures.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
@@ -108,7 +113,7 @@ def test_rst_print(settings):
 
     formatter = RestructuredTextFormatter(printer=receiver)
 
-    formatter.print(analyze, with_failures=False)
+    formatter.print([pkg.serialize() for pkg in packages], with_failures=False)
     assert "\n".join(output) == expected.read_text()
 
 
@@ -118,7 +123,14 @@ def test_rst_print_with_failures(settings):
     With failures enabled the output should contains both analyzed and failed tables
     each with a title.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
+    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
+    requirement_path = settings.fixtures_path / "requirements" / "basic.txt"
+    packages = analyzer.inspect(
+        requirement_path.read_text(),
+        path=requirement_path,
+        basepath=settings.fixtures_path,
+    )
+
     expected = settings.fixtures_path / "formatted/with_failures.rst"
 
     # Dummy printer function to receive output into 'output' to assert on it
@@ -128,7 +140,7 @@ def test_rst_print_with_failures(settings):
         output.append(content)
 
     formatter = RestructuredTextFormatter(printer=receiver)
-    formatter.print(analyze, with_failures=True)
+    formatter.print([pkg.serialize() for pkg in packages], with_failures=True)
 
     # print("👷")
     # print("\n".join(output))

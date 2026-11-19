@@ -473,9 +473,13 @@ class DependenciesAnalyzer(RequirementParser):
         """
         Inspect given requirements to collect their informations.
 
+        TODO: basepath could be discovered from 'path.parent' when given.
+
         Arguments:
             requirements (string or Path): Either a Path object for a file to open or
-                directly requirements content as a string.
+                directly requirements content as a string or a list of
+                PackageRequirement objects. If it is a list of PackageRequirement
+                objects, ``path`` should be given to have the right item origins.
 
         Keyword Arguments:
             path (Path): Path of requirement file if available. This is used to avoid
