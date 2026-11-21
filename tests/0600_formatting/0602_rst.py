@@ -1,37 +1,11 @@
 from freezegun import freeze_time
 
-from dependency_comb.analyzer import DependenciesAnalyzer
+from tests.utils import complete_analyze  # noqa: F401
+
 from dependency_comb.formatting import RestructuredTextFormatter
 
 
-def format_to_multline_str(content):
-    """
-    Shortand to format table output to a multiline string suitable for expected
-    assertions.
-
-    Each line will contain a Flake8 bypass code for "line too long".
-
-    This is mostly an helper to rewrite test data fixtures during development.
-
-    Arguments:
-        content (string): The content to format.
-
-    Returns:
-        string: Formatted content.
-    """
-    total = len(content.splitlines())
-    return "\n".join(
-        [
-            '"""{source}{newline}"""  # noqa: E501'.format(
-                source=l.replace('"', '\\"'),
-                newline="\\n" if i < total else "",
-            )
-            for i, l in enumerate(content.splitlines(), start=1)
-        ]
-    )
-
-
-def test_rst_build_errors_table():
+def test_build_errors_table():
     """
     Ensure all error cases are well formatted.
 
@@ -70,7 +44,8 @@ def test_rst_build_errors_table():
         },
     ])
 
-    # Used to rebuild table when code or formatting have changed
+    # Used to rebuild table when payload or formatter have changed behaviors
+    # from tests.utils import format_to_multline_str
     # print("👷")
     # print(format_to_multline_str(output))
     # print("👷")
@@ -94,18 +69,13 @@ def test_rst_build_errors_table():
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_rst_print(settings):
+def test_print_all(settings, complete_analyze):  # noqa: F811
     """
     Without failures enabled the output should only contains the analyzed table.
     """
-    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
-    packages = analyzer.inspect(
-        (settings.fixtures_path / "requirements" / "basic.txt").read_text()
-    )
+    expected = settings.fixtures_path / "formatted/complete_all.rst"
 
-    expected = settings.fixtures_path / "formatted/no_failures.rst"
-
-    # Dummy printer function to receive output into 'output' to assert on it
+    # Dummy printer function to receive and store output into 'output' to assert on it
     output = []
 
     def receiver(content, *args, **kwargs):
@@ -113,57 +83,77 @@ def test_rst_print(settings):
 
     formatter = RestructuredTextFormatter(printer=receiver)
 
-    formatter.print([pkg.serialize() for pkg in packages], with_failures=False)
+    formatter.print(
+        [v.serialize() for v in complete_analyze.packages],
+        with_failures=True,
+        with_duplicates=True,
+    )
     assert "\n".join(output) == expected.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_rst_print_with_failures(settings):
+def test_print_without_failures(settings, complete_analyze):  # noqa: F811
     """
     With failures enabled the output should contains both analyzed and failed tables
     each with a title.
     """
-    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
-    requirement_path = settings.fixtures_path / "requirements" / "basic.txt"
-    packages = analyzer.inspect(
-        requirement_path.read_text(),
-        path=requirement_path,
-        basepath=settings.fixtures_path,
-    )
+    expected = settings.fixtures_path / "formatted/complete_without_failures.rst"
 
-    expected = settings.fixtures_path / "formatted/with_failures.rst"
-
-    # Dummy printer function to receive output into 'output' to assert on it
+    # Dummy printer function to receive and store output into 'output' to assert on it
     output = []
 
     def receiver(content, *args, **kwargs):
         output.append(content)
 
     formatter = RestructuredTextFormatter(printer=receiver)
-    formatter.print([pkg.serialize() for pkg in packages], with_failures=True)
-
-    # print("👷")
-    # print("\n".join(output))
-    # print("👷")
+    formatter.print(
+        [v.serialize() for v in complete_analyze.packages],
+        with_failures=False,
+        with_duplicates=True,
+    )
 
     assert "\n".join(output) == expected.read_text()
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_rst_write_without_failures(settings, tmp_path):
+def test_print_without_duplicates(settings, complete_analyze):  # noqa: F811
+    """
+    With failures enabled the output should contains both analyzed and duplicates tables
+    each with a title.
+    """
+    expected = settings.fixtures_path / "formatted/complete_without_duplicates.rst"
+
+    # Dummy printer function to receive and store output into 'output' to assert on it
+    output = []
+
+    def receiver(content, *args, **kwargs):
+        output.append(content)
+
+    formatter = RestructuredTextFormatter(printer=receiver)
+    formatter.print(
+        [v.serialize() for v in complete_analyze.packages],
+        with_failures=True,
+        with_duplicates=False,
+    )
+
+    assert "\n".join(output) == expected.read_text()
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_write_all(settings, complete_analyze, tmp_path):  # noqa: F811
     """
     RST writer method should write the output formatted as RST in given destination
     file.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    expected = settings.fixtures_path / "formatted/no_failures.rst"
+    expected = settings.fixtures_path / "formatted/complete_all.rst"
     destination = tmp_path / "output.rst"
 
-    # Dummy printer function to receive output into 'output' to assert on it
     formatter = RestructuredTextFormatter()
-    formatter.write(analyze, destination=destination, with_failures=False)
+    formatter.write(
+        [v.serialize() for v in complete_analyze.packages],
+        destination=destination,
+        with_failures=True,
+        with_duplicates=True,
+    )
 
-    # print("👷")
-    # print(destination.read_text())
-    # print("👷")
     assert destination.read_text() == expected.read_text()

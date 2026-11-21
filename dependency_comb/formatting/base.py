@@ -9,6 +9,7 @@ import humanize
 
 from ..exceptions import FormatterEmptyContentError
 from ..models.package import STATUS_LABELS
+from ..utils.jsons import ExtendedJsonEncoder
 
 
 BuiltResults = namedtuple(
@@ -302,6 +303,10 @@ class BaseFormatter:
         """
         Write the analyzed and possibly failures into destination file.
 
+        Written content will be a list of lists, where each list is a part of
+        analyze (analyzed, duplicated, failed). Part list will contain their serialized
+        items.
+
         Arguments:
             content (Path or string or list): JSON content as built from Analyzer. See
                 ``BaseFormatter.open_content()`` doc for more details.
@@ -332,7 +337,7 @@ class BaseFormatter:
             output.extend(results.duplicated)
 
         # Write merged contents
-        destination.write_text(json.dumps(output))
+        destination.write_text(json.dumps(output, cls=ExtendedJsonEncoder))
 
         return destination
 

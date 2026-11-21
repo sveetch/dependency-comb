@@ -14,8 +14,8 @@ def test_from_file(settings):
     Parser should be able to parse requirements with valid Pip syntax from a file then
     return requirements objects.
     """
-    sample_source = settings.fixtures_path / "requirements/basic.txt"
-    expected = settings.fixtures_path / "parsed_requirements_basic.json"
+    sample_source = settings.fixtures_path / "requirements/complete.txt"
+    expected = settings.fixtures_path / "parsed/complete.json"
     parser = RequirementParser()
 
     results = parser.parse_requirements(sample_source, basepath=settings.fixtures_path)
@@ -33,8 +33,8 @@ def test_from_file_without_basepath(settings):
     Parser should be able to parse requirements with valid Pip syntax from a file
     without basepath then return requirements objects.
     """
-    sample_source = settings.fixtures_path / "requirements/basic.txt"
-    expected = settings.fixtures_path / "parsed_requirements_basic.json"
+    sample_source = settings.fixtures_path / "requirements/complete.txt"
+    expected = settings.fixtures_path / "parsed/complete.json"
     parser = RequirementParser()
 
     # NOTE: Patch 'origin' field as an absolute path
@@ -58,8 +58,8 @@ def test_from_string(settings):
     Parser should be able to parse requirements with valid Pip syntax from a string
     then return requirements objects.
     """
-    sample_source = settings.fixtures_path / "requirements/basic.txt"
-    expected = settings.fixtures_path / "parsed_requirements_basic.json"
+    sample_source = settings.fixtures_path / "requirements/complete.txt"
+    expected = settings.fixtures_path / "parsed/complete.json"
     parser = RequirementParser()
 
     # NOTE: Neutralize 'origin' field from expected data

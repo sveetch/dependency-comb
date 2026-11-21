@@ -105,8 +105,15 @@ from .. import __pkgname__
     is_flag=True,
     default=True,
     help=(
-        "Include requirement analyze failures in a different table, also each table"
-        "will have its own title."
+        "Include requirement analyze failures in a different table."
+    ),
+)
+@click.option(
+    "--duplicates/--no-duplicates",
+    is_flag=True,
+    default=True,
+    help=(
+        "Include requirement analyze duplicates in a different table."
     ),
 )
 @click.pass_context
@@ -142,6 +149,7 @@ def report_command(*args, **parameters):
     # Formatter opts
     format_name = parameters["format"]
     with_failures = parameters["failures"]
+    with_duplicates = parameters["duplicates"]
 
     # Find the source path and its basepath
     requirements_path = None
@@ -188,7 +196,8 @@ def report_command(*args, **parameters):
             format_name,
             json.dumps(payload, cls=ExtendedJsonEncoder),
             destination=destination,
-            with_failures=with_failures
+            with_failures=with_failures,
+            with_duplicates=with_duplicates,
         )
     except FormatterEmptyContentError as e:
         click.echo(str(e))

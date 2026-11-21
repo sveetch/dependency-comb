@@ -179,7 +179,6 @@ def test_parser_invalid(source, parsed_name):
             },
         ]
     """
-    #TODO
     pkg = PackageRequirement(source)
     assert pkg.status == parsed_name
     assert pkg.name is None

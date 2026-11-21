@@ -34,13 +34,18 @@ if RICH_ENABLED is True:
 
 
 def output_formatted_content(name, content, printer=None, printer_kwargs=None,
-                             destination=None, with_failures=True):
+                             destination=None, with_failures=True,
+                             with_duplicates=True):
     """
     Helper function to output formatted content either with a printer or written to a
     file.
+
+    TODO: Support of Path or string in 'content' is deprecated. Function is only used
+    from report command and we won't need anymore to give a string or Path, only a
+    list of PackageRequirement objects.
     """
     if name not in AVAILABLE_FORMATS:
-        raise ValueError("Given formatter name is unknowed: {}".format(name))
+        raise ValueError("Given formatter name is unknown: {}".format(name))
 
     formatter = AVAILABLE_FORMATS[name](
         printer=printer,
@@ -48,6 +53,15 @@ def output_formatted_content(name, content, printer=None, printer_kwargs=None,
     )
 
     if not destination:
-        formatter.print(content, with_failures=with_failures)
+        formatter.print(
+            content,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates,
+        )
     else:
-        formatter.write(content, destination, with_failures=with_failures)
+        formatter.write(
+            content,
+            destination,
+            with_failures=with_failures,
+            with_duplicates=with_duplicates,
+        )

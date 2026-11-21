@@ -13,73 +13,30 @@ import pytest
 
 from freezegun import freeze_time
 
-from dependency_comb.analyzer import DependenciesAnalyzer
+from tests.utils import complete_analyze, minimal_analyze  # noqa: F401
+
 from dependency_comb.formatting import AVAILABLE_FORMATS
-
-
-@pytest.mark.skip("Only to rebuild analyzer inspect")
-@freeze_time("2024-07-25 10:00:00.000000")
-@pytest.mark.parametrize("source, analyze", [
-    ("requirements/basic.txt", "analyzes/basic.json"),
-    ("requirements/basic_with_duplicates.txt", "analyzes/basic_with_duplicates.json"),
-    ("requirements/failure_only.txt", "analyzes/failure_only.json"),
-    (
-        "requirements/minimal_success_and_failure.txt",
-        "analyzes/minimal_success_and_failure.json"
-    ),
-    ("requirements/success_only.txt", "analyzes/success_only.json"),
-])
-def test_analyzer_build_inspection(settings, source, analyze):
-    """
-    A non test routine to rebuild JSON analyzes fixture files.
-    """
-    import json
-    from dependency_comb.utils.jsons import ExtendedJsonEncoder
-
-    cachedir = settings.fixtures_path / "api_cache"
-    sample_source = settings.fixtures_path / source
-    sample_analyzed = settings.fixtures_path / analyze
-
-    analyzer = DependenciesAnalyzer(cachedir=cachedir)
-
-    packages = analyzer.inspect(sample_source, basepath=settings.fixtures_path)
-    dump = json.dumps(
-        [item.serialize() for item in packages],
-        indent=4,
-        cls=ExtendedJsonEncoder
-    )
-
-    #print(dump)
-
-    sample_analyzed.write_text(dump)
-    print("Fixture wrote to:", sample_analyzed)
-
-    assert 1 == 42
 
 
 @pytest.mark.skip("Only to rebuild formatted analyzes")
 @freeze_time("2024-07-25 10:00:00.000000")
-@pytest.mark.parametrize("output_format", ["json", "rst"])  #, "rich"])
-def test_formatted_full(settings, output_format):
+@pytest.mark.parametrize("output_format", ["json", "rst", "rich"])
+def test_formatted_complete(settings, complete_analyze, output_format):  # noqa: F811
     """
-    A non test routine to rebuild formatted fixture files for a format.
+    A non test routine to rebuild formatted fixture files for a format with 'complete'
+    requirements.
 
-    TODO: Use analyzer to build payload to pass to formatter instead of deprecated
-    JSON analyze dump.
-    TODO: A output of table kind for duplicated will be needed
+    This routine is dependent from formatters so they are required to be working well,
+    broken formatter would fail or build broken dump.
     """
-    import json
-    from dependency_comb.utils.jsons import ExtendedJsonEncoder
-
-    cachedir = settings.fixtures_path / "api_cache"
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    # Complete formatted output
     formatted_full = (
-        settings.fixtures_path / "formatted/with_failures.{}".format(output_format)
+        "formatted/complete_all.{}".format(output_format)
     )
-    # Output of failed table only
-    formatted_no_failures = (
-        settings.fixtures_path / "formatted/no_failures.{}".format(output_format)
+    formatted_without_failures = (
+        "formatted/complete_without_failures.{}".format(output_format)
+    )
+    formatted_without_duplicates = (
+        "formatted/complete_without_duplicates.{}".format(output_format)
     )
 
     output = []
@@ -91,15 +48,68 @@ def test_formatted_full(settings, output_format):
     formatter_class = AVAILABLE_FORMATS[output_format]
     formatter = formatter_class(printer=print)
 
+    packages = [
+        v.serialize()
+        for v in complete_analyze.packages
+    ]
+
     # Write all kind of output
-    formatter.write(analyze, destination=formatted_full, with_failures=True, indent=4)
     formatter.write(
-        analyze, destination=formatted_no_failures, with_failures=False, indent=4
+        packages,
+        destination=settings.fixtures_path / formatted_full,
+        with_failures=True,
+        with_duplicates=True,
+        indent=4,
+    )
+    print(
+        "Fixture 'complete_all' wrote to:",
+        settings.fixtures_path / formatted_full
     )
 
-    print("Fixture 'with_failures' wrote to:", formatted_full)
-    print("Fixture 'no_failures' wrote to:", formatted_no_failures)
+    formatter.write(
+        packages,
+        destination=settings.fixtures_path / formatted_without_failures,
+        with_failures=False,
+        with_duplicates=True,
+        indent=4,
+    )
+    print(
+        "Fixture 'complete_without_failures' wrote to:",
+        settings.fixtures_path / formatted_without_failures
+    )
 
-    #formatter.print(analyze, with_failures=True)
+    formatter.write(
+        packages,
+        destination=settings.fixtures_path / formatted_without_duplicates,
+        with_failures=True,
+        with_duplicates=False,
+        indent=4,
+    )
+    print(
+        "Fixture 'complete_without_duplicates' wrote to:",
+        settings.fixtures_path / formatted_without_duplicates
+    )
+
+    """
+    print()
+    formatter.print(
+        packages,
+        with_failures=True,
+        with_duplicates=False,
+    )
+    print()
+    formatter.print(
+        packages,
+        with_failures=False,
+        with_duplicates=True,
+    )
+    print()
+    formatter.print(
+        packages,
+        with_failures=True,
+        with_duplicates=False,
+    )
+    print()
+    """
 
     assert 1 == 42

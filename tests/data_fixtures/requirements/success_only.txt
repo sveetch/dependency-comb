@@ -1,2 +1,0 @@
-# Sample of valid PIP requirements syntax
-django>=1.11,<1.12

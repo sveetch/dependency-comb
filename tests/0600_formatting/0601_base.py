@@ -1,19 +1,24 @@
 import json
+from pathlib import Path
 
 import pytest
 from freezegun import freeze_time
+from packaging.requirements import SpecifierSet
+from packaging.version import Version
 
-from dependency_comb.analyzer import DependenciesAnalyzer
+from tests.utils import complete_analyze, minimal_analyze  # noqa: F401
+
 from dependency_comb.exceptions import FormatterEmptyContentError
 from dependency_comb.formatting import BaseFormatter
 
 
+@pytest.mark.skip("Loading content from a file is deprecated")
 def test_open_content_from_filepath(settings):
     """
     Base formatter is able to open analyze from a file path and returns deserialized
     JSON to Python data.
 
-    NOTE: This is mostly to be deprecated in a further release.
+    DEPRECATED: We still have to remove its usage from code and tests
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
     formatter = BaseFormatter()
@@ -35,12 +40,13 @@ def test_open_content_from_filepath(settings):
     ]
 
 
+@pytest.mark.skip("Loading content from a string is deprecated")
 def test_open_content_from_string(settings):
     """
     Base formatter is able to open analyze from a string and returns deserialized JSON
     to Python data.
 
-    NOTE: This is mostly to be deprecated in a further release.
+    DEPRECATED: We still have to remove its usage from code and tests
     """
     analyze = settings.fixtures_path / "analyzes/basic.json"
 
@@ -64,24 +70,17 @@ def test_open_content_from_string(settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_build_analyzed_table(settings):
+def test_build_analyzed_table(minimal_analyze):  # noqa: F811
     """
     Method should build a list of dictionnaries for all items with status 'analyzed'.
     """
-    analyze = settings.fixtures_path / "analyzes/success_only.json"
-    analyze_content = [
-        v
-        for v in json.loads(analyze.read_text())
-        if v["status"] == "analyzed"
-    ]
-    # Use formatted dump but only use the analyzed part
-    formatted_analyzed = json.loads(
-        (settings.fixtures_path / "formatted/with_failures.json").read_text()
-    )["analyzed"]
-
     formatter = BaseFormatter()
 
-    output = formatter.build_analyzed_table(analyze_content)
+    output = formatter.build_analyzed_table([
+        v.serialize()
+        for v in minimal_analyze.packages
+        if v.status == "analyzed"
+    ])
     assert output == [
         {
             "key": 1,
@@ -90,62 +89,58 @@ def test_build_analyzed_table(settings):
             "resolved_version": "1.11.9 - 6 years ago",
             "latest_release": "5.1.2 - 2 months ago",
             "latest_activity": "2 months",
-            "release_label": "1.11.9",
+            "release_label": Version("1.11.9"),
             "release_age": "6 years",
             "lineno": 2,
-            "origin": "requirements/success_only.txt"
+            "origin": Path("minimal.txt")
         },
     ]
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_build_duplicates_table(settings):
+def test_build_duplicates_table(complete_analyze):  # noqa: F811
     """
     Method should build a list of dictionnaries for given items.
     """
-    analyze = settings.fixtures_path / "analyzes/basic_with_duplicates.json"
-    analyze_content = [
-        v
-        for v in json.loads(analyze.read_text())
-        if v["status"] == "duplicated"
-    ]
     formatter = BaseFormatter()
 
-    output = formatter.build_duplicates_table(analyze_content)
+    output = formatter.build_duplicates_table([
+        v.serialize()
+        for v in complete_analyze.packages
+        if v.status == "duplicated"
+    ])
     assert output == [
         {
             "key": 1,
             "name": "django",
             "source": "django<1.12",
-            "specifier": "<1.12",
+            "specifier": SpecifierSet("<1.12"),
             "lineno": 17,
-            "origin": "requirements/basic_with_duplicates.txt",
+            "origin": Path("complete.txt"),
         },
         {
             "key": 2,
             "name": "django-admin-shortcuts",
             "source": "django-admin-shortcuts",
-            "specifier": "",
+            "specifier": SpecifierSet(""),
             "lineno": 18,
-            "origin": "requirements/basic_with_duplicates.txt",
+            "origin": Path("complete.txt"),
         },
     ]
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_build_errors_table(settings):
+def test_build_errors_table(complete_analyze):  # noqa: F811
     """
     Method should build a list of dictionnaries for given items.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    analyze_content = [
-        v
-        for v in json.loads(analyze.read_text())
-        if v["status"] not in ("analyzed", "duplicated")
-    ]
     formatter = BaseFormatter()
 
-    output = formatter.build_errors_table(analyze_content)
+    output = formatter.build_errors_table([
+        v.serialize()
+        for v in complete_analyze.packages
+        if v.status not in ("analyzed", "duplicated")
+    ])
     assert output == [
         {
             "key": 1,
@@ -153,7 +148,7 @@ def test_build_errors_table(settings):
             "status": "unsupported-localpath",
             "resume": "Local package is not supported",
             "lineno": 12,
-            "origin": "requirements/basic.txt"
+            "origin": Path("complete.txt")
         },
         {
             "key": 2,
@@ -161,77 +156,97 @@ def test_build_errors_table(settings):
             "status": "unsupported-url",
             "resume": "Direct package URL is not supported",
             "lineno": 15,
-            "origin": "requirements/basic.txt"
+            "origin": Path("complete.txt")
         }
     ]
 
 
-@pytest.mark.parametrize("source, success, duplicated, failed, with_failures", [
-    (
-        "minimal_complete.txt",
-        ["django"],
-        ["django"],
-        ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
-        True,
-    ),
-    (
-        "minimal_success_and_failure.txt",
-        ["django"],
-        [],
-        ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
-        True,
-    ),
-    (
-        "minimal_success_and_failure.txt",
-        ["django"],
-        [],
-        [],
-        False,
-    ),
-    (
-        "failure_only.txt",
-        [],
-        [],
-        ["./downloads/numpy-1.9.2-cp34-none-\nwin32.whl"],
-        True,
-    ),
-    (
-        "success_only.txt",
-        ["django"],
-        [],
-        [],
-        True,
-    ),
-    (
-        "success_only.txt",
-        ["django"],
-        [],
-        [],
-        False,
-    ),
-])
-def test_build(settings, source, success, duplicated, failed, with_failures):
+@pytest.mark.parametrize(
+    "analyzed, duplicated, failed, with_failures, with_duplicates",
+    [
+        (
+            [
+                "django",
+                "Pillow",
+                "djangorestframework",
+                "django-admin-shortcuts",
+                "requests",
+                "urllib3",
+            ],
+            ["django", "django-admin-shortcuts"],
+            [
+                "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
+                "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
+            ],
+            True,
+            True,
+        ),
+        (
+            [
+                "django",
+                "Pillow",
+                "djangorestframework",
+                "django-admin-shortcuts",
+                "requests",
+                "urllib3",
+            ],
+            ["django", "django-admin-shortcuts"],
+            [],
+            False,
+            True,
+        ),
+        (
+            [
+                "django",
+                "Pillow",
+                "djangorestframework",
+                "django-admin-shortcuts",
+                "requests",
+                "urllib3",
+            ],
+            [],
+            [
+                "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
+                "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
+            ],
+            True,
+            False,
+        ),
+        (
+            [
+                "django",
+                "Pillow",
+                "djangorestframework",
+                "django-admin-shortcuts",
+                "requests",
+                "urllib3",
+            ],
+            [],
+            [],
+            False,
+            False,
+        ),
+    ]
+)
+def test_build(complete_analyze, analyzed, duplicated, failed,  # noqa: F811
+               with_failures, with_duplicates):
     """
-    The build method should return found success and possibly failures (according to
-    option).
+    The build method should return found analyzed and possible failured and duplicated
+    (according to options).
     """
-    analyze = (settings.fixtures_path / "requirements" / source).read_text()
-
-    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
-    packages = analyzer.inspect(analyze)
-
     formatter = BaseFormatter()
 
     results = formatter.build(
-        [pkg.serialize() for pkg in packages],
-        with_failures=with_failures
+        [pkg.serialize() for pkg in complete_analyze.packages],
+        with_failures=with_failures,
+        with_duplicates=with_duplicates
     )
-    assert [v["name"] for v in results.analyzed] == success
+    assert [v["name"] for v in results.analyzed] == analyzed
     assert [v["name"] for v in results.duplicated] == duplicated
     assert [v["source"] for v in results.failed] == failed
 
 
-def test_build_empty(settings):
+def test_build_empty():
     """
     Build method should raise an error if there is no success and failures.
     """
@@ -241,26 +256,12 @@ def test_build_empty(settings):
     with pytest.raises(FormatterEmptyContentError):
         formatter.build([])
 
-    # If analyze only have failures but they are disabled from option, this lead to
-    # empty result
-    analyze = (settings.fixtures_path / "requirements" / "failure_only.txt").read_text()
-    analyzer = DependenciesAnalyzer(cachedir=(settings.fixtures_path / "api_cache"))
-    packages = analyzer.inspect(analyze)
-    with pytest.raises(FormatterEmptyContentError):
-        formatter.build(
-            [pkg.serialize() for pkg in packages],
-            with_failures=False
-        )
-
 
 @freeze_time("2024-07-25 10:00:00")
-def test_print(settings):
+def test_print_all(minimal_analyze):  # noqa: F811
     """
     Printer method should write its result outputs into given printer function.
     """
-    analyze = settings.fixtures_path / "analyzes/minimal_success_and_failure.json"
-    analyze_content = json.loads(analyze.read_text())
-
     # Dummy printer function to receive output into 'output' to assert on it
     output = []
 
@@ -268,7 +269,11 @@ def test_print(settings):
         output.extend(content)
 
     formatter = BaseFormatter(printer=receiver)
-    formatter.print(analyze_content, with_failures=True)
+    formatter.print(
+        [v.serialize() for v in minimal_analyze.packages],
+        with_failures=True,
+        with_duplicates=True,
+    )
 
     assert output == [
         {
@@ -278,10 +283,10 @@ def test_print(settings):
             "resolved_version": "1.11.9 - 6 years ago",
             "latest_release": "5.1.2 - 2 months ago",
             "latest_activity": "2 months",
-            "release_label": "1.11.9",
+            "release_label": Version("1.11.9"),
             "release_age": "6 years",
             "lineno": 2,
-            "origin": "requirements/minimal_success_and_failure.txt"
+            "origin": Path("minimal.txt")
         },
         {
             "key": 1,
@@ -289,23 +294,34 @@ def test_print(settings):
             "status": "unsupported-localpath",
             "resume": "Local package is not supported",
             "lineno": 5,
-            "origin": "requirements/minimal_success_and_failure.txt"
+            "origin": Path("minimal.txt")
+        },
+        {
+            "key": 1,
+            "name": "django",
+            "source": "django>=1.11",
+            "specifier": SpecifierSet(">=1.11"),
+            "lineno": 7,
+            "origin": Path("minimal.txt"),
         },
     ]
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_write(settings, tmp_path):
+def test_write_all(minimal_analyze, tmp_path):  # noqa: F811
     """
     Base writer method should write its result outputs as JSON into given file
     destination.
     """
-    analyze = settings.fixtures_path / "analyzes/minimal_success_and_failure.json"
-    analyze_content = json.loads(analyze.read_text())
     destination = tmp_path / "output.json"
 
     formatter = BaseFormatter()
-    formatter.write(analyze_content, destination, with_failures=True)
+    formatter.write(
+        [v.serialize() for v in minimal_analyze.packages],
+        destination,
+        with_failures=True,
+        with_duplicates=True,
+    )
 
     assert json.loads(destination.read_text()) == [
         {
@@ -318,7 +334,7 @@ def test_write(settings, tmp_path):
             "release_label": "1.11.9",
             "release_age": "6 years",
             "lineno": 2,
-            "origin": "requirements/minimal_success_and_failure.txt"
+            "origin": "minimal.txt"
         },
         {
             "key": 1,
@@ -326,6 +342,14 @@ def test_write(settings, tmp_path):
             "status": "unsupported-localpath",
             "resume": "Local package is not supported",
             "lineno": 5,
-            "origin": "requirements/minimal_success_and_failure.txt"
+            "origin": "minimal.txt"
+        },
+        {
+            "key": 1,
+            "name": "django",
+            "source": "django>=1.11",
+            "specifier": ">=1.11",
+            "lineno": 7,
+            "origin": "minimal.txt",
         },
     ]

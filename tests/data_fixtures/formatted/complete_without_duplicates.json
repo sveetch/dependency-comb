@@ -10,7 +10,7 @@
             "release_label": "1.11.9",
             "release_age": "6 years",
             "lineno": 2,
-            "origin": "requirements/basic.txt"
+            "origin": "complete.txt"
         },
         {
             "key": 2,
@@ -22,7 +22,7 @@
             "release_label": "9.5.0",
             "release_age": "1 year, 4 months",
             "lineno": 3,
-            "origin": "requirements/basic.txt"
+            "origin": "complete.txt"
         },
         {
             "key": 3,
@@ -34,7 +34,7 @@
             "release_label": "Latest",
             "release_age": null,
             "lineno": 4,
-            "origin": "requirements/basic.txt"
+            "origin": "complete.txt"
         },
         {
             "key": 4,
@@ -46,7 +46,7 @@
             "release_label": "1.2.6",
             "release_age": "9 years",
             "lineno": 6,
-            "origin": "requirements/basic.txt"
+            "origin": "complete.txt"
         },
         {
             "key": 5,
@@ -58,7 +58,7 @@
             "release_label": "2.8.1",
             "release_age": "8 years",
             "lineno": 8,
-            "origin": "requirements/basic.txt"
+            "origin": "complete.txt"
         },
         {
             "key": 6,
@@ -70,9 +70,26 @@
             "release_label": "Latest",
             "release_age": null,
             "lineno": 9,
-            "origin": "requirements/basic.txt"
+            "origin": "complete.txt"
         }
     ],
     "duplicated": [],
-    "failures": []
+    "failures": [
+        {
+            "key": 1,
+            "source": "./downloads/numpy-1.9.2-cp34-none-\nwin32.whl",
+            "status": "unsupported-localpath",
+            "resume": "Local package is not supported",
+            "lineno": 12,
+            "origin": "complete.txt"
+        },
+        {
+            "key": 2,
+            "source": "http://wxpython.org/Phoenix/snapshot-bui\nlds/wxPython_Phoenix-",
+            "status": "unsupported-url",
+            "resume": "Direct package URL is not supported",
+            "lineno": 15,
+            "origin": "complete.txt"
+        }
+    ]
 }

@@ -1,2 +1,0 @@
-# It is possible to refer to specific local distribution paths.
-./downloads/numpy-1.9.2-cp34-none-win32.whl

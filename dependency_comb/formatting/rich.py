@@ -84,7 +84,7 @@ class RichFormatter(BaseStringFormatter):
                     else "{}:{}".format(item["origin"], item["lineno"])
                 ),
                 item["name"],
-                item["specifier"] or "-",
+                str(item["specifier"] or "-"),
                 item["source"],
             )
 
@@ -135,6 +135,8 @@ class RichFormatter(BaseStringFormatter):
                 ``BaseFormatter.open_content()`` doc for more details.
 
         Keyword Arguments:
+            destination (fileobject like): A fileobject where Rich will write its
+                console output. Mostly used for testing.
             with_failures (boolean): To disable display of failures.
             with_duplicates (boolean): To enable display of duplicates.
         """

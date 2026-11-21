@@ -1,6 +1,7 @@
 import json
 
 from .base import BaseFormatter
+from ..utils.jsons import ExtendedJsonEncoder
 
 
 class JSONFormatter(BaseFormatter):
@@ -57,7 +58,8 @@ class JSONFormatter(BaseFormatter):
                     with_failures=with_failures,
                     with_duplicates=with_duplicates
                 ),
-                indent=kwargs.get("indent", 4)
+                indent=kwargs.get("indent", 4),
+                cls=ExtendedJsonEncoder
             )
         )
 
@@ -84,7 +86,8 @@ class JSONFormatter(BaseFormatter):
                     with_failures=with_failures,
                     with_duplicates=with_duplicates
                 ),
-                indent=kwargs.get("indent", None)
+                indent=kwargs.get("indent", None),
+                cls=ExtendedJsonEncoder
             )
         )
 

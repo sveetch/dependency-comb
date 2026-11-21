@@ -93,10 +93,8 @@ in package requirement definition but is only evaluated if environment is given.
 environment is not given all markers are just ignored and the requirement is considered
 valid.
 
-Commands :ref:`cli_cmd_analyze` and :ref:`cli_cmd_report` allow to give an
-environment.
-
-Here is a JSON sample of an advanced environment: ::
+Command :ref:`cli_cmd_report` allow to give an environment from a JSON file. Here is a
+sample: ::
 
     {
         "implementation_name": "cpython",
@@ -112,7 +110,7 @@ Here is a JSON sample of an advanced environment: ::
         "sys_platform": "linux"
     }
 
-Not all these variables are needed but it finally depends from your requirements.
+Not all these variables are needed, it depends from your requirements.
 
 
 .. _overview_unsupported:
@@ -155,18 +153,18 @@ Invalid syntax
 Demonstration
 *************
 
-With the following requirements file ``requirements.txt``:
+With the following requirements file ``complete.txt``:
 
-.. include:: ../tests/data_fixtures/requirements/basic.txt
+.. include:: ../tests/data_fixtures/requirements/complete.txt
     :code: text
 
 We can build a report like this: ::
 
-    dependency_comb report requirements.txt
+    dependency_comb report complete.txt
 
 This will print the following output:
 
-.. include:: ../tests/data_fixtures/formatted/with_failures.rst
+.. include:: ../tests/data_fixtures/formatted/complete_all.rst
     :code: text
 
 .. Note::
@@ -177,4 +175,4 @@ a command option see :ref:`cli_logging`.
 
 The following sections are the included RestructuredText output sample from before.
 
-.. include:: ../tests/data_fixtures/formatted/with_failures.rst
+.. include:: ../tests/data_fixtures/formatted/complete_all.rst

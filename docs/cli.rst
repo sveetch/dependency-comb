@@ -13,6 +13,7 @@ Once installed on your system you can use the tool directly: ::
 
 This entrypoint don't perform any tasks, see its available commands.
 
+
 .. _cli_logging:
 
 Logging level
@@ -43,55 +44,13 @@ And if you use ``-h`` after a command name you will get its specific help: ::
 
     dependency-comb [COMMAND] -h
 
-.. _cli_cmd_analyze:
-
-Analyze
-*******
-
-Analyze given requirements to build a JSON file with all computed informations from
-releases of every valid requirement.
-
-.. Note::
-    When no destination are given, the command will output JSON to the standard output
-    and so all logging messages are muted to ensure valid JSON output.
-
-.. Hint::
-    This command is mostly useful to output an analyze to use in a further way with
-    some other tools or scripts. To quickly get a report see `Report`_ command instead.
-
-Usage:
-
-.. include:: ./_static/command_helps/analyze.txt
-    :code: text
-
-
-.. _cli_cmd_format:
-
-Format
-******
-
-Format a JSON analyze to a report with tables in RestructuredText format. Default
-behavior is to only report the correctly analyzed requirement and ignores everything
-else. There is an option to include also a table with requirement analyze failures
-(invalid syntax, unsupported syntax, etc..).
-
-.. Hint::
-    This command is mostly useful to format an archived analyze and so require usage
-    of ``analyze`` before. To quickly get a report see `Report`_ command instead.
-
-Usage:
-
-.. include:: ./_static/command_helps/format.txt
-    :code: text
-
 
 .. _cli_cmd_report:
 
 Report
 ******
 
-This command merge behaviors of ``analyze`` and ``format`` to directly get a report
-from given requirements.
+This command proceed to an analyze of requirements and format it to a report.
 
 Usage:
 

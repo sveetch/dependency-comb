@@ -3,6 +3,8 @@ from io import StringIO
 import pytest
 from freezegun import freeze_time
 
+from tests.utils import complete_analyze  # noqa: F401
+
 from dependency_comb.formatting import RichFormatter
 
 
@@ -15,65 +17,83 @@ rich_available = pytest.mark.skipif(
 
 @rich_available
 @freeze_time("2024-07-25 10:00:00")
-def test_rich_print(settings):
+def test_print_all(settings, complete_analyze):  # noqa: F811
+    """
+    With all features enabled, the output should contains all tables.
+    """
+    expected = settings.fixtures_path / "formatted/complete_all.rich"
+
+    # Dummy printer function to receive output into 'output' to assert on it
+    formatter = RichFormatter()
+
+    console = formatter.print(
+        [v.serialize() for v in complete_analyze.packages],
+        destination=StringIO(),
+        with_failures=True,
+        with_duplicates=True,
+    )
+    assert console.file.getvalue() == expected.read_text()
+
+
+@rich_available
+@freeze_time("2024-07-25 10:00:00")
+def test_print_without_failures(settings, complete_analyze):  # noqa: F811
     """
     Without failures enabled the output should only contains the analyzed table.
 
     Rich formatter does not use the given printer.
-
-    NOTE: Rich can make some empty line with some whitespace that can not be visible,
-    be careful when editing the '*.rich' files.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    expected = settings.fixtures_path / "formatted/no_failures.rich"
+    expected = settings.fixtures_path / "formatted/complete_without_failures.rich"
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
 
-    console = formatter.print(analyze, destination=StringIO(), with_failures=False)
-    # print("👷")
-    # print(console.file.getvalue())
-    # print("👷")
+    console = formatter.print(
+        [v.serialize() for v in complete_analyze.packages],
+        destination=StringIO(),
+        with_failures=False,
+        with_duplicates=True,
+    )
     assert console.file.getvalue() == expected.read_text()
 
 
 @rich_available
 @freeze_time("2024-07-25 10:00:00")
-def test_rich_print_with_failures(settings):
+def test_print_without_duplicates(settings, complete_analyze):  # noqa: F811
     """
     With failures enabled the output should contains the analyzed and failures tables.
 
     Rich formatter does not use the given printer.
-
-    NOTE: Rich can make some empty line with some whitespace that can not be visible,
-    be careful when editing the '*.rich' files.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    expected = settings.fixtures_path / "formatted/with_failures.rich"
+    expected = settings.fixtures_path / "formatted/complete_without_duplicates.rich"
 
     # Dummy printer function to receive output into 'output' to assert on it
     formatter = RichFormatter()
 
-    console = formatter.print(analyze, destination=StringIO(), with_failures=True)
-    # print("👷")
-    # print(console.file.getvalue())
-    # print("👷")
+    console = formatter.print(
+        [v.serialize() for v in complete_analyze.packages],
+        destination=StringIO(),
+        with_failures=True,
+        with_duplicates=False
+    )
     assert console.file.getvalue() == expected.read_text()
 
 
 @rich_available
 @freeze_time("2024-07-25 10:00:00")
-def test_rich_write_with_failures(settings, tmp_path):
+def test_write_all(settings, complete_analyze, tmp_path):  # noqa: F811
     """
     Rich writer method should write the console output in given destination file.
     """
-    analyze = settings.fixtures_path / "analyzes/basic.json"
-    expected = settings.fixtures_path / "formatted/with_failures.rich"
+    expected = settings.fixtures_path / "formatted/complete_all.rich"
     destination = tmp_path / "output.rich"
 
     formatter = RichFormatter()
-    formatter.write(analyze, destination=destination, with_failures=True)
-
-    # expected.write_text(destination.read_text())
+    formatter.write(
+        [v.serialize() for v in complete_analyze.packages],
+        destination=destination,
+        with_failures=True,
+        with_duplicates=True,
+    )
 
     assert destination.read_text() == expected.read_text()

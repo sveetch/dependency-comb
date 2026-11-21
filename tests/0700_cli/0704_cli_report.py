@@ -1,6 +1,7 @@
+import json
+
 import pytest
 from freezegun import freeze_time
-
 from click.testing import CliRunner
 
 from dependency_comb import __pkgname__
@@ -9,7 +10,7 @@ from dependency_comb.formatting import AVAILABLE_FORMATS
 from dependency_comb.compat.click_support import ABORT_ENDING
 
 
-def test_report_default(caplog):
+def test_default(caplog):
     """
     Command should fail without requirement arguments/options.
     """
@@ -27,7 +28,135 @@ def test_report_default(caplog):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_report_with_failures_from_stdin(caplog, settings):
+def test_all(caplog, settings):
+    """
+    Command should succeed to analyze from file and return a full RST report.
+    """
+    requirements_file = settings.fixtures_path / "requirements/complete.txt"
+    formatted = settings.fixtures_path / "formatted/complete_all.rst"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "-v", "0",
+            "report",
+            str(requirements_file),
+            "--format", "rst",
+            "--cachedir", str(settings.apicache_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert caplog.record_tuples == []
+
+    assert result.output == formatted.read_text() + "\n"
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_all_env(caplog, settings):
+    """
+    When environment dict is given to command, markers are evaluated again environment
+    and can lead to some requirement to be rejected.
+    """
+    requirements_file = settings.fixtures_path / "requirements/complete.txt"
+    environment_file = settings.fixtures_path / "env_requirements.json"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "-v", "0",
+            "report",
+            str(requirements_file),
+            "--format", "json",
+            "--cachedir", str(settings.apicache_path),
+            "--env", str(environment_file),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert caplog.record_tuples == []
+
+    # 'requests' is not in analyzed since it has been rejected by marker
+    loaded = json.loads(result.output)
+    assert "requests" not in [v["name"] for v in loaded["analyzed"]]
+
+    # 'requests' is in failures as a 'marker-reject'
+    rejected = [v for v in loaded["failures"] if v["status"] == "marker-reject"]
+    assert rejected == [
+        {
+            "key": 1,
+            "source": "requests [security] >= 2.8.1, == 2.8.* ;\n"
+            "python_version < \"2.7\"",
+            "status": "marker-reject",
+            "resume": "Rejected by marker evaluation against\ngiven environment",
+            "lineno": 8,
+            "origin": "complete.txt",
+        },
+    ]
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_without_duplicates(caplog, settings):
+    """
+    Command should succeed to analyze from file and return a RST report without
+    duplicates.
+    """
+    requirements_file = settings.fixtures_path / "requirements/complete.txt"
+    formatted = settings.fixtures_path / "formatted/complete_without_duplicates.rst"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "-v", "0",
+            "report",
+            str(requirements_file),
+            "--no-duplicates",
+            "--format", "rst",
+            "--cachedir", str(settings.apicache_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    assert result.output == formatted.read_text() + "\n"
+
+    assert caplog.record_tuples == []
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_without_failures(caplog, settings):
+    """
+    Command should succeed to analyze from file and return a RST report without
+    failures.
+    """
+    requirements_file = settings.fixtures_path / "requirements/complete.txt"
+    formatted = settings.fixtures_path / "formatted/complete_without_failures.rst"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "-v", "0",
+            "report",
+            str(requirements_file),
+            "--no-failures",
+            "--format", "rst",
+            "--cachedir", str(settings.apicache_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    assert result.output == formatted.read_text() + "\n"
+
+    assert caplog.record_tuples == []
+
+
+@freeze_time("2024-07-25 10:00:00")
+def test_all_from_stdin(caplog, settings):
     """
     Command should succeed to analyze from standard input and return a full
     JSON format with failures included.
@@ -35,12 +164,11 @@ def test_report_with_failures_from_stdin(caplog, settings):
     NOTE: We use JSON format because it is easier to patch origin with stdin (no
     origin) and expected dump (include an origin).
     """
-    cachedir = settings.fixtures_path / "api_cache"
-    requirements_file = settings.fixtures_path / "requirements/basic.txt"
-    formatted = settings.fixtures_path / "formatted/with_failures.json"
+    requirements_file = settings.fixtures_path / "requirements/complete.txt"
+    formatted = settings.fixtures_path / "formatted/complete_all.json"
     # Patch dump to nullify origin
     expected = formatted.read_text().replace(
-        "\"origin\": \"requirements/basic.txt\"",
+        "\"origin\": \"complete.txt\"",
         "\"origin\": null"
     )
 
@@ -51,7 +179,7 @@ def test_report_with_failures_from_stdin(caplog, settings):
             "-v", "0",
             "report", "-",
             "--format", "json",
-            "--cachedir", str(cachedir)
+            "--cachedir", str(settings.apicache_path),
         ],
         input=requirements_file.read_text()
     )
@@ -63,67 +191,26 @@ def test_report_with_failures_from_stdin(caplog, settings):
 
 
 @freeze_time("2024-07-25 10:00:00")
-def test_report_no_failures_from_stdin(caplog, settings):
-    """
-    Command should succeed to analyze from standard input and return a
-    RST format without failures included and titles. Logs are muted.
-
-    NOTE: We use JSON format because it is easier to patch origin with stdin (no
-    origin) and expected dump (include an origin).
-    """
-    cachedir = settings.fixtures_path / "api_cache"
-    requirements_file = settings.fixtures_path / "requirements/basic.txt"
-    formatted = settings.fixtures_path / "formatted/no_failures.json"
-    # Patch dump to nullify origin
-    expected = formatted.read_text().replace(
-        "\"origin\": \"requirements/basic.txt\"",
-        "\"origin\": null"
-    )
-
-    runner = CliRunner()
-    result = runner.invoke(
-        cli_frontend,
-        [
-            "-v", "0",
-            "report", "-",
-            "--no-failures",
-            "--format", "json",
-            "--cachedir", str(cachedir)
-        ],
-        input=requirements_file.read_text()
-    )
-
-    assert result.exit_code == 0
-
-    assert result.output == expected + "\n"
-
-    assert caplog.record_tuples == []
-
-
-@freeze_time("2024-07-25 10:00:00")
-def test_report_to_file(caplog, tmp_path, settings):
+def test_all_to_rst_file(caplog, tmp_path, settings):
     """
     Command should write RST to a file instead of standard output and logging
     some messages.
     """
-    cachedir = settings.fixtures_path / "api_cache"
     destination = tmp_path / "format.rst"
-    expected = settings.fixtures_path / "formatted/no_failures.rst"
-    requirements_file = settings.fixtures_path / "requirements/basic.txt"
+    requirements_file = settings.fixtures_path / "requirements/complete.txt"
+    expected = settings.fixtures_path / "formatted/complete_all.rst"
 
     runner = CliRunner()
     result = runner.invoke(
         cli_frontend,
         [
             "report",
-            "-",
-            "--no-failures",
+            str(requirements_file),
             "--cachedir",
-            str(cachedir),
+            str(settings.apicache_path),
             "--destination",
-            str(destination)
+            str(destination),
         ],
-        input=requirements_file.read_text()
     )
 
     # if result.exit_code > 0:
@@ -150,12 +237,12 @@ def test_report_to_file(caplog, tmp_path, settings):
 
 
 @pytest.mark.parametrize("format_name", AVAILABLE_FORMATS)
-def test_empty(caplog, settings, format_name):
+def test_empty_input(caplog, settings, format_name):
     """
-    Ensure empty analyze is properly managed.
-    """
-    analyze = settings.fixtures_path / "analyzes/failure_only.json"
+    Ensure empty input is properly managed.
 
+    TODO: In fact it should raise another kind of error for an empty input.
+    """
     runner = CliRunner()
 
     result = runner.invoke(
@@ -166,9 +253,34 @@ def test_empty(caplog, settings, format_name):
             "--no-failures",
             "--format", format_name,
         ],
-        input=analyze.read_text()
+        input=""
     )
-    # print(result.output)
+    print(result.output)
+    assert result.exit_code == 1
+    assert result.output == (
+        "There was no data to format.\nAborted{}\n".format(ABORT_ENDING)
+    )
+    assert caplog.record_tuples == []
+
+
+@pytest.mark.parametrize("format_name", AVAILABLE_FORMATS)
+def test_empty_analyze(caplog, settings, format_name):
+    """
+    Ensure empty analyze is properly managed.
+    """
+    runner = CliRunner()
+
+    result = runner.invoke(
+        cli_frontend,
+        [
+            "report",
+            "-",
+            "--no-failures",
+            "--format", format_name,
+        ],
+        input="./downloads/numpy-1.9.2-cp34-none-win32.whl"
+    )
+    print(result.output)
     assert result.exit_code == 1
     assert result.output == (
         "There was no data to format.\nAborted{}\n".format(ABORT_ENDING)

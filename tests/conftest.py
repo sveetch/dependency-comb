@@ -22,6 +22,8 @@ class FixturesSettingsTestMixin(object):
         tests_path (pathlib.Path): Absolute path to the tests directory.
         fixtures_dir (pathlib.Path): Directory name which include tests datas.
         fixtures_path (pathlib.Path): Absolute path to the tests datas.
+        apicache_dir (pathlib.Path): Directory name which include API cache datas.
+        apicache_path (pathlib.Path): Absolute path to the API cache directory.
     """
     def __init__(self):
         self.application_path = Path(
@@ -35,6 +37,9 @@ class FixturesSettingsTestMixin(object):
 
         self.fixtures_dir = "data_fixtures"
         self.fixtures_path = self.tests_path / self.fixtures_dir
+
+        self.apicache_dir = "api_cache"
+        self.apicache_path = self.fixtures_path / self.apicache_dir
 
     def format(self, content):
         """
