@@ -255,7 +255,7 @@ def test_empty_input(caplog, settings, format_name):
         ],
         input=""
     )
-    print(result.output)
+
     assert result.exit_code == 1
     assert result.output == (
         "There was no data to format.\nAborted{}\n".format(ABORT_ENDING)
@@ -280,7 +280,7 @@ def test_empty_analyze(caplog, settings, format_name):
         ],
         input="./downloads/numpy-1.9.2-cp34-none-win32.whl"
     )
-    print(result.output)
+
     assert result.exit_code == 1
     assert result.output == (
         "There was no data to format.\nAborted{}\n".format(ABORT_ENDING)

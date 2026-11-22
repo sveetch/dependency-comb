@@ -507,6 +507,7 @@ class DependenciesAnalyzer(RequirementParser):
             basepath=basepath,
         )
 
+        # Init statistics registry
         self.statistics = {
             "creation_date": self.now_date,
             "packages": {

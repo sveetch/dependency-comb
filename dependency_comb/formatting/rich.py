@@ -17,7 +17,7 @@ class RichFormatter(BaseStringFormatter):
         Build the information table for properly analyzed requirements.
 
         Arguments:
-            items (list): List of requirement dict as returned from Analyzer. All
+            items (list): List of requirement dict. All
                 given items should have a status "analyzed" else it would lead to
                 unexpected results or even errors.
 
@@ -54,7 +54,7 @@ class RichFormatter(BaseStringFormatter):
         Build the information table for duplicated requirements.
 
         Arguments:
-            items (list): List of requirement dict as returned from Analyzer. Given
+            items (list): List of requirement dict. Given
                 items could have any status despite not very useful for properly
                 analyzed items.
 
@@ -95,7 +95,7 @@ class RichFormatter(BaseStringFormatter):
         Build the information table for failed requirements analyze.
 
         Arguments:
-            items (list): List of requirement dict as returned from Analyzer. Given
+            items (list): List of requirement dict. Given
                 items could have any status despite not very useful for properly
                 analyzed items.
 
@@ -131,8 +131,7 @@ class RichFormatter(BaseStringFormatter):
         Print out the analyzed and possible failures
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             destination (fileobject like): A fileobject where Rich will write its
@@ -182,8 +181,7 @@ class RichFormatter(BaseStringFormatter):
         Write the analyzed and possibly failures into destination file.
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.

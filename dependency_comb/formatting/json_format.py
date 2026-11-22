@@ -19,8 +19,7 @@ class JSONFormatter(BaseFormatter):
         Build dictionnary of analyzed and possibles failures
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
@@ -44,8 +43,7 @@ class JSONFormatter(BaseFormatter):
         Print out the analyzed and possibly failures
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
@@ -69,8 +67,7 @@ class JSONFormatter(BaseFormatter):
         Write the analyzed and possibly failures into destination file.
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.

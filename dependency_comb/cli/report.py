@@ -6,7 +6,6 @@ from ..analyzer import DependenciesAnalyzer
 from ..compat.click_support import click
 from ..exceptions import DependencyCombError, FormatterEmptyContentError
 from ..formatting import DEFAULT_FORMAT, AVAILABLE_FORMATS, output_formatted_content
-from ..utils.jsons import ExtendedJsonEncoder
 from .. import __pkgname__
 
 
@@ -184,8 +183,6 @@ def report_command(*args, **parameters):
             strict=False,
             basepath=basepath,
         )
-        # NOTE: We could just pass the package objects without serialize
-        payload = [pkg.serialize() for pkg in packages]
     except DependencyCombError as e:
         logger.critical(e)
         raise click.Abort()
@@ -194,8 +191,9 @@ def report_command(*args, **parameters):
     try:
         output_formatted_content(
             format_name,
-            json.dumps(payload, cls=ExtendedJsonEncoder),
+            [pkg.serialize() for pkg in packages],
             destination=destination,
+            statistics=analyzer.statistics,
             with_failures=with_failures,
             with_duplicates=with_duplicates,
         )

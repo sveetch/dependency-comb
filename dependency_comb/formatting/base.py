@@ -1,7 +1,6 @@
 import json
 from collections import namedtuple
 
-from pathlib import Path
 from textwrap import TextWrapper
 
 import click
@@ -61,39 +60,6 @@ class BaseFormatter:
             klass(content, **opts)
         else:
             klass(content)
-
-    def open_content(self, content):
-        """
-        Open content, parse it and returns it as a list of requirement dict.
-
-        It is helpful since formatter can receive content to parse from different
-        tools.
-
-        Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. It
-                can be either:
-
-                * A list that is expected to be directly the list of (dict) analyzed
-                  requirements, no JSON parsing is involved. Commonly for some internals
-                  like tests that don't work with intermediary JSON content;
-                * A file Path that will be readed and parsed as JSON when dump path has
-                  to be readen an parsed. Commonly when a processor does not need to
-                  open it before;
-                * Else it is assumed to be a JSON string to be parsed. Commonly when an
-                  analyze dump is already in memory.
-
-        Returns:
-            list: The list of all (dict) requirements from given content.
-        """
-        if isinstance(content, list):
-            return content
-
-        if isinstance(content, Path):
-            content = content.read_text()
-
-        data = json.loads(content)
-
-        return data
 
     def get_required_release(self, item):
         """
@@ -169,8 +135,6 @@ class BaseFormatter:
     def build_duplicates_table(self, items):
         """
         Build a table of duplicated items
-
-        TODO: Item should be ordered. Ever on name then version, or origin then name.
         """
         rows = []
 
@@ -231,8 +195,7 @@ class BaseFormatter:
         method.
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To enable display of failures.
@@ -241,26 +204,28 @@ class BaseFormatter:
         Return:
             namedtuple: With items analyzed, duplicated and failed. Alls are lists.
         """
-        data = self.open_content(content)
-
         # NOTE: This is not efficient as it could be since we iterate again the same
         # list for each kind of table
         results = BuiltResults(
             analyzed=self.build_analyzed_table(
-                [v for v in data if v["status"] == "analyzed"]
+                [v for v in content if v["status"] == "analyzed"]
             ),
             duplicated=(
                 []
                 if with_duplicates is False
                 else self.build_duplicates_table(
-                    [v for v in data if v["status"] == "duplicated"]
+                    [v for v in content if v["status"] == "duplicated"]
                 )
             ),
             failed=(
                 []
                 if with_failures is False
                 else self.build_errors_table(
-                    [v for v in data if v["status"] not in ("analyzed", "duplicated")]
+                    [
+                        v
+                        for v in content
+                        if v["status"] not in ("analyzed", "duplicated")
+                    ]
                 )
             )
         )
@@ -276,8 +241,7 @@ class BaseFormatter:
         Print out the analyzed and possibly failures.
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
@@ -308,8 +272,7 @@ class BaseFormatter:
         items.
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
@@ -355,8 +318,7 @@ class BaseStringFormatter(BaseFormatter):
         Write the analyzed and possibly failures into destination file.
 
         Arguments:
-            content (Path or string or list): JSON content as built from Analyzer. See
-                ``BaseFormatter.open_content()`` doc for more details.
+            content (list): List of PackageRequirement objects as built from Analyzer.
 
         Keyword Arguments:
             with_failures (boolean): To disable display of failures.
