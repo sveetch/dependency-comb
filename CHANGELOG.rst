@@ -11,12 +11,20 @@ Development
 * Now the method 'DependenciesAnalyzer.inspect()' compute some statistics about package
   and project;
 * RequirementPackage class is now a dataclass and considered as a model object;
-* Now the RequirementPackage contains the line number where it have been found from
+* The RequirementPackage now contains the line number where it have been found from
   requirements parsing. And if requirements comes from a file it is stored as the
-  'origin', finally the requirements parsed from a string will have a null origin;
+  'origin', the requirements parsed from a string will have a null origin;
 * Removed CSV format since this format is not suitable for multiple tables;
 * Removed commands ``analyze`` and ``format`` because they do not bring any added value
   compared to ``report`` and so complicated development for nothing;
+* Refactored tests and data fixtures to be simpler and more coherent;
+* Removed useless feature in formatter that allowed to read content from string and
+  file, now only a list of PackageRequirement is supported;
+* Analyzer inspection now collect some statistics;
+* Duplicate requirements are now statued explicitely and listed apart in their own
+  table;
+* Dropped Analyzer argument ``logger``, now the analyzer get the logger object simply
+  from ``logging.getLogger()``;
 
 
 Version 0.5.1 - 2026/11/06

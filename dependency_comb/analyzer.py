@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import time
 
 from operator import itemgetter
@@ -10,9 +11,11 @@ from packaging.version import Version, InvalidVersion
 from .exceptions import AnalyzerError, AnalyzerAPIError
 from .parser import RequirementParser
 from .utils.lists import split_to_chunks
-from .utils.logger import NoOperationLogger
 from .utils.dates import parse_pypi_date
 from . import __pkgname__, __version__
+
+
+logger = logging.getLogger(__pkgname__)
 
 
 class DependenciesAnalyzer(RequirementParser):
@@ -39,7 +42,6 @@ class DependenciesAnalyzer(RequirementParser):
             date. When analyzer is used in conjunction of a formatter, the corresponding
             analyzer attribute should be passed to formatter to ensure they are working
             with the exact same date.
-        logger (logging.Logger): Logger object to use.
         ignores (boolean): Unused yet, it should be a list of patterns to ignore when
             collecting packages from requirements.
 
@@ -54,9 +56,8 @@ class DependenciesAnalyzer(RequirementParser):
     PACKAGE_RELEASES_ENDPOINT = "https://pypi.org/simple/{name}/"
 
     def __init__(self, cachedir=None, api_pause=1, api_timeout=None, api_chunk=None,
-                 logger=None, now_date=None, ignores=None):
+                 now_date=None, ignores=None):
         self.cachedir = cachedir
-        self.logger = logger or NoOperationLogger()
         self.api_chunk = api_chunk or 10
         self.api_pause = api_pause
         self.api_timeout = api_timeout
@@ -165,7 +166,7 @@ class DependenciesAnalyzer(RequirementParser):
         Returns:
             dict: Returned payload from API or from stored cache.
         """
-        self.logger.debug("Get package {label} for '{name}'".format(
+        logger.debug("Get package {label} for '{name}'".format(
             label=label,
             name=name or "Unknow"
         ))
@@ -181,13 +182,13 @@ class DependenciesAnalyzer(RequirementParser):
 
         # Return cache if it exists
         if cache_file and cache_file.exists():
-            self.logger.debug("Loading data from cache")
+            logger.debug("Loading data from cache")
             return json.loads(cache_file.read_text())
 
         # Use given method name to request payload from API
         response = method(name)
 
-        self.logger.debug("[{status}] API response from {url}".format(
+        logger.debug("[{status}] API response from {url}".format(
             status=response.status_code,
             url=response.url.split("?")[0],
         ))
@@ -195,7 +196,7 @@ class DependenciesAnalyzer(RequirementParser):
 
         # Build cache file if cache is enabled
         if self.cachedir:
-            self.logger.debug("Writing cache: {}".format(cache_file))
+            logger.debug("Writing cache: {}".format(cache_file))
             cache_file.write_text(json.dumps(output, indent=4))
 
         return output
@@ -248,7 +249,7 @@ class DependenciesAnalyzer(RequirementParser):
             dict: A dictionnary that contain all useful package informations (detail
             and releases).
         """
-        self.logger.info("Processing package: {name}".format(
+        logger.info("Processing package: {name}".format(
             name=name or "Unknow"
         ))
 
@@ -300,7 +301,7 @@ class DependenciesAnalyzer(RequirementParser):
                 msg = (
                     "Ignored invalid version number '{version}' for package '{name}'"
                 )
-                self.logger.debug(msg.format(name=name, version=item["number"]))
+                logger.debug(msg.format(name=name, version=item["number"]))
                 continue
             else:
                 item["number"] = number
@@ -553,7 +554,7 @@ class DependenciesAnalyzer(RequirementParser):
 
             # Apply possible pause time before processing a new chunk
             if self.api_pause and i < len(chunks):
-                self.logger.debug("Making pause of {} second(s)".format(self.api_pause))
+                logger.debug("Making pause of {} second(s)".format(self.api_pause))
                 time.sleep(self.api_pause)
 
             # Compute package total

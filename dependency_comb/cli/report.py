@@ -174,7 +174,6 @@ def report_command(*args, **parameters):
             api_chunk=api_chunk,
             api_pause=api_pause,
             api_timeout=api_timeout,
-            logger=logger,
         )
         packages = analyzer.inspect(
             source,

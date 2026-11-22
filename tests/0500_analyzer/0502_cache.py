@@ -1,7 +1,6 @@
 import logging
 
 from dependency_comb import __pkgname__
-from dependency_comb.utils.logger import LoggerBase
 from dependency_comb.analyzer import DependenciesAnalyzer
 
 
@@ -12,7 +11,7 @@ def test_get_cache_or_request_cached(caplog, settings):
     caplog.set_level(logging.DEBUG)
 
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer(cachedir=cachedir, logger=LoggerBase().log)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     # Dummy function that won't be called
     def fake(name):
@@ -42,7 +41,7 @@ def test_get_cache_or_request_requested(caplog, settings, tmp_path):
     """
     caplog.set_level(logging.DEBUG)
 
-    analyzer = DependenciesAnalyzer(cachedir=tmp_path, logger=LoggerBase().log)
+    analyzer = DependenciesAnalyzer(cachedir=tmp_path)
 
     # Fake response object to simulate requests.Response and avoid a real request
     class FakeResponse:
@@ -80,7 +79,7 @@ def test_get_package_data_from_cache(caplog, settings):
     caplog.set_level(logging.DEBUG)
 
     cachedir = settings.fixtures_path / "api_cache"
-    analyzer = DependenciesAnalyzer(cachedir=cachedir, logger=LoggerBase().log)
+    analyzer = DependenciesAnalyzer(cachedir=cachedir)
 
     payload = analyzer.get_package_data("diskette")
 
