@@ -20,7 +20,7 @@ can include in your RST documents.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/formatted/basic_all.rst
+.. include:: ../tests/data_fixtures/formatted/complete_all.rst
     :code: text
 
 
@@ -40,7 +40,7 @@ commands then you didn't installed Rich.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/formatted/basic_all.rich
+.. include:: ../tests/data_fixtures/formatted/complete_all.rich
     :code: text
 
 
@@ -52,6 +52,6 @@ It will output analyze and possibles failures in a JSON structure.
 Example
 -------
 
-.. include:: ../tests/data_fixtures/formatted/basic_all.json
+.. include:: ../tests/data_fixtures/formatted/complete_all.json
     :code: text
 

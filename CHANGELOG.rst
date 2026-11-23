@@ -25,6 +25,7 @@ Development
   table;
 * Dropped Analyzer argument ``logger``, now the analyzer get the logger object simply
   from ``logging.getLogger()``;
+* Fixed ``report`` command help to display correctly with both click and rich-click;
 
 
 Version 0.5.1 - 2026/11/06

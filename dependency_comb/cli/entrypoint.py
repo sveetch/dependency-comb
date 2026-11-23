@@ -12,6 +12,7 @@ from .report import report_command
 if RICH_CLICK_ENABLED:
     # This is a rich-click option only to show arguments in help
     click.rich_click.SHOW_ARGUMENTS = True
+    click.rich_click.TEXT_MARKUP = "markdown"
 
 
 # Help alias on "-h" argument
@@ -37,7 +38,8 @@ APP_LOGGER_CONF = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", None)
 @click.pass_context
 def cli_frontend(ctx, verbose):
     """
-    dependency-comb commandline entrypoint.
+    This is 'dependency-comb' commandline entrypoint, please use one of the available
+    commands.
     """
     printout = True
     if verbose == 0:

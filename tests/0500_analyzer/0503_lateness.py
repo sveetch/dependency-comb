@@ -7,7 +7,7 @@ from packaging.version import Version
 from dependency_comb.analyzer import DependenciesAnalyzer
 
 
-@freeze_time("2024-10-25 10:00:00.000000")
+@freeze_time("2024-10-25 10:00:00")
 def test_get_version_lateness(settings):
     """
     Computed lateness should return a list of release versions with a higher version

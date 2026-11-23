@@ -103,7 +103,7 @@ def test_inspect(settings, source, strict, environment, expected):
     assert [(item.source, item.name, item.status) for item in packages] == expected
 
 
-@freeze_time("2024-07-25 10:00:00.000000")
+@freeze_time("2024-07-25 10:00:00")
 def test_statistics(settings):
     """
     Once all packages have been enumerated from inspect, statistics should have been

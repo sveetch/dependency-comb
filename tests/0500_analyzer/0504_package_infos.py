@@ -83,7 +83,7 @@ def test_get_package_urls(settings):
     }
 
 
-@freeze_time("2024-10-25 10:00:00.000000")
+@freeze_time("2024-10-25 10:00:00")
 def test_complete_package_informations_with_requirement(settings):
     """
     Method should set computed informations on given package name and version
@@ -135,7 +135,7 @@ def test_complete_package_informations_with_requirement(settings):
     }
 
 
-@freeze_time("2024-10-25 10:00:00.000000")
+@freeze_time("2024-10-25 10:00:00")
 def test_complete_package_informations_without_requirement(settings):
     """
     Method should return computed informations for given package name without any
@@ -157,7 +157,7 @@ def test_complete_package_informations_without_requirement(settings):
     assert data["resolved_version"] is None
 
 
-@freeze_time("2024-10-25 10:00:00.000000")
+@freeze_time("2024-10-25 10:00:00")
 def test_complete_package_informations_with_younger_requirement(settings):
     """
     If specifiers resolve to version higher than releases available on Pypi, no

@@ -120,20 +120,12 @@ def report_command(*args, **parameters):
     """
     Analyze and report informations about requirements.
 
-    Arguments:
-
     \b
-    SOURCE
-        Pip requirements file to parse, analyze and report.
-        Instead of a file path you can also give a requirements file content from
-        standard input using '-'. For example using the Pip freeze output:
+    The SOURCE argument is either:
 
-            pip freeze | dependency-comb report -
+    * A file to parse;
 
-        Or to make a report for an unique package:
-
-            echo "django==3.2.1" | dependency-comb report -
-
+    * A character '-' that would mean to read source from standard input;
     """
     logger = logging.getLogger(__pkgname__)
 
