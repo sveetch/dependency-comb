@@ -1,4 +1,5 @@
 import logging
+import os
 
 from pathlib import Path
 
@@ -22,8 +23,14 @@ class RequirementParser:
         Find the requirement file to include its content from an inclusion directive.
 
         Arguments:
-            line (string):
-            basepath (Path):
+            line (string): Inclusion source line to resolve as a path.
+            basepath (Path): Basepath where the source line comes from. This is used
+                to resolve inclusion path.
+
+        Raises:
+            RequirementParserError: If resolved path does not exists. This is commonly
+                either for is badly resolved (because of a wrong basepath) or if
+                resolved path does not exists.
 
         Returns:
             Path: The file path to read for inclusion content.
@@ -54,7 +61,8 @@ class RequirementParser:
             line (string): Content line of the inclusion directive.
             basepath (Path): A directory path where to search for requirement
                 inclusions (directive ``-r foo.txt``) from requirements file.
-            crumb (Path): Path of the file where the content line comes from.
+            crumb (Path): Path of the file where the content line comes from. It may
+                be null if content line comes from a direct string.
 
         Keyword Arguments:
             breadcrumbs (list): A list of Path objects for parent files when content is
@@ -64,7 +72,12 @@ class RequirementParser:
                 `PEP 508 <https://peps.python.org/pep-0508/>` to use for marker
                 evaluations on parsed requirement items.
         """
-        inclusion_path = self.get_inclusion_path(line, basepath)
+        # Resolve inclusion path, given basepath is the current processed requirement
+        # file if there is one (not from a direct string)
+        inclusion_path = self.get_inclusion_path(
+            line,
+            crumb.parent if crumb else basepath
+        )
 
         if inclusion_path:
             if inclusion_path in breadcrumbs:
@@ -176,7 +189,8 @@ class RequirementParser:
             list: List of PackageRequirement objects for all involved requirements.
         """
         breadcrumbs = [] if breadcrumbs is None else breadcrumbs
-        # The path of requirements source we are currently parsing
+        # The path of requirements source we are currently parsing, it may be None when
+        # current requirements source is a string (like from standard input)
         crumb = breadcrumbs[-1] if breadcrumbs else None
 
         resolved = []
@@ -184,7 +198,7 @@ class RequirementParser:
             # Build origin according to crumb and basepath
             origin = crumb if crumb else None
             if origin and basepath:
-                origin = origin.relative_to(basepath)
+                origin = Path(os.path.relpath(origin, start=basepath))
 
             # Ignore empty lines and comment lines
             if not line.strip() or line.strip().startswith("#"):
@@ -221,8 +235,7 @@ class RequirementParser:
 
         return resolved
 
-    def parse_requirements(self, content, path=None, sourcepath=None,
-                           environment=None, basepath=None):
+    def parse_requirements(self, content, path=None, environment=None, basepath=None):
         """
         Load content as requirements.
 
@@ -253,6 +266,8 @@ class RequirementParser:
         # Open a new registry where to store accepted packages with their specifier
         # that is used to avoid duplicate and conflicts
         # TODO: Calling 'parse_recursive_lines' directly will cause AttributeError
+        # Set it first in __init__, keep resetting it here, documentate this behavior
+        # and make analyzer __init__ to user super() in preambule
         self.package_registry = {}
 
         return self.parse_recursive_lines(

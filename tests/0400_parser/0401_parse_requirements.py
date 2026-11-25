@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 
@@ -101,6 +102,7 @@ def test_markers(settings):
         for pkg in results
     }
 
+    # Only assert on some relevant fields
     assert data["django"]["name"] == "django"
     assert data["django"]["status"] == "parsed"
     assert data["django"]["marker"] is None
@@ -185,6 +187,80 @@ def test_include_notfound(settings):
     assert str(excinfo.value) == (
         "Unable to find included source: {}".format(included_source)
     )
+
+
+def test_include_path_outside_basepath(settings, tmp_path):
+    """
+    Inclusion path resolution should work even when path is outside basepath, in
+    this case the path should be resolved with some '../'.
+    """
+    parser = RequirementParser()
+
+    # Build sample directory structure
+    foo_path = tmp_path / "foo"
+    foo_path.mkdir()
+    bar_path = foo_path / "bar"
+    bar_path.mkdir()
+
+    ping_path = tmp_path / "ping"
+    ping_path.mkdir()
+    pong_path = ping_path / "pong"
+    pong_path.mkdir()
+
+    # Create requirement files
+    base_path = bar_path / "base.txt"
+    base_path.write_text("django>=1.11\n-r ../../middle.txt")
+
+    middle_path = tmp_path / "middle.txt"
+    middle_path.write_text(
+        "requests\n./downloads/numpy-1.9.2-cp34-none-win32.whl"
+        "\n-r ping/pong/leaf.txt"
+    )
+
+    leaf_path = pong_path / "leaf.txt"
+    leaf_path.write_text("urllib3\ndjango")
+
+    # Start to parse base requirements
+    results = parser.parse_requirements(
+        base_path,
+        path=base_path,
+        basepath=base_path.parent
+    )
+
+    # We only care for a few set of PackageRequirement fields
+    fields = ("name", "source", "status", "origin")
+    assert [v.serialize(allows_only=fields) for v in results] == [
+        {
+            "source": "django>=1.11",
+            "origin": Path("base.txt"),
+            "name": "django",
+            "status": "parsed",
+        },
+        {
+            "source": "requests",
+            "origin": Path("../../middle.txt"),
+            "name": "requests",
+            "status": "parsed",
+        },
+        {
+            "source": "./downloads/numpy-1.9.2-cp34-none-win32.whl",
+            "origin": Path("../../middle.txt"),
+            "name": None,
+            "status": "unsupported-localpath",
+        },
+        {
+            "source": "urllib3",
+            "origin": Path("../../ping/pong/leaf.txt"),
+            "name": "urllib3",
+            "status": "parsed",
+        },
+        {
+            "source": "django",
+            "origin": Path("../../ping/pong/leaf.txt"),
+            "name": "django",
+            "status": "duplicated",
+        },
+    ]
 
 
 def test_circular(settings):
